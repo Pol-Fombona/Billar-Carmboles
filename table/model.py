@@ -1,4 +1,5 @@
 import glm
+from matplotlib import table
 import numpy as np
 import moderngl as mgl
 import pygame as pg
@@ -372,12 +373,14 @@ class TableFloor:
 
 
 class Legs:
-    def __init__(self, app, posx=0, posz=0, size=1, height=2):
+    def __init__(self, app, pos=(0, 0, 0), size=1, height=2, table_height=0.5):
         self.app = app
         self.ctx = app.ctx
         self.size = size
         self.height = height
-        self.vbo = self.get_vbo(posx, posz)
+        self.pos = pos
+        self.table_height = table_height
+        self.vbo = self.get_vbo()
         self.shader_program = self.get_shader_program("legs")
         self.vao = self.get_vao()
         self.m_model = self.get_model_matrix()
@@ -427,16 +430,18 @@ class Legs:
         )
         return vao
 
-    def get_vertex_data(self, posx, posz):
+    def get_vertex_data(self):
+        print(self.pos[1])
+        """
         vertices = [
-            (0, 0, 0),
-            (self.size, 0, 0),
-            (self.size, self.height, 0),
-            (0, self.height, 0),
-            (0, 0, self.size),
-            (self.size, 0, self.size),
-            (self.size, self.height, self.size),
-            (0, self.height, self.size),
+            (0, posy, 0),
+            (self.size, posy, 0),
+            (self.size, -self.height, 0),
+            (0, -self.height, 0),
+            (0, posy, self.size),
+            (self.size, posy, self.size),
+            (self.size, -self.height, self.size),
+            (0, -self.height, self.size),
         ]
         vertices_end = []
         for (x, y, z) in vertices:
@@ -457,6 +462,37 @@ class Legs:
             (0, 7, 3),
         ]
         vertex_data = self.get_data(vertices_end, indices)
+        """
+        posx = self.pos[0]
+        posy = self.pos[1]
+        posz = self.pos[2]
+        vertices = [
+            (posx, posy, posz),
+            (posx + self.size, posy, posz),
+            (posx + self.size, posy, posz + self.size),
+            (posx, posy, posz + self.size),
+            (posx, posy - self.height, posz),
+            (posx + self.size, posy - self.height, posz),
+            (posx + self.size, posy - self.height, posz + self.size),
+            (posx, posy - self.height, posz + self.size),
+        ]
+
+        indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+            (4, 5, 6),
+            (4, 6, 7),
+            (0, 4, 5),
+            (0, 5, 1),
+            (1, 5, 6),
+            (1, 6, 2),
+            (2, 6, 7),
+            (2, 7, 3),
+            (0, 4, 7),
+            (0, 7, 3),
+        ]
+
+        vertex_data = self.get_data(vertices, indices)
 
         tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
         tex_coord_indices = [
@@ -485,8 +521,8 @@ class Legs:
         data = [vertices[ind] for triangle in indices for ind in triangle]
         return np.array(data, dtype="f4")
 
-    def get_vbo(self, posx, posz):
-        vertex_data = self.get_vertex_data(posx, posz)
+    def get_vbo(self):
+        vertex_data = self.get_vertex_data()
         vbo = self.ctx.buffer(vertex_data)
         return vbo
 

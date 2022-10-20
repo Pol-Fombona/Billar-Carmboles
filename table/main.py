@@ -7,11 +7,16 @@ from camera import *
 
 
 # Table measures
-TABLE_POSITION = (0, 2, 0)
 TABLE_WIDTH = 1.27
 TABLE_LENGTH = 2.54
 TABLE_HEIGHT = 0.5
 MARGIN_WIDTH = 0.2
+LEGS_HEIGHT = 2
+TABLE_PROF = (
+    TABLE_HEIGHT / 2
+)  # Aixo es la profunditat de la moqueta a l'interor de la taula
+# Per a tenir la moqueta de la taula a 0,0,0 aquestes son les coordenades de la taula => (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
+TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 
 
 class GraphicsEngine:
@@ -38,25 +43,61 @@ class GraphicsEngine:
         # camera
         self.camera = Camera(
             self,
-            position=(TABLE_POSITION[0] + TABLE_WIDTH + 1, TABLE_POSITION[1] + TABLE_HEIGHT + 1, TABLE_POSITION[2] + TABLE_LENGTH),
+            position=(
+                TABLE_POSITION[0] + TABLE_WIDTH + 1,
+                TABLE_POSITION[1] + TABLE_HEIGHT + 1,
+                TABLE_POSITION[2] + TABLE_LENGTH,
+            ),
             table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
         )
         # scene
-        self.scene = Legs(self, TABLE_POSITION[0], TABLE_POSITION[2], MARGIN_WIDTH, 2)
-        self.leg2 = Legs(self, TABLE_WIDTH + MARGIN_WIDTH, 0, MARGIN_WIDTH, 2)
+        self.scene = Legs(
+            self,
+            (TABLE_POSITION[0], TABLE_POSITION[1], TABLE_POSITION[2]),
+            MARGIN_WIDTH,
+            LEGS_HEIGHT,
+            TABLE_HEIGHT,
+        )
+        self.leg2 = Legs(
+            self,
+            (
+                TABLE_POSITION[0] + TABLE_WIDTH + MARGIN_WIDTH,
+                TABLE_POSITION[1],
+                TABLE_POSITION[2],
+            ),
+            MARGIN_WIDTH,
+            LEGS_HEIGHT,
+            TABLE_HEIGHT,
+        )
         self.leg3 = Legs(
             self,
-            TABLE_WIDTH + MARGIN_WIDTH,
-            TABLE_LENGTH + MARGIN_WIDTH,
+            (
+                TABLE_POSITION[0] + TABLE_WIDTH + MARGIN_WIDTH,
+                TABLE_POSITION[1],
+                TABLE_POSITION[2] + TABLE_LENGTH + MARGIN_WIDTH,
+            ),
             MARGIN_WIDTH,
-            2,
+            LEGS_HEIGHT,
+            TABLE_HEIGHT,
         )
         self.leg4 = Legs(
-            self, TABLE_POSITION[0], TABLE_LENGTH + MARGIN_WIDTH, MARGIN_WIDTH, 2
+            self,
+            (
+                TABLE_POSITION[0],
+                TABLE_POSITION[1],
+                TABLE_POSITION[2] + TABLE_LENGTH + MARGIN_WIDTH,
+            ),
+            MARGIN_WIDTH,
+            LEGS_HEIGHT,
+            TABLE_HEIGHT,
         )
         self.floor = TableFloor(
             self,
-            (MARGIN_WIDTH, TABLE_POSITION[1] + TABLE_HEIGHT / 2, MARGIN_WIDTH),
+            (
+                TABLE_POSITION[0] + MARGIN_WIDTH,
+                TABLE_POSITION[1] + TABLE_PROF,
+                TABLE_POSITION[2] + +MARGIN_WIDTH,
+            ),
             TABLE_WIDTH,
             TABLE_HEIGHT / 2,
             TABLE_LENGTH,

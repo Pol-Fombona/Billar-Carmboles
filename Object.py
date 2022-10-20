@@ -5,8 +5,9 @@ import pygame as pg
 
 from MovementManagement import movement
 
+
 class Object:
-    def __init__(self,app, pos=(0,0,0), rot=(0,0,0), scale = (1,1,1)):
+    def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
         self.app = app
         self.ctx = app.ctx
         self.vbo = self.get_vbo()
@@ -20,79 +21,103 @@ class Object:
         self.m_model = self.get_model_matrix()
         self.on_init()
 
-        
     def get_model_matrix(self):
-        
+
         m_model = glm.mat4()
 
-        #translate (origen)
-        m_model = glm.translate(m_model, (0,0,0))
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
 
         # rotation
-        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1,0,0))
-        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0,1,0))
-        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0,0,1))
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
 
-        # scale 
+        # scale
         m_model = glm.scale(m_model, self.scale)
 
         # translate
         m_model = glm.translate(m_model, self.pos)
-        
-
 
         return m_model
-                
+
     def on_init(self):
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
 
     def update(self):
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
 
     def render(self):
         self.update()
         self.vao.render()
-        
-    def destroy (self):
+
+    def destroy(self):
         self.vbo.release()
         self.shader_program.release()
         self.vao.release()
         self.vaop.release()
         self.vaoa.release()
-    
+
     def get_vao(self):
-        vao = self.ctx.vertex_array(self.shader_program, [(self.vbo, '3f 3f', 'in_color', 'in_position')])
+        vao = self.ctx.vertex_array(
+            self.shader_program, [(self.vbo, "3f 3f", "in_color", "in_position")]
+        )
         return vao
-    
+
     def get_vertex_data(self):
 
-        #vertices = [(0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
+        # vertices = [(0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
 
-        vertices = [(-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)]
-        
-        indices = [(0,2,1),(0,3,2),(4,5,6),(4,6,7),(0,1,4),(1,4,5),
-                   (2,3,7),(2,7,6),(1,2,6),(1,6,5),(0,4,7),(0,7,3)]
+        vertices = [
+            (-1, -1, -1),
+            (1, -1, -1),
+            (1, 1, -1),
+            (-1, 1, -1),
+            (-1, -1, 1),
+            (1, -1, 1),
+            (1, 1, 1),
+            (-1, 1, 1),
+        ]
+
+        indices = [
+            (0, 2, 1),
+            (0, 3, 2),
+            (4, 5, 6),
+            (4, 6, 7),
+            (0, 1, 4),
+            (1, 4, 5),
+            (2, 3, 7),
+            (2, 7, 6),
+            (1, 2, 6),
+            (1, 6, 5),
+            (0, 4, 7),
+            (0, 7, 3),
+        ]
         vertex_data = self.get_data(vertices, indices)
         return vertex_data
-    
+
     @staticmethod
-    def get_data(vertices, indices, colour): 
-        #data = [vertices[ind] for triangle in indices for ind in triangle]
-        data = [(colour[i],vertices[ind]) for i,triangle in enumerate(indices) for ind in triangle]
-        return np.array(data, dtype='f4')
+    def get_data(vertices, indices, colour):
+        # data = [vertices[ind] for triangle in indices for ind in triangle]
+        data = [
+            (colour[i], vertices[ind])
+            for i, triangle in enumerate(indices)
+            for ind in triangle
+        ]
+        return np.array(data, dtype="f4")
 
     def get_vbo(self):
         vertex_data = self.get_vertex_data()
         vbo = self.ctx.buffer(vertex_data)
         return vbo
-    
+
     def get_shader_program(self):
-        program = self.ctx.program(    
-            vertex_shader='''
+        program = self.ctx.program(
+            vertex_shader="""
                 #version 330
                 layout (location = 0) in vec3 in_color;
                 layout (location = 1) in vec3 in_position;
@@ -104,8 +129,8 @@ class Object:
                     color = in_color;
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
-            ''',
-            fragment_shader='''
+            """,
+            fragment_shader="""
                 #version 330
                 layout (location = 0) out vec4 fragColor;
                 in vec3 color;
@@ -113,12 +138,13 @@ class Object:
                     //vec3 color = vec3(1,1,0);
                     fragColor = vec4(color,1.0);
                 }
-            ''',
+            """,
         )
         return program
 
+
 class Axis:
-    def __init__(self,app):
+    def __init__(self, app):
         self.app = app
         self.ctx = app.ctx
         self.vbo = self.get_vbo()
@@ -127,61 +153,74 @@ class Axis:
         self.m_model = self.get_model_matrix()
         self.on_init()
         self.a = True
-        
+
     def get_model_matrix(self):
         m_model = glm.mat4()
-        #m_model = glm.rotate(glm.mat4(),glm.radians(45),glm.vec3(0,1,0))
+        # m_model = glm.rotate(glm.mat4(),glm.radians(45),glm.vec3(0,1,0))
         return m_model
-        
+
     def on_init(self):
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
 
     def update(self):
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
 
     def render(self):
         self.update()
-        if (self.a):
+        if self.a:
             self.vao.render(mgl.LINES)
-        
-    def destroy (self):
+
+    def destroy(self):
         self.vbo.release()
         self.shader_program.release()
         self.vao.release()
-    
+
     def get_vao(self):
-        vao = self.ctx.vertex_array(self.shader_program, [(self.vbo, '3f 3f', 'in_color','in_position')])
+        vao = self.ctx.vertex_array(
+            self.shader_program, [(self.vbo, "3f 3f", "in_color", "in_position")]
+        )
         return vao
-    
+
     def get_vertex_data(self):
 
-        vertices = [(0,0,0), (100,0,0), (0,100,0), (0,0,100), (0,0,0), (0,0,0)] 
-        indices = [(0,1), (2, 4), (3,5)]
-        indices_colours = [0,0,1,1,2,2]
-        colours = [(1,0,0), (0,1,0), (0,0,1)]
+        vertices = [
+            (0, 0, 0),
+            (100, 0, 0),
+            (0, 100, 0),
+            (0, 0, 100),
+            (0, 0, 0),
+            (0, 0, 0),
+        ]
+        indices = [(0, 1), (2, 4), (3, 5)]
+        indices_colours = [0, 0, 1, 1, 2, 2]
+        colours = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
 
         vertex_data = self.get_data(vertices, indices, colours, indices_colours)
         return vertex_data
-    
+
     @staticmethod
-    def get_data(vertices, indices, color, indices_colours): 
-#        data = [("", vertices[ind]) for triangle in indices for ind in triangle]
-        
-        data = [(color[i],vertices[ind]) for i,triangle in enumerate(indices) for ind in triangle]
-        return np.array(data, dtype='f4')
+    def get_data(vertices, indices, color, indices_colours):
+        #        data = [("", vertices[ind]) for triangle in indices for ind in triangle]
+
+        data = [
+            (color[i], vertices[ind])
+            for i, triangle in enumerate(indices)
+            for ind in triangle
+        ]
+        return np.array(data, dtype="f4")
 
     def get_vbo(self):
         vertex_data = self.get_vertex_data()
         vbo = self.ctx.buffer(vertex_data)
         return vbo
-    
+
     def get_shader_program(self):
-        program = self.ctx.program(    
-            vertex_shader='''
+        program = self.ctx.program(
+            vertex_shader="""
                 #version 330
                 layout (location = 0) in vec3 in_color;
                 layout (location = 1) in vec3 in_position;
@@ -193,8 +232,8 @@ class Axis:
                     color = in_color;
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
-            ''',
-            fragment_shader='''
+            """,
+            fragment_shader="""
                 #version 330
                 layout (location = 0) out vec4 fragColor;
                 in vec3 color;
@@ -202,12 +241,22 @@ class Axis:
                     //vec3 color = vec3(1,1,1);
                     fragColor = vec4(color,1.0);
                 }
-            ''',
+            """,
         )
         return program
 
+
 class Sphere:
-    def __init__(self,app, pos=(0,0,0), rot=(0,0,0), scale = (1,1,1), radi = 1, slices = 10, stacks = 10):
+    def __init__(
+        self,
+        app,
+        pos=(0, 0, 0),
+        rot=(0, 0, 0),
+        scale=(1, 1, 1),
+        radi=1,
+        slices=10,
+        stacks=10,
+    ):
         self.app = app
         self.ctx = app.ctx
         self.radi = radi
@@ -215,7 +264,6 @@ class Sphere:
         ## velocity and friction
         self.velocityX = 0
         self.velocityZ = 0
-
 
         self.slices = slices
         self.stacks = stacks
@@ -234,74 +282,73 @@ class Sphere:
         self.on_init()
 
     def get_model_matrix(self):
-        
+
         m_model = glm.mat4()
 
-        #translate (origen)
-        m_model = glm.translate(m_model, (0,0,0))
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
 
         # rotation
-        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1,0,0))
-        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0,1,0))
-        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0,0,1))
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
 
-        # scale 
+        # scale
         m_model = glm.scale(m_model, self.scale)
 
         # translate
         m_model = glm.translate(m_model, self.pos)
-        
 
-
-        return m_model   
+        return m_model
 
     def on_init(self):
-        self.shader_program['light.position'].write(self.app.light.position)
-        self.shader_program['light.Ia'].write(self.app.light.Ia)
-        self.shader_program['light.Id'].write(self.app.light.Id)
+        self.shader_program["light.position"].write(self.app.light.position)
+        self.shader_program["light.Ia"].write(self.app.light.Ia)
+        self.shader_program["light.Id"].write(self.app.light.Id)
 
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
 
     def update(self):
-        #self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        
+        # self.shader_program['m_proj'].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+
         # Rotation
         if self.rotate:
-            m_model = glm.rotate(self.m_model, 2*self.app.time, glm.vec3(0,1,0))
+            m_model = glm.rotate(self.m_model, 2 * self.app.time, glm.vec3(0, 1, 0))
 
         else:
             # Fixed position
             m_model = self.m_model
-            
+
         m_model = movement(self, m_model)
-        self.shader_program['m_model'].write(m_model)
+        self.shader_program["m_model"].write(m_model)
 
     def render(self):
         self.update()
 
         if self.object:
             self.vao.render()
-        self.vaoa.render(mgl.LINE_LOOP)      
+        self.vaoa.render(mgl.LINE_LOOP)
 
-    def destroy (self):
+    def destroy(self):
         self.vbo.release()
         self.shader_program.release()
         self.vao.release()
         self.vaoa.release()
 
-
     def get_vao(self):
-        vao = self.ctx.vertex_array(self.shader_program, [(self.vbo, '3f 3f 3f', 'in_color', 'in_normal', 'in_position')])
+        vao = self.ctx.vertex_array(
+            self.shader_program,
+            [(self.vbo, "3f 3f 3f", "in_color", "in_normal", "in_position")],
+        )
         return vao
-
 
     def get_vertex_data(self):
 
         vertex_data = []
-        color = (1,0.5,0)
+        color = (1, 0.5, 0)
         slices = self.slices
         stacks = self.stacks
         radius = self.radi
@@ -323,7 +370,7 @@ class Sphere:
             sinCache2a.append(sinCache1a[i])
             cosCache2a.append(cosCache1a[i])
 
-        for j in range(stacks+1):
+        for j in range(stacks + 1):
             angle = np.pi * j / stacks
             sinCache2b.append(np.sin(angle))
             cosCache2b.append(np.cos(angle))
@@ -342,8 +389,6 @@ class Sphere:
         start = 0
         finish = stacks
 
-        
-
         for j in range(finish):
             zLow = cosCache1b[j]
             zHigh = cosCache1b[j + 1]
@@ -357,9 +402,9 @@ class Sphere:
             for i in range(slices):
                 v1 = (sintemp2 * sinCache1a[i], sintemp2 * cosCache1a[i], zHigh)
                 v2 = (sintemp1 * sinCache1a[i], sintemp1 * cosCache1a[i], zLow)
-                v3 = (sintemp1 * sinCache1a[i+1], sintemp1 * cosCache1a[i+1], zLow)
-                v4 = (sintemp1 * sinCache1a[i+1], sintemp1 * cosCache1a[i+1], zLow)
-                v5 = (sintemp2 * sinCache1a[i+1], sintemp2 * cosCache1a[i+1], zHigh)
+                v3 = (sintemp1 * sinCache1a[i + 1], sintemp1 * cosCache1a[i + 1], zLow)
+                v4 = (sintemp1 * sinCache1a[i + 1], sintemp1 * cosCache1a[i + 1], zLow)
+                v5 = (sintemp2 * sinCache1a[i + 1], sintemp2 * cosCache1a[i + 1], zHigh)
                 v6 = (sintemp2 * sinCache1a[i], sintemp2 * cosCache1a[i], zHigh)
                 vertex_data.append((color, v1, v1))
                 vertex_data.append((color, v2, v2))
@@ -368,23 +413,22 @@ class Sphere:
                 vertex_data.append((color, v5, v5))
                 vertex_data.append((color, v6, v6))
 
-
         vertex_data = np.array(vertex_data, dtype="f4")
         return vertex_data
 
     @staticmethod
-    def get_data(vertices, indices): 
+    def get_data(vertices, indices):
         data = [vertices[ind] for triangle in indices for ind in triangle]
-        return np.array(data, dtype='f4')
+        return np.array(data, dtype="f4")
 
     def get_vbo(self):
         vertex_data = self.get_vertex_data()
         vbo = self.ctx.buffer(vertex_data)
         return vbo
-    
+
     def get_shader_program(self):
-        program = self.ctx.program(    
-            vertex_shader='''
+        program = self.ctx.program(
+            vertex_shader="""
                 #version 330 core
                 layout (location = 0) in vec3 in_color;
                 layout (location = 1) in vec3 in_normal;
@@ -410,22 +454,21 @@ class Sphere:
                     color = in_color * (ambient + diffuse);
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
-            ''',
-            fragment_shader='''
+            """,
+            fragment_shader="""
                 #version 330 core
                 layout (location = 0) out vec4 fragColor;
                 in vec3 color;
                 void main() {
                     fragColor = vec4(color,1);
                 }
-            ''',
+            """,
         )
         return program
 
 
-
 class Cube:
-    def __init__(self,app, pos=(0,0,0), rot=(0,0,0), scale = (1,1,1)):
+    def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
         self.app = app
         self.ctx = app.ctx
         self.vbo = self.get_vbo()
@@ -439,85 +482,120 @@ class Cube:
         self.m_model = self.get_model_matrix()
         self.on_init()
 
-        
     def get_model_matrix(self):
-        
+
         m_model = glm.mat4()
 
-        #translate (origen)
-        m_model = glm.translate(m_model, (0,0,0))
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
 
         # rotation
-        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1,0,0))
-        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0,1,0))
-        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0,0,1))
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
 
-        # scale 
+        # scale
         m_model = glm.scale(m_model, self.scale)
 
         # translate
         m_model = glm.translate(m_model, self.pos)
-        
-
 
         return m_model
-                
+
     def on_init(self):
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
 
     def update(self):
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.shader_program['m_view'].write(self.app.camera.m_view)
-        #self.shader_program['m_model'].write(self.m_model)
-        #m_model = glm.rotate(self.m_model, 3*self.app.time, glm.vec3(0,1,0))
-        self.shader_program['m_model'].write(self.m_model)
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        # self.shader_program['m_model'].write(self.m_model)
+        # m_model = glm.rotate(self.m_model, 3*self.app.time, glm.vec3(0,1,0))
+        self.shader_program["m_model"].write(self.m_model)
 
     def render(self):
         self.update()
         self.vao.render()
 
-        
-    def destroy (self):
+    def destroy(self):
         self.vbo.release()
         self.shader_program.release()
         self.vao.release()
         self.vaop.release()
         self.vaoa.release()
-    
+
     def get_vao(self):
-        vao = self.ctx.vertex_array(self.shader_program, [(self.vbo, '3f 3f', 'in_color', 'in_position')])
+        vao = self.ctx.vertex_array(
+            self.shader_program, [(self.vbo, "3f 3f", "in_color", "in_position")]
+        )
         return vao
 
     def get_vertex_data(self):
 
-        #vertices = [(0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
+        # vertices = [(0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1),(1,0,1),(1,1,1),(0,1,1)]
 
-        vertices = [(-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)]
-        
-        indices = [(0,2,1),(0,3,2),(4,5,6),(4,6,7),(0,1,4),(1,4,5),
-                   (2,3,7),(2,7,6),(1,2,6),(1,6,5),(0,4,7),(0,7,3)]
+        vertices = [
+            (-1, -1, -1),
+            (1, -1, -1),
+            (1, 1, -1),
+            (-1, 1, -1),
+            (-1, -1, 1),
+            (1, -1, 1),
+            (1, 1, 1),
+            (-1, 1, 1),
+        ]
 
-        colours = [(1,0,0), (0,1,0), (1,0,0), (0,1,0), (1,0,0), (0,1,0),
-                    (1,0,0), (0,1,0), (1,0,0), (0,1,0), (1,0,0), (0,1,0)]
+        indices = [
+            (0, 2, 1),
+            (0, 3, 2),
+            (4, 5, 6),
+            (4, 6, 7),
+            (0, 1, 4),
+            (1, 4, 5),
+            (2, 3, 7),
+            (2, 7, 6),
+            (1, 2, 6),
+            (1, 6, 5),
+            (0, 4, 7),
+            (0, 7, 3),
+        ]
+
+        colours = [
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+        ]
         vertex_data = self.get_data(vertices, indices, colours)
         return vertex_data
-    
+
     @staticmethod
-    def get_data(vertices, indices, colours): 
-        #data = [vertices[ind] for triangle in indices for ind in triangle]
-        data = [(colours[i],vertices[ind]) for i,triangle in enumerate(indices) for ind in triangle]
-        return np.array(data, dtype='f4')
+    def get_data(vertices, indices, colours):
+        # data = [vertices[ind] for triangle in indices for ind in triangle]
+        data = [
+            (colours[i], vertices[ind])
+            for i, triangle in enumerate(indices)
+            for ind in triangle
+        ]
+        return np.array(data, dtype="f4")
 
     def get_vbo(self):
         vertex_data = self.get_vertex_data()
         vbo = self.ctx.buffer(vertex_data)
         return vbo
-    
+
     def get_shader_program(self):
-        program = self.ctx.program(    
-            vertex_shader='''
+        program = self.ctx.program(
+            vertex_shader="""
                 #version 330
                 layout (location = 0) in vec3 in_color;
                 layout (location = 1) in vec3 in_position;
@@ -529,8 +607,8 @@ class Cube:
                     color = in_color;
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
-            ''',
-            fragment_shader='''
+            """,
+            fragment_shader="""
                 #version 330
                 layout (location = 0) out vec4 fragColor;
                 in vec3 color;
@@ -538,14 +616,14 @@ class Cube:
                     //vec3 color = vec3(1,1,0);
                     fragColor = vec4(color,1.0);
                 }
-            ''',
+            """,
         )
         return program
 
 
 def norm(v):
 
-    length = (v[0]**2 + v[1]**2 + v[2]**2) ** (1/2)
+    length = (v[0] ** 2 + v[1] ** 2 + v[2] ** 2) ** (1 / 2)
     v = v / length
 
     return v
@@ -595,7 +673,7 @@ class Table:
 
     def update(self):
         self.shader_program["m_view"].write(self.app.camera.m_view)
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)  
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
 
     def render(self):
         self.vao.render()
@@ -796,7 +874,7 @@ class TableFloor:
         self.shader_program = self.get_shader_program("table_floor")
         self.vao = self.get_vao()
         self.m_model = self.get_model_matrix()
-        #self.texture = self.get_texture("textures/pool_table_texture.jpg")
+        # self.texture = self.get_texture("textures/pool_table_texture.jpg")
         self.on_init()
 
     def get_texture(self, path):
@@ -826,8 +904,7 @@ class TableFloor:
 
     def update(self):
         self.shader_program["m_view"].write(self.app.camera.m_view)
-        self.shader_program['m_proj'].write(self.app.camera.m_proj)        
-
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
 
     def render(self):
         self.vao.render()
