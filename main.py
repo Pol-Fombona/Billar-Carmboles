@@ -1,4 +1,3 @@
-import time
 from Engine import GraphicsEngine
 
 if __name__ == "__main__":

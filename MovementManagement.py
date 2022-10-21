@@ -1,5 +1,6 @@
 from turtle import pos
 import glm
+import numpy as np
 
 friction = 0.99
 
@@ -94,14 +95,27 @@ def movement(ball, m_model):
 
 def ballRotation(ball, m_model):
 
-    total = 90 * (abs(ball.velocityX) + abs(ball.velocityZ))
+    # TODO: Quan col·lisiona amb la taula no fa el canvi de rotació suaument
 
-    if total != 0:
-        m_model = glm.rotate(m_model, total, glm.vec3(-ball.velocityZ,0,ball.velocityX))
-        ball.last_rotation_pos = (total, -ball.velocityZ, ball.velocityX)
+    radi = 1
+    perimeter = 2*np.pi*radi
+    last_rotation = ball.last_rotation
+    vX, vZ = ball.velocityX, ball.velocityZ
+    velocity = np.sqrt(vX**2 + vZ**2)
+
+    if velocity != 0:
+        angle_to_rotate = 360 * (velocity / perimeter)
+
+        if (last_rotation[1] * vX) >= 0 and (last_rotation[2] * vZ) >= 0:
+            angle_to_rotate += ball.last_rotation[0]
+
+        else:
+            angle_to_rotate = ball.last_rotation[0] - angle_to_rotate
+            
+        m_model = glm.rotate(m_model, glm.radians(angle_to_rotate), (vZ, 0, -vX))
+        ball.last_rotation = (angle_to_rotate%360, vX, vZ)
 
     else:
-        m_model = glm.rotate(m_model, ball.last_rotation_pos[0], glm.vec3(ball.last_rotation_pos[1],0,ball.last_rotation_pos[2]))
-
+        m_model = glm.rotate(m_model, glm.radians(ball.last_rotation[0]), (ball.last_rotation[2], 0, -ball.last_rotation[1]))
+    
     return m_model
-
