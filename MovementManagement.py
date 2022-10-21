@@ -82,7 +82,26 @@ def movement(ball, m_model):
     ball.velocityX = ball.velocityX * friction
     ball.velocityZ = ball.velocityZ * friction
     ball.pos = (ball.pos[0]+ball.velocityX, ball.pos[1], ball.pos[2] + ball.velocityZ)
+
     m_model = glm.mat4()
     m_model = glm.translate(m_model, ball.pos)
 
+    ### Ball Rotation
+    m_model = ballRotation(ball, m_model)
+
     return m_model
+
+
+def ballRotation(ball, m_model):
+
+    total = 90 * (abs(ball.velocityX) + abs(ball.velocityZ))
+
+    if total != 0:
+        m_model = glm.rotate(m_model, total, glm.vec3(-ball.velocityZ,0,ball.velocityX))
+        ball.last_rotation_pos = (total, -ball.velocityZ, ball.velocityX)
+
+    else:
+        m_model = glm.rotate(m_model, ball.last_rotation_pos[0], glm.vec3(ball.last_rotation_pos[1],0,ball.last_rotation_pos[2]))
+
+    return m_model
+

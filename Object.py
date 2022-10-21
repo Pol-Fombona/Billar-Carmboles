@@ -260,6 +260,7 @@ class Sphere:
         self.app = app
         self.ctx = app.ctx
         self.radi = radi
+        self.last_rotation_pos = (1,1,1)
 
         ## velocity and friction
         self.velocityX = 0
@@ -314,13 +315,7 @@ class Sphere:
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
         self.shader_program["m_view"].write(self.app.camera.m_view)
 
-        # Rotation
-        if self.rotate:
-            m_model = glm.rotate(self.m_model, 2 * self.app.time, glm.vec3(0, 1, 0))
-
-        else:
-            # Fixed position
-            m_model = self.m_model
+        m_model = self.m_model
 
         m_model = movement(self, m_model)
         self.shader_program["m_model"].write(m_model)

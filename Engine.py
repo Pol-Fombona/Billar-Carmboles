@@ -170,6 +170,9 @@ class GraphicsEngine:
                 self.ball_1.velocityZ += -0.5
             elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
                 self.ball_1.velocityZ += 0.5
+            elif event.type == pg.KEYDOWN and event.key == pg.K_n:
+                self.ball_1.velocityZ += 0.5
+                self.ball_1.velocityX += 0.5
                 
     def render(self):
         # clear framebuffer
