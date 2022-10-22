@@ -40,23 +40,22 @@ def checkEdgeCollisions(objects):
 
     for ball in objects:
 
-        collision = False
-        # If ball center plus its radi touching edge 
-        if ((ball.pos[0] - 1)<= 0):
-            collision = True
-
-        elif ((ball.pos[0] + 1) >= 41.64):
-            collision = True
-
-        elif ((ball.pos[2] - 1) <= 0):
-            collision = True
-
-        elif ((ball.pos[2] + 1) >= 83.28):
-            collision = True
-
-        if collision:
+        # X-edges of table
+        if (((ball.pos[0] - 1) <= 0 or (ball.pos[0] + 1) >= 41.64) and not ball.collisions["vX"]):
+        
             ball.velocityX *= -1
+            ball.collisions["vX"] = True
+            
+
+        # Z-edges of table
+        elif (((ball.pos[2] - 1) <= 0 or (ball.pos[2] + 1) >= 83.28) and not ball.collisions["vX"]):
+            
             ball.velocityZ *= -1
+            ball.collisions["vZ"] = True
+
+        else:
+            ball.collisions["vX"], ball.collisions["vZ"] = False, False
+
 
 
 def movement(ball, m_model):

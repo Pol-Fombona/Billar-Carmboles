@@ -260,7 +260,9 @@ class Sphere:
         self.app = app
         self.ctx = app.ctx
         self.radi = radi
-        self.last_rotation_pos = (1,1,1)
+        
+        self.last_rotation = (0, 1, 1)
+        self.collisions = {"vX":False, "vZ":False}
 
         ## velocity and friction
         self.velocityX = 0

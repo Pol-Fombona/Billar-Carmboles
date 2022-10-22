@@ -48,6 +48,7 @@ class GraphicsEngine:
         self.ball_1 = Sphere(self, pos =(5,3,10), radi = 1, slices= 20, stacks = 20)
         self.ball_2 = Sphere(self, pos =(5,3,15), radi = 1, slices= 20, stacks = 20)
         # Esfera per subdivisions de triangles
+        #from Object import SphereSubdivision
         #self.ball_1 = SphereSubdivision(self, depth = 3, pos=(5,3,10))
         #self.ball_2 = SphereSubdivision(self, depth = 3, pos=(5,3,15))
 
