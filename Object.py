@@ -4,7 +4,8 @@ import numpy as np
 import pygame as pg
 
 from MovementManagement import movement
-
+import copy
+from MoveCue import displace_cue, rotate_cue, reset_displace_cue, points_distance, cue_hit_ball, change_objective
 
 class Object:
     def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
@@ -462,6 +463,170 @@ class Sphere:
             """,
         )
         return program
+
+class Cue:
+    def __init__(self, app, axis=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1), length = 0, width = 0, heigth = 0, dist_ball = 0):
+        self.app = app
+        self.ctx = app.ctx
+        self.length = length
+        self.width = width
+        self.heigth = heigth
+        self.dist_ball = dist_ball
+        self.rotate_flag = False
+        self.rotate_direction = 0
+        self.angle = 0
+        self.displace_cue = False
+        self.reset_pos = True
+        self.turn = 1
+        self.moving = False
+        self.vbo = self.get_vbo()
+        self.shader_program = self.get_shader_program()
+        self.vao = self.get_vao()
+        self.axis = axis
+        self.pos = copy.deepcopy(self.axis)
+        self.pos[0]+=copy.deepcopy(self.dist_ball)
+        self.pos_orig = glm.vec3(self.dist_ball,0,0)
+        #self.pos_reset = copy.deepcopy(self.pos)
+        self.rot = glm.vec3([glm.radians(a) for a in rot])
+        self.scale = scale
+        self.m_model = self.get_model_matrix()
+        self.on_init()
+
+    def get_model_matrix(self):
+
+        m_model = glm.mat4()
+
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
+
+        # scale
+        m_model = glm.scale(m_model, self.scale)
+
+        # translate
+        m_model = glm.translate(m_model, self.axis)
+
+        return m_model
+
+    def on_init(self):
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
+
+    def update(self):
+        if self.app.ball_1.velocityX==self.app.ball_1.velocityZ==0:
+            if self.app.ball_2.velocityX==self.app.ball_2.velocityZ==0:
+                if self.moving == True:
+                    if self.turn == 1:
+                        change_objective(self, self.app.ball_1)
+                    else:
+                        change_objective(self, self.app.ball_2)
+                    self.moving=False
+                if self.rotate_flag == True:
+                    rotate_cue(self)
+                if self.displace_cue == True and points_distance(self.axis,self.pos)<=20:
+                    displace_cue(self)
+                if self.displace_cue == False and self.reset_pos==False:
+                    reset_displace_cue(self)
+                    self.reset_pos=True
+                    if self.turn == 1:
+                        cue_hit_ball(self,self.app.ball_1)
+                    else:
+                        cue_hit_ball(self,self.app.ball_2)
+                    self.turn*=-1
+                    self.pos = copy.deepcopy(self.axis)
+                    self.pos[0] = self.dist_ball
+                    self.pos_orig = glm.vec3(self.dist_ball,0,0)
+                    self.moving = True
+        self.shader_program["m_proj"].write(self.app.camera.m_proj)
+        self.shader_program["m_view"].write(self.app.camera.m_view)
+        self.shader_program["m_model"].write(self.m_model)
+
+    def render(self):
+        self.update()
+        self.vao.render()
+
+    def destroy(self):
+        self.vbo.release()
+        self.shader_program.release()
+        self.vao.release()
+
+    def get_vao(self):
+        vao = self.ctx.vertex_array(self.shader_program, [(self.vbo, '3f', 'in_position')])
+        return vao
+
+    def get_vertex_data(self):
+        vertices = [
+            (self.dist_ball, -self.heigth/2, -self.width/2),
+            (self.length+self.dist_ball, -self.heigth/2, -self.width/2),
+            (self.length+self.dist_ball, self.heigth/2, -self.width/2),
+            (self.dist_ball, self.heigth/2, -self.width/2),
+            (self.dist_ball, -self.heigth/2, self.width/2),
+            (self.length+self.dist_ball, -self.heigth/2, self.width/2),
+            (self.length+self.dist_ball, self.heigth/2, self.width/2),
+            (self.dist_ball, self.heigth/2, self.width/2),
+        ]
+        indices = [
+            (0, 2, 1),
+            (0, 3, 2),
+            (4, 5, 6),
+            (4, 6, 7),
+            (0, 1, 4),
+            (1, 4, 5),
+            (2, 3, 7),
+            (2, 7, 6),
+            (1, 2, 6),
+            (1, 6, 5),
+            (0, 4, 7),
+            (0, 7, 3),
+        ]
+        vertex_data = self.get_data(vertices, indices)
+        return vertex_data
+
+    @staticmethod
+    def get_data(vertices, indices): 
+        data = [vertices[ind] for triangle in indices for ind in triangle]
+        return np.array(data, dtype='f4')
+
+    def get_vbo(self):
+        vertex_data = self.get_vertex_data()
+        vbo = self.ctx.buffer(vertex_data)
+        return vbo
+
+    def get_shader_program(self):
+        program = self.ctx.program(    
+            vertex_shader='''
+                #version 330
+                layout (location = 0) in vec3 in_position;
+                uniform mat4 m_proj;
+                uniform mat4 m_view;
+                uniform mat4 m_model;
+                void main() {
+                    gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
+                }
+            ''',
+            fragment_shader='''
+                #version 330
+                layout (location = 0) out vec4 fragColor;
+                void main() { 
+                    vec3 color = vec3(.5,.25,0);
+                    fragColor = vec4(color,1.0);
+                }
+            ''',
+        )
+        return program
+
+
+def norm(v):
+
+    length = (v[0] ** 2 + v[1] ** 2 + v[2] ** 2) ** (1 / 2)
+    v = v / length
+
+    return v
 
 
 class Cube:

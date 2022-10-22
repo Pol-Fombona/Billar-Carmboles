@@ -5,7 +5,7 @@ import sys
 import glm
 
 from FreeCamera import Camera
-from Object import Cube, Axis, Legs, Sphere, TableFloor, Table
+from Object import Cube, Axis, Legs, Sphere, TableFloor, Table, Cue
 
 from Light import Light
 from MovementManagement import checkBallsCollisions, checkEdgeCollisions
@@ -53,6 +53,14 @@ class GraphicsEngine:
         #self.ball_2 = SphereSubdivision(self, depth = 3, pos=(5,3,15))
 
         self.objects = [self.ball_1, self.ball_2]
+
+        # Pal
+        CUE_LENGTH = 20
+        CUE_WIDTH = 1
+        CUE_HEIGTH = 1
+        DIST_BALL = 1.2
+        self.cue = Cue(self, axis =glm.vec3(5,3,10), length = CUE_LENGTH, width = CUE_WIDTH, heigth = CUE_HEIGTH, dist_ball = DIST_BALL)
+        #self.cue = Cue(self,pos=(5,3,10))
 
         ###
         # Table
@@ -174,6 +182,24 @@ class GraphicsEngine:
             elif event.type == pg.KEYDOWN and event.key == pg.K_n:
                 self.ball_1.velocityZ += 0.5
                 self.ball_1.velocityX += 0.5
+
+            elif event.type == pg.KEYDOWN and event.key == pg.K_k:
+                self.cue.rotate_flag = True
+                self.cue.rotate_direction=1
+            elif event.type == pg.KEYDOWN and event.key == pg.K_j:
+                self.cue.rotate_flag = True
+                self.cue.rotate_direction=-1
+            elif event.type == pg.KEYUP and event.key == pg.K_k:
+                self.cue.rotate_flag = False
+                self.cue.rotate_direction=0
+            elif event.type == pg.KEYUP and event.key == pg.K_j:
+                self.cue.rotate_flag = False
+                self.cue.rotate_direction=0
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.cue.displace_cue=True
+            elif event.type == pg.MOUSEBUTTONUP:
+                self.cue.displace_cue=False
+                self.cue.reset_pos = False
                 
     def render(self):
         # clear framebuffer
@@ -183,6 +209,7 @@ class GraphicsEngine:
 
         self.ball_1.render()
         self.ball_2.render()
+        self.cue.render()
 
         for objecte in self.table_objects:
             objecte.render()
