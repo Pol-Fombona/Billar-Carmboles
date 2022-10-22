@@ -32,8 +32,8 @@ def ballCollision(ball_1, ball_2):
     x1 = np.array(ball_1.pos)
     x2 = np.array(ball_2.pos)
 
-    if np.sum(abs(v1)) == 0: v1 += 0.01
-    elif np.sum(abs(v2)) == 0: v2 += 0.01
+    if np.sum(abs(v1)) == 0: v1 += 0.001
+    elif np.sum(abs(v2)) == 0: v2 += 0.001
 
     # v1 inicial + v2 inicial = v1 final + v2 final
     if np.sum(abs(v1)) != 0 and np.sum(abs(v2)) != 0:
@@ -46,7 +46,7 @@ def ballCollision(ball_1, ball_2):
 
 def getImpactVelocity(v1, v2, m1, m2, x1, x2):
     # https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
-    
+
     v = v1 - (2 * m2 / (m1 + m2)) 
     v = v * np.dot(v1 - v2, x1 - x2) 
     v = v / (np.linalg.norm(x1 - x2) ** 2) 

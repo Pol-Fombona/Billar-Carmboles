@@ -624,13 +624,6 @@ class Cue:
         return program
 
 
-def norm(v):
-
-    length = (v[0] ** 2 + v[1] ** 2 + v[2] ** 2) ** (1 / 2)
-    v = v / length
-
-    return v
-
 class Cube:
     def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
         self.app = app

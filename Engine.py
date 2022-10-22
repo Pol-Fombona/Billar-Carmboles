@@ -1,11 +1,10 @@
-from msilib import Table
 import pygame as pg
 import moderngl as mgl
 import sys
 import glm
 
 from FreeCamera import Camera
-from Object import Cube, Axis, Legs, Sphere, TableFloor, Table, Cue, Cue
+from Object import Axis, Legs, Sphere, TableFloor, Table, Cue
 
 from Light import Light
 from MovementManagement import checkBallsCollisions, checkEdgeCollisions
@@ -54,14 +53,6 @@ class GraphicsEngine:
         #self.ball_2 = SphereSubdivision(self, depth = 3, pos=(5,3,15))
 
         self.objects = [self.ball_1, self.ball_2, self.ball_3]
-
-        # Pal
-        CUE_LENGTH = 20
-        CUE_WIDTH = 1
-        CUE_HEIGTH = 1
-        DIST_BALL = 1.2
-        self.cue = Cue(self, axis =glm.vec3(5,3,10), length = CUE_LENGTH, width = CUE_WIDTH, heigth = CUE_HEIGTH, dist_ball = DIST_BALL)
-        #self.cue = Cue(self,pos=(5,3,10))
 
         # Pal
         CUE_LENGTH = 20
