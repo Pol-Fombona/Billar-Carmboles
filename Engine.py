@@ -5,7 +5,7 @@ import sys
 import glm
 
 from FreeCamera import Camera
-from Object import Cube, Axis, Legs, Sphere, TableFloor, Table
+from Object import Cube, Axis, Legs, Sphere, TableFloor, Table, Cue
 
 from Light import Light
 from MovementManagement import checkBallsCollisions, checkEdgeCollisions
@@ -45,14 +45,23 @@ class GraphicsEngine:
         #self.scene = Cube(self, pos=(10,1,0), rot=(0,0,0), scale = (0.1,0.4,0.1))
 
         # Esfera per particions horitzontals i verticals
-        self.ball_1 = Sphere(self, pos =(5,3,10), radi = 1, slices= 20, stacks = 20)
-        self.ball_2 = Sphere(self, pos =(5,3,15), radi = 1, slices= 20, stacks = 20)
+        self.ball_1 = Sphere(self, pos =(5,3,10), radi = 1, slices= 20, stacks = 20, color = (1,1,1))
+        self.ball_2 = Sphere(self, pos =(5,3,15), radi = 1, slices= 20, stacks = 20, color = (1,1,0))
+        self.ball_3 = Sphere(self, pos =(10,3,10), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
         # Esfera per subdivisions de triangles
         #from Object import SphereSubdivision
         #self.ball_1 = SphereSubdivision(self, depth = 3, pos=(5,3,10))
         #self.ball_2 = SphereSubdivision(self, depth = 3, pos=(5,3,15))
 
-        self.objects = [self.ball_1, self.ball_2]
+        self.objects = [self.ball_1, self.ball_2, self.ball_3]
+
+        # Pal
+        CUE_LENGTH = 20
+        CUE_WIDTH = 1
+        CUE_HEIGTH = 1
+        DIST_BALL = 1.2
+        self.cue = Cue(self, axis =glm.vec3(5,3,10), length = CUE_LENGTH, width = CUE_WIDTH, heigth = CUE_HEIGTH, dist_ball = DIST_BALL)
+        #self.cue = Cue(self,pos=(5,3,10))
 
         ###
         # Table
@@ -116,8 +125,8 @@ class GraphicsEngine:
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
-                self.ball_1.destroy()
-                self.ball_2.destroy()
+                for object in self.objects:
+                    object.destroy()
 
                 for objecte in self.table_objects:
                     objecte.destroy()
@@ -155,12 +164,14 @@ class GraphicsEngine:
 
 
             elif event.type == pg.KEYDOWN and event.key == pg.K_p:
-                ##reset positions
+                ## Reset positions
 
                 self.ball_1.velocityX, self.ball_1.velocityZ = 0, 0
                 self.ball_1.pos = (5,3,10)
                 self.ball_2.velocityX, self.ball_2.velocityZ = 0, 0
                 self.ball_2.pos = (5,3,15)
+                self.ball_3.velocityX, self.ball_3.velocityZ = 0, 0
+                self.ball_3.pos = (10,3,10)
 
 
             elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
@@ -174,6 +185,26 @@ class GraphicsEngine:
             elif event.type == pg.KEYDOWN and event.key == pg.K_n:
                 self.ball_1.velocityZ += 0.5
                 self.ball_1.velocityX += 0.5
+
+            
+            elif event.type == pg.KEYDOWN and event.key == pg.K_k:
+                self.cue.rotate_flag = True
+                self.cue.rotate_direction=1
+            elif event.type == pg.KEYDOWN and event.key == pg.K_j:
+                self.cue.rotate_flag = True
+                self.cue.rotate_direction=-1
+            elif event.type == pg.KEYUP and event.key == pg.K_k:
+                self.cue.rotate_flag = False
+                self.cue.rotate_direction=0
+            elif event.type == pg.KEYUP and event.key == pg.K_j:
+                self.cue.rotate_flag = False
+                self.cue.rotate_direction=0
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.cue.displace_cue=True
+            elif event.type == pg.MOUSEBUTTONUP:
+                self.cue.displace_cue=False
+                self.cue.reset_pos = False
+
                 
     def render(self):
         # clear framebuffer
@@ -181,18 +212,17 @@ class GraphicsEngine:
         self.ctx.viewport = (0,0,self.WIN_SIZE[0],self.WIN_SIZE[1])
         self.axis.render()
 
-        self.ball_1.render()
-        self.ball_2.render()
+        for objecte in self.objects:
+            objecte.render()
+
+        self.cue.render()
 
         for objecte in self.table_objects:
             objecte.render()
 
-        if self.ball_1.pos != self.temp:
-            # Check balls collisions
-            checkBallsCollisions(self.objects)
-            checkEdgeCollisions(self.objects)
-            self.temp = self.ball_1.pos
-
+        # Check balls collisions
+        checkBallsCollisions(self.objects)
+        checkEdgeCollisions(self.objects)
 
         pg.display.flip()
         
