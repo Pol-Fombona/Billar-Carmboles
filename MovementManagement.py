@@ -4,6 +4,7 @@ import numpy as np
 
 friction = 0.99
 edge_collision_loss = 0.99
+radius = 1
 
 def checkBallsCollisions(objects):
     #Si la suma dels dos radis es superior a la distancia entre les dues esferes (punt central), col·lisio
@@ -14,43 +15,90 @@ def checkBallsCollisions(objects):
         radi = 1
         x1 = np.array(ball_1.pos)
         x2 = np.array(ball_2.pos)
-        dist = np.linalg.norm(x1 -x2)
+        dist = np.linalg.norm(x1 - x2)
         
-        if (dist * 0.95 <= (radi * 2)):
+        if (dist <= (radi * 2)):
+
+            # overlap
+            correctOverlap(ball_1, ball_2, dist, x1, x2)
             ballCollision(ball_1, ball_2)
 
 
+def correctOverlap(ball_1, ball_2, dist, x1, x2):
+    # Correct ball pos if there is overlap from the movement
+    
+    overlap = (dist - radius - radius) / -2
 
+    distance = x1 - x2
+    distX, distZ = distance[0], distance[1]
+
+    b1X = ball_1.pos[0] + (overlap * distX) / dist
+    b1Z = ball_1.pos[2] + (overlap * distZ) / dist
+
+    b2X = ball_2.pos[0] - (overlap * distX) / dist
+    b2Z = ball_2.pos[2] - (overlap * distZ) / dist
+
+    ball_1.pos = (b1X, ball_1.pos[1], b1Z)
+    ball_2.pos = (b2X, ball_2.pos[1], b2Z)
+
+    return
 
 def ballCollision(ball_1, ball_2):
-    # Temporal
-    # Set inverted velocity for the one moving
-    # Transfer velocity to the one stopped
     
     v1 = np.array((ball_1.velocityX, 0, ball_1.velocityZ))
     v2 = np.array((ball_2.velocityX, 0, ball_2.velocityZ))
     x1 = np.array(ball_1.pos)
     x2 = np.array(ball_2.pos)
 
-    if np.sum(abs(v1)) == 0: v1 += 0.001
-    elif np.sum(abs(v2)) == 0: v2 += 0.001
-
-    # v1 inicial + v2 inicial = v1 final + v2 final
+    temp = np.sum(abs(v1)+abs(v2))
     if np.sum(abs(v1)) != 0 and np.sum(abs(v2)) != 0:
         v1f = getImpactVelocity(v1, v2, 1, 1, x1, x2)
-        v2f = getImpactVelocity(v2,v1, 1, 1, x2,x1)
+        v2f = getImpactVelocity(v2, v1, 1, 1, x2, x1)
 
         ball_1.velocityX, ball_1.velocityZ = v1f[0], v1f[2]
-        ball_2.velocityX, ball_2.velocityZ = v2f[0], v2f[2] 
+        ball_2.velocityX, ball_2.velocityZ = v2f[0], v2f[2]
+
+    else:
+        #  Quan una bola està en repós
+        #### https://github.com/OneLoneCoder/Javidx9/blob/master/ConsoleGameEngine/BiggerProjects/Balls/OneLoneCoder_Balls1.cpp 
+        distance =  np.linalg.norm(x1 - x2)
+        nx = (x2[0]-x1[0])/distance
+        ny = (x2[2]-x1[2])/distance
+
+        kx = ball_1.velocityX - ball_2.velocityX
+        ky = ball_1.velocityZ - ball_2.velocityZ
+
+        p = 2.0 * (nx * kx + ny * ky) / 2
+
+        ball_1.velocityX = ball_1.velocityX - p * 1 * nx
+        ball_1.velocityZ = ball_1.velocityZ - p * 1 * ny
+
+        ball_2.velocityX = ball_2.velocityX + p * 1 * nx
+        ball_2.velocityZ = ball_2.velocityZ + p * 1 * ny
+
+    ball_1.velocityX *= 0.9
+    ball_1.velocityZ *= 0.9
+
+    ball_2.velocityX *= 0.9
+    ball_2.velocityZ *= 0.9
+
+
+    ## No important, només per mirar l'elasticitat 
+    v1f = np.array((ball_1.velocityX, 0, ball_1.velocityZ))
+    v2f = np.array((ball_2.velocityX, 0, ball_2.velocityZ))
+    temp2 = np.sum(abs(v1f)+abs(v2f))
+
+    if (temp < temp2):
+        print("bola1", v1, "final", v1f)
+        print("bola2", v2, "final", v2f)
+        print("v1",temp, "v2", temp2)
+        #exit()
 
 
 def getImpactVelocity(v1, v2, m1, m2, x1, x2):
     # https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
 
-    v = v1 - (2 * m2 / (m1 + m2)) 
-    v = v * np.dot(v1 - v2, x1 - x2) 
-    v = v / (np.linalg.norm(x1 - x2) ** 2) 
-    v = v * (x1 - x2)
+    v = v1 - (2 * m2 / (m1 + m2)) * np.dot(v1 - v2, x1 - x2) / (np.linalg.norm(x1 - x2) ** 2) * (x1 - x2)
     
     return v
 
