@@ -2,9 +2,10 @@ import pygame as pg
 import moderngl as mgl
 import sys
 
-from model import *
+from model2 import *
 from camera import *
-from texture import Texture
+from mesh import Mesh
+from scene import Scene
 
 
 # Table measures
@@ -51,88 +52,12 @@ class GraphicsEngine:
             ),
             table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
         )
+        self.positions = {"leg1": (0, 0, 0), "leg2": (3, 3, 3)}
         # scene
-        self.texture = Texture(self.ctx)
-        self.scene = Legs(
-            self,
-            (TABLE_POSITION[0], TABLE_POSITION[1], TABLE_POSITION[2]),
-            MARGIN_WIDTH,
-            LEGS_HEIGHT,
-            TABLE_HEIGHT,
-        )
-        print((TABLE_POSITION[0], TABLE_POSITION[1], TABLE_POSITION[2]))
-        self.leg2 = Legs(
-            self,
-            (
-                TABLE_POSITION[0] + TABLE_WIDTH + MARGIN_WIDTH,
-                TABLE_POSITION[1],
-                TABLE_POSITION[2],
-            ),
-            MARGIN_WIDTH,
-            LEGS_HEIGHT,
-            TABLE_HEIGHT,
-        )
-        print((
-                TABLE_POSITION[0] + TABLE_WIDTH + MARGIN_WIDTH,
-                TABLE_POSITION[1],
-                TABLE_POSITION[2],
-            ))
-        self.leg3 = Legs(
-            self,
-            (
-                TABLE_POSITION[0] + TABLE_WIDTH + MARGIN_WIDTH,
-                TABLE_POSITION[1],
-                TABLE_POSITION[2] + TABLE_LENGTH + MARGIN_WIDTH,
-            ),
-            MARGIN_WIDTH,
-            LEGS_HEIGHT,
-            TABLE_HEIGHT,
-        )
-        print((
-                TABLE_POSITION[0] + TABLE_WIDTH + MARGIN_WIDTH,
-                TABLE_POSITION[1],
-                TABLE_POSITION[2] + TABLE_LENGTH + MARGIN_WIDTH,
-            ))
-        self.leg4 = Legs(
-            self,
-            (
-                TABLE_POSITION[0],
-                TABLE_POSITION[1],
-                TABLE_POSITION[2] + TABLE_LENGTH + MARGIN_WIDTH,
-            ),
-            MARGIN_WIDTH,
-            LEGS_HEIGHT,
-            TABLE_HEIGHT,
-        )
-        print((
-                TABLE_POSITION[0],
-                TABLE_POSITION[1],
-                TABLE_POSITION[2] + TABLE_LENGTH + MARGIN_WIDTH,
-            ))
-        self.floor = TableFloor(
-            self,
-            (
-                TABLE_POSITION[0] + MARGIN_WIDTH,
-                TABLE_POSITION[1] + TABLE_PROF,
-                TABLE_POSITION[2] + +MARGIN_WIDTH,
-            ),
-            TABLE_WIDTH,
-            TABLE_HEIGHT / 2,
-            TABLE_LENGTH,
-        )
-        self.table = Table(
-            self,
-            TABLE_POSITION,
-            TABLE_WIDTH,
-            TABLE_HEIGHT,
-            TABLE_LENGTH,
-            MARGIN_WIDTH,
-        )
+        self.mesh = Mesh(self)
+        self.scene = Scene(self)
         self.scene.pinfo = "Object: ON"
         self.scene.o = True
-        self.axis = Axis(self)
-        self.axis.pinfo = "Object: ON"
-        self.axis.o = True
         self.delta_time = 0
 
     def check_events(self):
@@ -140,12 +65,7 @@ class GraphicsEngine:
             if event.type == pg.QUIT or (
                 event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE
             ):
-                self.scene.destroy()
-                self.leg2.destroy()
-                self.leg3.destroy()
-                self.leg4.destroy()
-                self.table.destroy()
-                self.floor.destroy()
+                self.mesh.destroy()
                 pg.quit()
                 sys.exit()
             if event.type == pg.KEYDOWN and event.key == pg.K_o:
@@ -167,18 +87,9 @@ class GraphicsEngine:
         # clear framebuffer
         self.ctx.clear(color=(0.08, 0.16, 0.18))
         # render scene
-        if self.axis.o:
-            self.axis.render()
         if self.scene.o:
             self.scene.render()
-            self.leg2.render()
-            self.leg3.render()
-            self.leg4.render()
-            self.table.render()
-            self.floor.render()
-        pg.display.set_caption(
-            f"{self.axis.pinfo} | {self.scene.pinfo} | {self.camera.pinfo}"
-        )
+        pg.display.set_caption(f" | {self.scene.pinfo} | {self.camera.pinfo}")
         # swap buffers
         pg.display.flip()
 

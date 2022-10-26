@@ -3,6 +3,7 @@ from matplotlib import table
 import numpy as np
 import moderngl as mgl
 import pygame as pg
+from texture import Texture
 
 
 class Table:
@@ -20,7 +21,8 @@ class Table:
         self.shader_program = self.get_shader_program("table")
         self.vao = self.get_vao()
         self.m_model = self.get_model_matrix()
-        self.texture = self.get_texture("table/textures/wooden-textured-background.jpg")
+        self.tex_id = 0
+        self.texture = app.texture
         self.on_init()
 
     def get_texture(self, path):
@@ -40,6 +42,7 @@ class Table:
 
     def on_init(self):
         # texture
+        self.texture = self.texture.textures[0]
         self.shader_program["u_texture_0"] = 0
         self.texture.use()
         # mvp
@@ -58,6 +61,7 @@ class Table:
         self.vbo.release()
         self.shader_program.release()
         self.vao.release()
+        self.texture.destroy()
 
     def get_vao(self):
         vao = self.ctx.vertex_array(
@@ -384,7 +388,7 @@ class Legs:
         self.shader_program = self.get_shader_program("legs")
         self.vao = self.get_vao()
         self.m_model = self.get_model_matrix()
-        self.texture = self.get_texture("table/textures/wooden-textured-background.jpg")
+        self.texture = app.texture
         self.on_init()
 
     def get_texture(self, path):
@@ -405,6 +409,7 @@ class Legs:
 
     def on_init(self):
         # texture
+        self.texture = self.texture.textures[1]
         self.shader_program["u_texture_0"] = 0
         self.texture.use()
         # mvp
@@ -423,6 +428,7 @@ class Legs:
         self.vbo.release()
         self.shader_program.release()
         self.vao.release()
+        self.texture.destroy()
 
     def get_vao(self):
         vao = self.ctx.vertex_array(
