@@ -2,13 +2,9 @@ import moderngl as mgl
 import numpy as np
 import glm
 
-cont = 0
-
 
 class BaseModel:
     def __init__(self, app, vao_name, tex_id, pos=(0, 0, 0)):
-        global cont
-        # TODO jugar amb el contador per a les posicions dels objectes
         self.app = app
         self.m_model = self.get_model_matrix()
         self.tex_id = tex_id
