@@ -1,4 +1,4 @@
-from model2 import *
+from model import *
 from positions import *
 
 # All the positions are set form here
