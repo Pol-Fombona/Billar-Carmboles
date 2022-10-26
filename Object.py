@@ -279,9 +279,10 @@ class Sphere:
         self.vao = self.get_vao()
         self.vaoa = self.get_vao()
         self.vaop = self.get_vao()
-        self.rotate = False
-        self.object = True
 
+        # Position intial, useful when resseting position
+        self.initial_position = pos
+        
         self.pos = pos
         self.rot = glm.vec3([glm.radians(a) for a in rot])
         self.scale = scale
@@ -329,9 +330,8 @@ class Sphere:
     def render(self):
         self.update()
 
-        if self.object:
-            self.vao.render()
-        self.vaoa.render(mgl.LINE_LOOP)
+        self.vao.render()
+        #self.vaoa.render(mgl.LINE_LOOP)
 
     def destroy(self):
         self.vbo.release()
@@ -1284,4 +1284,265 @@ class Legs:
             vertex_shader=vertex_shader, fragment_shader=fragment_shader
         )
 
+        return program
+
+
+
+class SphereSubdivision:
+    def __init__(self,app, pos=(0,0,0), rot=(0,0,0), scale = (1,1,1), depth = 0, color1 = (0,0,0), color2 = (0,0,0)):
+        self.app = app
+        self.depth = depth
+        self.ctx = app.ctx
+
+        self.color1 = color1
+        self.color2 = color2
+        self.radi = 1
+
+        self.vbo = self.get_vbo()
+        self.shader_program = self.get_shader_program()
+
+        self.last_rotation = (0, 1, 1)
+        self.collisions = {"vX":False, "vZ":False}
+
+
+        self.vao = self.get_vao()
+        self.vaoa = self.get_vao()
+        self.vaop = self.get_vao()
+
+        # Position intial, useful when resseting position
+        self.initial_position = pos
+
+        self.pos = pos
+
+        self.rotate = False
+        self.object = True
+
+        ## velocity and friction
+        self.velocityX = 0
+        self.velocityZ = 0
+
+        self.rot = glm.vec3([glm.radians(a) for a in rot])
+        self.scale = scale
+        self.m_model = self.get_model_matrix()
+        self.on_init()
+
+        
+    def get_model_matrix(self):
+        
+        m_model = glm.mat4()
+        
+        #translate (origen)
+        m_model = glm.translate(m_model, (0,0,0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1,0,0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0,1,0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0,0,1))
+
+        # scale 
+        m_model = glm.scale(m_model, self.scale)
+        
+        # translate
+        m_model = glm.translate(m_model, self.pos)
+        return m_model
+
+                
+    def on_init(self):
+        # Light
+        self.shader_program['light.position'].write(self.app.light.position)
+        self.shader_program['light.Ia'].write(self.app.light.Ia)
+        self.shader_program['light.Id'].write(self.app.light.Id)
+        self.shader_program['light.Is'].write(self.app.light.Is)
+
+
+        self.shader_program['m_proj'].write(self.app.camera.m_proj)
+        self.shader_program['m_view'].write(self.app.camera.m_view)
+        self.shader_program['m_model'].write(self.m_model)
+
+    def update(self):
+        self.shader_program['m_proj'].write(self.app.camera.m_proj)
+        self.shader_program['m_view'].write(self.app.camera.m_view)
+                
+        m_model = self.m_model
+
+        m_model = movement(self, m_model)
+        
+        self.shader_program['m_model'].write(m_model)
+        self.shader_program['camPos'].write(self.app.camera.position)
+
+    def render(self):
+        self.update()
+
+        self.vao.render()
+        #self.vaoa.render(mgl.LINE_LOOP)      
+        
+    def destroy (self):
+        self.vbo.release()
+        self.shader_program.release()
+        self.vao.release()
+        self.vaop.release()
+        self.vaoa.release()
+    
+    def get_vao(self):
+        vao = self.ctx.vertex_array(self.shader_program, [(self.vbo, '3f 3f 3f', 'in_color', 'in_normal', 'in_position')])
+        return vao
+    
+    def get_vertex_data(self):
+
+        data = []
+        v1 = np.array([0.,0.,0.])
+        v2 = np.array([1.,0.,0.])
+        v3 = np.array([1.,0.,1.])
+        v4 = np.array([0.,0.,1.])
+        v5 = np.array([0.5,1.,0.5])
+        v6 = np.array([0.5,-1.,0.5])
+        
+        c = (v1+v2+v3+v4+v5+v6)/6.0  # calculo el centre per treure'l i centrar la figura
+        v1-=c
+        v2-=c
+        v3-=c
+        v4-=c
+        v5-=c
+        v6-=c
+        
+        color = ((1,0,0), (1,1,0), (0,1,1), (0,1,0), (0,0,1), 
+            (1,0,1), (0.5, 0.5, 0.5), (1,0.5,0.3))
+
+        color = (self.color1, self.color1, self.color1, self.color1,
+            self.color2, self.color2, self.color2, self.color2)
+
+        # Part superior
+        data.append((color[0], glm.normalize(v1), glm.normalize(v1))) # primer triangle (cara) : color, normal, position
+        data.append((color[0], glm.normalize(v5), glm.normalize(v5))) # primer triangle (cara)
+        data.append((color[0], glm.normalize(v2), glm.normalize(v2))) # primer triangle (cara)
+
+        data.append((color[1], glm.normalize(v2), glm.normalize(v2))) 
+        data.append((color[1], glm.normalize(v5), glm.normalize(v5))) 
+        data.append((color[1], glm.normalize(v3), glm.normalize(v3))) 
+
+        data.append((color[2], glm.normalize(v3), glm.normalize(v3))) 
+        data.append((color[2], glm.normalize(v5), glm.normalize(v5))) 
+        data.append((color[2], glm.normalize(v4), glm.normalize(v4))) 
+
+        data.append((color[3], glm.normalize(v4), glm.normalize(v4))) 
+        data.append((color[3], glm.normalize(v5), glm.normalize(v5))) 
+        data.append((color[3], glm.normalize(v1), glm.normalize(v1))) 
+
+        ###Part inferior
+        data.append((color[4], glm.normalize(v6), glm.normalize(v6))) 
+        data.append((color[4], glm.normalize(v1), glm.normalize(v1))) 
+        data.append((color[4], glm.normalize(v2), glm.normalize(v2))) 
+
+        data.append((color[5], glm.normalize(v6), glm.normalize(v6))) 
+        data.append((color[5], glm.normalize(v2), glm.normalize(v2))) 
+        data.append((color[5], glm.normalize(v3), glm.normalize(v3)))
+
+        data.append((color[6], glm.normalize(v6), glm.normalize(v6))) 
+        data.append((color[6], glm.normalize(v3), glm.normalize(v3))) 
+        data.append((color[6], glm.normalize(v4), glm.normalize(v4))) 
+
+        data.append((color[7], glm.normalize(v6), glm.normalize(v6))) 
+        data.append((color[7], glm.normalize(v4), glm.normalize(v4))) 
+        data.append((color[7], glm.normalize(v1), glm.normalize(v1))) 
+
+        data = self.tessel(data, self.depth)
+
+        return np.array(data, dtype='f4')
+
+    def tessel(self, data, depth):
+
+        if depth == 0:
+            return data
+
+        else:
+            depth -= 1
+            new_data = []
+
+            for i in range(0, len(data), 3):
+                
+                v12 = glm.normalize((data[i][1] + data[i+1][1]) / 2 )
+                v13 = glm.normalize((data[i][1] + data[i+2][1]) / 2 )
+                v23 = glm.normalize((data[i+1][1] + data[i+2][1]) / 2)
+
+                new_data.append((data[i][0], v12, v12))
+                new_data.append((data[i][0], v13, v13))
+                new_data.append((data[i][0], data[i][1], data[i][2]))
+
+                new_data.append((data[i+2][0], v23, v23))
+                new_data.append((data[i+2][0], data[i+2][1], data[i+2][2]))
+                new_data.append((data[i+2][0], v13, v13))
+
+                new_data.append((data[i+1][0], data[i+1][1], data[i+1][2]))
+                new_data.append((data[i+1][0], v23, v23))
+                new_data.append((data[i+1][0], v12, v12))
+
+                new_data.append((data[i][0], v12, v12))
+                new_data.append((data[i+2][0], v23, v23))
+                new_data.append((data[i+1][0], v13, v13))
+
+
+            new_data = self.tessel(new_data, depth)
+
+            return new_data
+    
+    @staticmethod
+    def get_data(vertices, indices, colour): 
+        #data = [vertices[ind] for triangle in indices for ind in triangle]
+        data = [(colour[i],vertices[ind]) for i,triangle in enumerate(indices) for ind in triangle]
+        return np.array(data, dtype='f4')
+
+    def get_vbo(self):
+        vertex_data = self.get_vertex_data()
+        vbo = self.ctx.buffer(vertex_data)
+        return vbo
+    
+    
+    def get_shader_program(self):
+        program = self.ctx.program(    
+            vertex_shader='''
+                #version 330 core
+                layout (location = 0) in vec3 in_color;
+                layout (location = 1) in vec3 in_normal;
+                layout (location = 2) in vec3 in_position;
+                out vec3 color;
+                
+                struct Light {
+                    vec3 position;
+                    vec3 Ia;
+                    vec3 Id;
+                    vec3 Is;
+                };
+                
+                uniform Light light;
+                uniform mat4 m_proj;
+                uniform mat4 m_view;
+                uniform mat4 m_model;
+                uniform vec3 camPos;
+                
+                void main() {
+                    vec3 normal = mat3(transpose(inverse(m_model))) * normalize(in_normal);
+                    vec3 ambient = light.Ia;
+                    vec3 lightDir = normalize(light.position-in_position);
+                    vec3 diffuse = light.Id * max(0,dot(lightDir,normalize(normal)));
+                    
+                    //Specular light
+                    vec3 viewDir = normalize(camPos-in_position);
+                    vec3 reflectDir = reflect(-lightDir, normalize(normal));
+                    float spec = pow(max(dot(viewDir, reflectDir), 0), 32);
+                    vec3 specular = spec * light.Is;
+
+                    //color = ambient + in_color * diffuse;
+                    color = in_color * (ambient + diffuse + specular);
+                    gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
+                }
+            ''',
+            fragment_shader='''
+                #version 330
+                layout (location = 0) out vec4 fragColor;
+                in vec3 color;
+                void main() { 
+                    fragColor = vec4(color,1.0);
+                }
+            ''',
+        )
         return program

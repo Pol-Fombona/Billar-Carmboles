@@ -44,15 +44,39 @@ class GraphicsEngine:
         #self.scene = Cube(self, pos=(10,1,0), rot=(0,0,0), scale = (0.1,0.4,0.1))
 
         # Esfera per particions horitzontals i verticals
-        self.ball_1 = Sphere(self, pos =(5,3,10), radi = 1, slices= 20, stacks = 20, color = (1,1,1))
-        self.ball_2 = Sphere(self, pos =(5,3,15), radi = 1, slices= 20, stacks = 20, color = (1,1,0))
-        self.ball_3 = Sphere(self, pos =(10,3,10), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
+        self.ball_1 = Sphere(self, pos =(20,3,10), radi = 1, slices= 20, stacks = 20, color = (1,1,1))
+
+        self.ball_2 = Sphere(self, pos =(20,3,60), radi = 1, slices= 20, stacks = 20, color = (1,1,0))
+        self.ball_3 = Sphere(self, pos =(23,3,60), radi = 1, slices= 20, stacks = 20, color = (1,1,0))
+        self.ball_4 = Sphere(self, pos =(17,3,60), radi = 1, slices= 20, stacks = 20, color = (1,1,0))
+
+        self.ball_5 = Sphere(self, pos =(26,3,65), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
+        self.ball_6 = Sphere(self, pos =(23,3,65), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
+        self.ball_7 = Sphere(self, pos =(20,3,65), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
+        self.ball_8 = Sphere(self, pos =(17,3,65), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
+        self.ball_9 = Sphere(self, pos =(14,3,65), radi = 1, slices= 20, stacks = 20, color = (1,0,1))
+
+        self.ball_10 = Sphere(self, pos =(29,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        self.ball_11 = Sphere(self, pos =(26,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        self.ball_12 = Sphere(self, pos =(23,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        self.ball_13 = Sphere(self, pos =(20,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        self.ball_14 = Sphere(self, pos =(17,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        self.ball_15 = Sphere(self, pos =(14,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        self.ball_16 = Sphere(self, pos =(11,3,75), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+        
+        self.ball_17 = Sphere(self, pos =(20,3,80), radi = 1, slices= 20, stacks = 20, color = (0.8,0.1,1))
+
         # Esfera per subdivisions de triangles
         #from Object import SphereSubdivision
-        #self.ball_1 = SphereSubdivision(self, depth = 3, pos=(5,3,10))
-        #self.ball_2 = SphereSubdivision(self, depth = 3, pos=(5,3,15))
+        #self.ball_1 = SphereSubdivision(self, depth = 3, pos=(5,3,10), color1=(1,0,0), color2=(1,1,0))
+        #self.ball_2 = SphereSubdivision(self, depth = 3, pos=(10,3,10), color1=(0.5,0.5,0), color2=(0,1,1))
+        #self.ball_3 = SphereSubdivision(self, depth = 3, pos=(15,3,10), color1=(0,0,1), color2=(1,0,1))
 
-        self.objects = [self.ball_1, self.ball_2, self.ball_3]
+
+        self.objects = [self.ball_1, self.ball_2, self.ball_3, self.ball_4, self.ball_5, 
+                        self.ball_6, self.ball_7, self.ball_8, self.ball_9, self.ball_10,
+                        self.ball_11, self.ball_12, self.ball_13, self.ball_14, self.ball_15,
+                        self.ball_16, self.ball_17]
 
         # Pal
         CUE_LENGTH = 20
@@ -132,26 +156,8 @@ class GraphicsEngine:
 
                 pg.quit()
                 sys.exit()
-
-            if event.type == pg.KEYDOWN and event.key == pg.K_r:
-                self.mode_rotate = not self.mode_rotate
-
-                if self.mode_rotate:
-                    self.ball_1.rotate = True
-
-                else:
-                    self.ball_1.rotate = False
-
-            elif event.type == pg.KEYDOWN and event.key == pg.K_o:
-                self.mode_object = not self.mode_object
-
-                if self.mode_object:
-                    self.ball_1.object = True
-
-                else:
-                    self.ball_1.object = False
    
-            elif event.type == pg.KEYDOWN and event.key == pg.K_b:
+            if event.type == pg.KEYDOWN and event.key == pg.K_b:
 
                 self.mode_birc_cam = not self.mode_birc_cam
 
@@ -165,13 +171,9 @@ class GraphicsEngine:
             elif event.type == pg.KEYDOWN and event.key == pg.K_p:
                 ## Reset positions
 
-                self.ball_1.velocityX, self.ball_1.velocityZ = 0, 0
-                self.ball_1.pos = (5,3,10)
-                self.ball_2.velocityX, self.ball_2.velocityZ = 0, 0
-                self.ball_2.pos = (5,3,15)
-                self.ball_3.velocityX, self.ball_3.velocityZ = 0, 0
-                self.ball_3.pos = (10,3,10)
-
+                for object in self.objects:
+                    object.velocityX, object.velocityZ = 0, 0
+                    object.pos = object.initial_position
 
             elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
                 self.ball_1.velocityX += -0.5
@@ -181,10 +183,6 @@ class GraphicsEngine:
                 self.ball_1.velocityZ += -0.5
             elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
                 self.ball_1.velocityZ += 0.5
-            elif event.type == pg.KEYDOWN and event.key == pg.K_n:
-                self.ball_1.velocityZ += 0.5
-                self.ball_1.velocityX += 0.5
-
             
             elif event.type == pg.KEYDOWN and event.key == pg.K_k:
                 self.cue.rotate_flag = True
