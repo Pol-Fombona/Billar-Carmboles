@@ -17,17 +17,12 @@ class Scene:
         app = self.app
         add = self.add_object
 
-        print("aaaa")
-        print(TABLE_POSITION)
-        print(LEG_1)
-        print("aaa")
-
         add(Legs(app, pos=LEG_1))
         add(Legs(app, pos=LEG_2))
         add(Legs(app, pos=LEG_3))
         add(Legs(app, pos=LEG_4))
         add(Table(app, pos=TABLE_POSITION))
-        add(TableFloor(app, pos=(0, 0, 0), tex_id=2))
+        add(TableFloor(app, pos=(0, 0, 0), tex_id=0))
 
     def render(self):
         for obj in self.objects:

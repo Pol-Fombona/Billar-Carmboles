@@ -22,7 +22,6 @@ class BaseModel:
 
     def get_model_matrix(self):
         m_model = glm.mat4()
-        print(self.pos)
         m_model = glm.translate(m_model, self.pos)
 
         return m_model

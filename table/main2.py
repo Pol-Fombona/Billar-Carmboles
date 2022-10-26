@@ -52,7 +52,6 @@ class GraphicsEngine:
             ),
             table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
         )
-        self.positions = {"leg1": (0, 0, 0), "leg2": (3, 3, 3)}
         # scene
         self.mesh = Mesh(self)
         self.scene = Scene(self)
