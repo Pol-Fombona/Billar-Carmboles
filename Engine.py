@@ -184,10 +184,10 @@ class GraphicsEngine:
             elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
                 self.ball_1.velocityZ += 0.5
             
-            elif event.type == pg.KEYDOWN and event.key == pg.K_k:
+            elif event.type == pg.KEYDOWN and event.key == pg.K_k and not self.cue.displace_cue:
                 self.cue.rotate_flag = True
                 self.cue.rotate_direction=1
-            elif event.type == pg.KEYDOWN and event.key == pg.K_j:
+            elif event.type == pg.KEYDOWN and event.key == pg.K_j and not self.cue.displace_cue:
                 self.cue.rotate_flag = True
                 self.cue.rotate_direction=-1
             elif event.type == pg.KEYUP and event.key == pg.K_k:
@@ -196,9 +196,9 @@ class GraphicsEngine:
             elif event.type == pg.KEYUP and event.key == pg.K_j:
                 self.cue.rotate_flag = False
                 self.cue.rotate_direction=0
-            elif event.type == pg.MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONDOWN and not self.cue.rotate_flag:
                 self.cue.displace_cue=True
-            elif event.type == pg.MOUSEBUTTONUP:
+            elif event.type == pg.MOUSEBUTTONUP and not self.cue.rotate_flag:
                 self.cue.displace_cue=False
                 self.cue.reset_pos = False
                 
