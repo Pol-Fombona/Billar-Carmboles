@@ -200,7 +200,7 @@ class GraphicsEngine:
                 self.cue.rotate_direction=0
             elif event.type == pg.MOUSEBUTTONDOWN and not self.cue.rotate_flag:
                 self.cue.displace_cue=True
-            elif event.type == pg.MOUSEBUTTONUP:
+            elif event.type == pg.MOUSEBUTTONUP and not self.cue.rotate_flag:
                 self.cue.displace_cue=False
                 self.cue.reset_pos = False
                 
