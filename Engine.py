@@ -79,11 +79,11 @@ class GraphicsEngine:
                         self.ball_16, self.ball_17]
 
         # Pal
-        CUE_LENGTH = 20
-        CUE_WIDTH = 1
-        CUE_HEIGTH = 1
-        DIST_BALL = 1.2
-        self.cue = Cue(self, axis =glm.vec3(5,3,10), length = CUE_LENGTH, width = CUE_WIDTH, heigth = CUE_HEIGTH, dist_ball = DIST_BALL)
+        #CUE_LENGTH = 20
+        #CUE_WIDTH = 1
+        #CUE_HEIGTH = 1
+        #DIST_BALL = 1.2
+        self.cue = Cue(self, axis =glm.vec3(20,3,10))
         #self.cue = Cue(self,pos=(5,3,10))
 
         ###
