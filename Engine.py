@@ -48,59 +48,59 @@ class GraphicsEngine:
 
         # Esfera per particions horitzontals i verticals
         self.ball_1 = Sphere(
-            self, pos=(20, 3, 10), radi=1, slices=20, stacks=20, color=(1, 1, 1)
+            self, pos=(20, 1, 10), radi=1, slices=20, stacks=20, color=(1, 1, 1)
         )
 
         self.ball_2 = Sphere(
-            self, pos=(20, 3, 60), radi=1, slices=20, stacks=20, color=(1, 1, 0)
+            self, pos=(20, 1, 60), radi=1, slices=20, stacks=20, color=(1, 1, 0)
         )
         self.ball_3 = Sphere(
-            self, pos=(23, 3, 60), radi=1, slices=20, stacks=20, color=(1, 1, 0)
+            self, pos=(23, 1, 60), radi=1, slices=20, stacks=20, color=(1, 1, 0)
         )
         self.ball_4 = Sphere(
-            self, pos=(17, 3, 60), radi=1, slices=20, stacks=20, color=(1, 1, 0)
+            self, pos=(17, 1, 60), radi=1, slices=20, stacks=20, color=(1, 1, 0)
         )
 
         self.ball_5 = Sphere(
-            self, pos=(26, 3, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
+            self, pos=(26, 1, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
         )
         self.ball_6 = Sphere(
-            self, pos=(23, 3, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
+            self, pos=(23, 1, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
         )
         self.ball_7 = Sphere(
-            self, pos=(20, 3, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
+            self, pos=(20, 1, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
         )
         self.ball_8 = Sphere(
-            self, pos=(17, 3, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
+            self, pos=(17, 1, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
         )
         self.ball_9 = Sphere(
-            self, pos=(14, 3, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
+            self, pos=(14, 1, 65), radi=1, slices=20, stacks=20, color=(1, 0, 1)
         )
 
         self.ball_10 = Sphere(
-            self, pos=(29, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(29, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
         self.ball_11 = Sphere(
-            self, pos=(26, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(26, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
         self.ball_12 = Sphere(
-            self, pos=(23, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(23, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
         self.ball_13 = Sphere(
-            self, pos=(20, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(20, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
         self.ball_14 = Sphere(
-            self, pos=(17, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(17, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
         self.ball_15 = Sphere(
-            self, pos=(14, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(14, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
         self.ball_16 = Sphere(
-            self, pos=(11, 3, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(11, 1, 75), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
 
         self.ball_17 = Sphere(
-            self, pos=(20, 3, 80), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
+            self, pos=(20, 1, 80), radi=1, slices=20, stacks=20, color=(0.8, 0.1, 1)
         )
 
         # Esfera per subdivisions de triangles
