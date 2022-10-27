@@ -134,7 +134,7 @@ class GraphicsEngine:
         # CUE_WIDTH = 1
         # CUE_HEIGTH = 1
         # DIST_BALL = 1.2
-        self.cue = Cue(self, axis=glm.vec3(20, 3, 10))
+        self.cue = Cue(self, axis=glm.vec3(self.ball_1.pos))
         # self.cue = Cue(self,pos=(5,3,10))
 
         ###
