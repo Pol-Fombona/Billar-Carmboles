@@ -43,9 +43,6 @@ class GraphicsEngine:
         # camera
         self.camera = Camera(self)
 
-        # scene
-        # self.scene = Cube(self, pos=(10,1,0), rot=(0,0,0), scale = (0.1,0.4,0.1))
-
         # Esfera per particions horitzontals i verticals
         self.ball_1 = Sphere(
             self, pos=(20, 1, 10), radi=1, slices=20, stacks=20, color=(1, 1, 1)
@@ -148,7 +145,7 @@ class GraphicsEngine:
         TABLE_LENGTH = 83.28
         TABLE_HEIGHT = 0.5
         MARGIN_WIDTH = 1
-        LEGS_HEIGHT = 2
+        LEGS_HEIGHT = 20
         TABLE_PROF = TABLE_HEIGHT / 2
         TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 

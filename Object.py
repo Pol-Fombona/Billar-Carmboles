@@ -272,8 +272,8 @@ class Sphere:
         self.radi = radi
         self.color = color
 
-        self.last_rotation = (0, 1, 1)
-        self.collisions = {"vX": False, "vZ": False}
+        self.translation = glm.mat4()
+        self.rotation = glm.mat4()
 
         ## velocity and friction
         self.velocityX = 0
@@ -329,9 +329,13 @@ class Sphere:
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
         self.shader_program["m_view"].write(self.app.camera.m_view)
 
-        m_model = self.m_model
+        self.translation, new_rotation = movement(self)
 
-        m_model = movement(self, m_model)
+        if new_rotation != None:
+            self.rotation = new_rotation * self.rotation
+
+        m_model = self.translation * self.rotation
+
         self.shader_program["m_model"].write(m_model)
 
     def render(self):
@@ -1630,15 +1634,15 @@ class SphereSubdivision:
         self.depth = depth
         self.ctx = app.ctx
 
+        self.translation = glm.mat4()
+        self.rotation = glm.mat4()
+
         self.color1 = color1
         self.color2 = color2
         self.radi = 1
 
         self.vbo = self.get_vbo()
         self.shader_program = self.get_shader_program()
-
-        self.last_rotation = (0, 1, 1)
-        self.collisions = {"vX": False, "vZ": False}
 
         self.vao = self.get_vao()
         self.vaoa = self.get_vao()
@@ -1695,10 +1699,12 @@ class SphereSubdivision:
         self.shader_program["m_proj"].write(self.app.camera.m_proj)
         self.shader_program["m_view"].write(self.app.camera.m_view)
 
-        m_model = self.m_model
+        self.translation, new_rotation = movement(self)
 
-        m_model = movement(self, m_model)
+        if new_rotation != None:
+            self.rotation = new_rotation * self.rotation
 
+        m_model = self.translation * self.rotation
         self.shader_program["m_model"].write(m_model)
         self.shader_program["camPos"].write(self.app.camera.position)
 

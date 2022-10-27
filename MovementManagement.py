@@ -135,7 +135,7 @@ def checkEdgeCollisions(objects):
             ball.velocityZ = -abs(ball.velocityZ) * edge_collision_loss
  
 
-def movement(ball, m_model):
+def movement(ball):
     # Controls the movement of the balls adding friction and rotation
 
     if abs(ball.velocityX) < 0.001:
@@ -155,48 +155,28 @@ def movement(ball, m_model):
     ball.velocityZ = ball.velocityZ * friction
     ball.pos = (ball.pos[0]+ball.velocityX, ball.pos[1], ball.pos[2] + ball.velocityZ)
 
-    m_model = glm.mat4()
-    m_model = glm.translate(m_model, ball.pos)
+    translation = glm.mat4()
+    translation = glm.translate(translation, ball.pos)
 
     ### Ball Rotation
-    m_model = ballRotation(ball, m_model)
+    rotation = ballRotation(ball)
 
-    return m_model
+    return translation, rotation
 
 
-def ballRotation(ball, m_model):
-
-    # TODO: Quan fa un canvi de direcció en diagonal no fa el canvi de rotació suaument
+def ballRotation(ball):
 
     radi = 1
     perimeter = 2*np.pi*radi
-    last_rotation = ball.last_rotation
     vX, vZ = ball.velocityX, ball.velocityZ
     velocity = np.sqrt(vX**2 + vZ**2)
 
     if velocity != 0:
+
         angle_to_rotate = 360 * (velocity / perimeter)
-
-        if (last_rotation[1] * vX) >= 0 and (last_rotation[2] * vZ) >= 0:
-            angle_to_rotate += ball.last_rotation[0]
-
-        else:
-            #Canvis en diagonal
-            if (vX != 0 and vZ != 0):
-                # Xoc en eix Z
-                if (last_rotation[1] * vX) >= 0 and  (last_rotation[2] * vZ) < 0:
-                    ...
-                # Xoc en eix X
-                else:
-                    ...
-            # Canvis perpendiculars
-            else:
-                angle_to_rotate = 360 - ball.last_rotation[0] + angle_to_rotate
-
-        m_model = glm.rotate(m_model, glm.radians(angle_to_rotate), (vZ, 0, -vX))
-        ball.last_rotation = (angle_to_rotate%360, vX, vZ)
+        coords = np.cross(np.array((vX, 0, vZ)), np.array((0,1,0)))
+        rotation = glm.mat4()
+        return glm.rotate(rotation, glm.radians(-angle_to_rotate), (coords[0], coords[1], coords[2]))
 
     else:
-        m_model = glm.rotate(m_model, glm.radians(ball.last_rotation[0]), (ball.last_rotation[2], 0, -ball.last_rotation[1]))
-
-    return m_model
+        return None
