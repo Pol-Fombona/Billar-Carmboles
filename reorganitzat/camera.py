@@ -54,7 +54,7 @@ class Camera:
         return glm.lookAt(self.position, self.position + self.forward, self.up)
 
     def get_projection_matrix(self):
-        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 100)
+        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 500)
 
     def update(self):
         self.move()

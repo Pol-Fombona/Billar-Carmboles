@@ -19,6 +19,13 @@ class VAO:
             program=self.program.programs["table_floor"],
             vbo=self.vbo.vbos["table_floor"],
         )
+        self.vaos["balls"] = self.get_vao(
+            program=self.program.programs["balls"], vbo=self.vbo.vbos["balls"]
+        )
+        self.vaos["subdivision_balls"] = self.get_vao(
+            program=self.program.programs["subdivision_balls"], 
+            vbo=self.vbo.vbos["subdivision_balls"]
+        )
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)])

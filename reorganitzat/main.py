@@ -3,17 +3,21 @@ import moderngl as mgl
 import sys
 
 from model import *
-from camera import *
+from FreeCamera import *
 from mesh import Mesh
 from scene import Scene
 
+from Light import Light
+from MovementManagement import checkBallsCollisions, checkEdgeCollisions
+
+
 
 # Table measures
-TABLE_WIDTH = 1.27
-TABLE_LENGTH = 2.54
+TABLE_WIDTH = 41.64
+TABLE_LENGTH = 83.28
 TABLE_HEIGHT = 0.5
-MARGIN_WIDTH = 0.2
-LEGS_HEIGHT = 2
+MARGIN_WIDTH = 1
+LEGS_HEIGHT = 500
 TABLE_PROF = (
     TABLE_HEIGHT / 2
 )  # Aixo es la profunditat de la moqueta a l'interor de la taula
@@ -22,7 +26,7 @@ TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 
 
 class GraphicsEngine:
-    def __init__(self, win_size=(900, 900)):
+    def __init__(self, win_size=(1600, 900)):
         # init pygame modules
         pg.init()
         # window size
@@ -43,6 +47,7 @@ class GraphicsEngine:
         # self.ctx.viewport(0,0,self.WIN_SIZE[0]/2,self.WIN_SIZE[1]/2)
         self.clock = pg.time.Clock()
         # camera
+        '''
         self.camera = Camera(
             self,
             position=(
@@ -52,12 +57,17 @@ class GraphicsEngine:
             ),
             table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
         )
+        '''
+        self.camera = Camera(self)
         # scene
+        self.light = Light()
         self.mesh = Mesh(self)
         self.scene = Scene(self)
         self.scene.pinfo = "Object: ON"
         self.scene.o = True
         self.delta_time = 0
+        self.mode_bird_cam = True
+
 
     def check_events(self):
         for event in pg.event.get():
@@ -74,13 +84,33 @@ class GraphicsEngine:
                 else:
                     self.scene.pinfo = "Object: OFF"
                     self.scene.o = False
-            if event.type == pg.KEYDOWN and event.key == pg.K_p:
-                if not self.axis.o:
-                    self.axis.pinfo = "Axis: ON"
-                    self.axis.o = True
+
+    
+            elif event.type == pg.KEYDOWN and event.key == pg.K_b:
+
+                self.mode_bird_cam = not self.mode_bird_cam
+
+                if self.mode_bird_cam:
+                    self.camera.bird_camera = True
+
                 else:
-                    self.axis.pinfo = "Axis: OFF"
-                    self.axis.o = False
+                    self.camera.bird_camera = False   
+
+            elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                self.scene.ball_objects[0].velocityX += -0.5
+            elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
+                self.scene.ball_objects[0].velocityX += 0.5
+            elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
+                self.scene.ball_objects[0].velocityZ += -0.5
+            elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
+                self.scene.ball_objects[0].velocityZ += 0.5
+
+            elif event.type == pg.KEYDOWN and event.key == pg.K_p:
+                ## Reset positions
+
+                for object in self.scene.ball_objects:
+                    object.velocityX, object.velocityZ = 0, 0
+                    object.pos = object.initial_position
 
     def render(self):
         # clear framebuffer
@@ -88,7 +118,11 @@ class GraphicsEngine:
         # render scene
         if self.scene.o:
             self.scene.render()
-        pg.display.set_caption(f" | {self.scene.pinfo} | {self.camera.pinfo}")
+
+        checkBallsCollisions(self.scene.ball_objects)
+        checkEdgeCollisions(self.scene.ball_objects)
+
+        #pg.display.set_caption(f" | {self.scene.pinfo} | {self.camera.pinfo}")
         # swap buffers
         pg.display.flip()
 

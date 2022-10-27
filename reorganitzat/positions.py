@@ -1,8 +1,8 @@
-TABLE_WIDTH = 1.27
-TABLE_LENGTH = 2.54
+TABLE_WIDTH = 41.64
+TABLE_LENGTH = 83.28
 TABLE_HEIGHT = 0.5
-MARGIN_WIDTH = 0.2
-LEGS_HEIGHT = 2
+MARGIN_WIDTH = 1
+LEGS_HEIGHT = 500
 TABLE_PROF = (
     TABLE_HEIGHT / 2
 )  # Aixo es la profunditat de la moqueta a l'interor de la taula
@@ -29,3 +29,14 @@ TABLE_FLOOR = (
     TABLE_POSITION[1] + TABLE_PROF,
     TABLE_POSITION[2] + +MARGIN_WIDTH,
 )
+
+### BALLS
+SLICES = 20
+STACKS = 20
+RADIUS = 1
+BALL_COLOR = (1,0,1)
+
+# SubDivision ball colour
+SDCOLOR1 = (1,0,0)
+SDCOLOR2 = (1,1,0)
+SDDEPTH = 4
