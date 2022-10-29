@@ -26,6 +26,9 @@ class VAO:
             program=self.program.programs["subdivision_balls"], 
             vbo=self.vbo.vbos["subdivision_balls"]
         )
+        self.vaos["cue"] = self.get_vao(program=self.program.programs["cue"],
+            vbo=self.vbo.vbos["cue"]
+        )
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)])

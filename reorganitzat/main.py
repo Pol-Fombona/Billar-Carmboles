@@ -112,6 +112,32 @@ class GraphicsEngine:
                     object.velocityX, object.velocityZ = 0, 0
                     object.pos = object.initial_position
 
+            elif (
+                event.type == pg.KEYDOWN
+                and event.key == pg.K_k
+                and not self.scene.cue_objects[0].displace_cue
+            ):
+                self.scene.cue_objects[0].rotate_flag = True
+                self.scene.cue_objects[0].rotate_direction = 1
+            elif (
+                event.type == pg.KEYDOWN
+                and event.key == pg.K_j
+                and not self.scene.cue_objects[0].displace_cue
+            ):
+                self.scene.cue_objects[0].rotate_flag = True
+                self.scene.cue_objects[0].rotate_direction = -1
+            elif event.type == pg.KEYUP and event.key == pg.K_k:
+                self.scene.cue_objects[0].rotate_flag = False
+                self.scene.cue_objects[0].rotate_direction = 0
+            elif event.type == pg.KEYUP and event.key == pg.K_j:
+                self.scene.cue_objects[0].rotate_flag = False
+                self.scene.cue_objects[0].rotate_direction = 0
+            elif event.type == pg.MOUSEBUTTONDOWN and not self.scene.cue_objects[0].rotate_flag:
+                self.scene.cue_objects[0].displace_cue = True
+            elif event.type == pg.MOUSEBUTTONUP and not self.scene.cue_objects[0].rotate_flag:
+                self.scene.cue_objects[0].displace_cue = False
+                self.scene.cue_objects[0].reset_pos = False
+
     def render(self):
         # clear framebuffer
         self.ctx.clear(color=(0.08, 0.16, 0.18))

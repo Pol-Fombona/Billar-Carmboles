@@ -14,6 +14,7 @@ class Texture:
         self.textures[2] = self.get_texture(path="textures/test_mantel.png")
         #self.textures[3] = None # Falta per crear les textures de les boles
         #self.textures[4] = None # Falta per crear les textures de les boles subdivisions
+        self.textures[5] = self.get_texture(path="textures/cue.png")
 
 
     def get_texture(self, path):
