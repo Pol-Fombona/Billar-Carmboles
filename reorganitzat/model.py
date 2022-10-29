@@ -267,6 +267,7 @@ class Cue(BaseModel):
         self.program["m_model"].write(self.m_model)
 
     def update(self):
+        self.texture.use()
         if self.app.scene.ball_objects[0].velocityX == self.app.scene.ball_objects[0].velocityZ == 0:
             if self.app.scene.ball_objects[1].velocityX == self.app.scene.ball_objects[1].velocityZ == 0:
                 if self.moving == True:
