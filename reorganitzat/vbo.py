@@ -52,8 +52,8 @@ class LegsVBO(BaseVBO):
         return np.array(data, dtype="f4")
 
     def get_vertex_data(self):
-        size = 0.2
-        height = 2
+        size = 0.5
+        height = 10
         posx = 0
         posy = 0
         posz = 0
