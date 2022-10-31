@@ -1,11 +1,13 @@
 import pygame as pg
 import moderngl as mgl
+import time
 import sys
 
 from model import *
 from FreeCamera import *
 from mesh import Mesh
 from scene import Scene
+from MenuManager import pause_manager, progress_manager
 
 from Light import Light
 from MovementManagement import checkBallsCollisions, checkEdgeCollisions
@@ -67,76 +69,83 @@ class GraphicsEngine:
         self.scene.o = True
         self.delta_time = 0
         self.mode_bird_cam = True
+        self.pause = False
+        self.quit = False
 
 
     def check_events(self):
+        if self.quit:
+            self.mesh.destroy()
+            pg.quit()
+            sys.exit()
+
         for event in pg.event.get():
-            if event.type == pg.QUIT or (
-                event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE
-            ):
-                self.mesh.destroy()
-                pg.quit()
-                sys.exit()
-            if event.type == pg.KEYDOWN and event.key == pg.K_o:
-                if not self.scene.o:
-                    self.scene.pinfo = "Object: ON"
-                    self.scene.o = True
-                else:
-                    self.scene.pinfo = "Object: OFF"
-                    self.scene.o = False
 
-    
-            elif event.type == pg.KEYDOWN and event.key == pg.K_b:
+            if not self.pause:
+                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                    self.pause = True
 
-                self.mode_bird_cam = not self.mode_bird_cam
+                elif event.type == pg.KEYDOWN and event.key == pg.K_o:
+                    if not self.scene.o:
+                        self.scene.pinfo = "Object: ON"
+                        self.scene.o = True
+                    else:
+                        self.scene.pinfo = "Object: OFF"
+                        self.scene.o = False
+        
+                elif event.type == pg.KEYDOWN and event.key == pg.K_b:
 
-                if self.mode_bird_cam:
-                    self.camera.bird_camera = True
+                    self.mode_bird_cam = not self.mode_bird_cam
 
-                else:
-                    self.camera.bird_camera = False   
+                    if self.mode_bird_cam:
+                        self.camera.bird_camera = True
 
-            elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
-                self.scene.ball_objects[0].velocityX += -0.5
-            elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
-                self.scene.ball_objects[0].velocityX += 0.5
-            elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
-                self.scene.ball_objects[0].velocityZ += -0.5
-            elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
-                self.scene.ball_objects[0].velocityZ += 0.5
+                    else:
+                        self.camera.bird_camera = False   
 
-            elif event.type == pg.KEYDOWN and event.key == pg.K_p:
-                ## Reset positions
+                elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                    self.scene.ball_objects[0].velocityX += -0.5
+                elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
+                    self.scene.ball_objects[0].velocityX += 0.5
+                elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
+                    self.scene.ball_objects[0].velocityZ += -0.5
+                elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
+                    self.scene.ball_objects[0].velocityZ += 0.5
 
-                for object in self.scene.ball_objects:
-                    object.velocityX, object.velocityZ = 0, 0
-                    object.pos = object.initial_position
+                elif event.type == pg.KEYDOWN and event.key == pg.K_p:
+                    ## Reset positions
 
-            elif (
-                event.type == pg.KEYDOWN
-                and event.key == pg.K_k
-                and not self.scene.cue_objects[0].displace_cue
-            ):
-                self.scene.cue_objects[0].rotate_flag = True
-                self.scene.cue_objects[0].rotate_direction = 1
-            elif (
-                event.type == pg.KEYDOWN
-                and event.key == pg.K_j
-                and not self.scene.cue_objects[0].displace_cue
-            ):
-                self.scene.cue_objects[0].rotate_flag = True
-                self.scene.cue_objects[0].rotate_direction = -1
-            elif event.type == pg.KEYUP and event.key == pg.K_k:
-                self.scene.cue_objects[0].rotate_flag = False
-                self.scene.cue_objects[0].rotate_direction = 0
-            elif event.type == pg.KEYUP and event.key == pg.K_j:
-                self.scene.cue_objects[0].rotate_flag = False
-                self.scene.cue_objects[0].rotate_direction = 0
-            elif event.type == pg.MOUSEBUTTONDOWN and not self.scene.cue_objects[0].rotate_flag:
-                self.scene.cue_objects[0].displace_cue = True
-            elif event.type == pg.MOUSEBUTTONUP and not self.scene.cue_objects[0].rotate_flag:
-                self.scene.cue_objects[0].displace_cue = False
-                self.scene.cue_objects[0].reset_pos = False
+                    for object in self.scene.ball_objects:
+                        object.velocityX, object.velocityZ = 0, 0
+                        object.pos = object.initial_position
+
+                elif (
+                    event.type == pg.KEYDOWN
+                    and event.key == pg.K_k
+                    and not self.scene.cue_objects[0].displace_cue
+                ):
+                    self.scene.cue_objects[0].rotate_flag = True
+                    self.scene.cue_objects[0].rotate_direction = 1
+                elif (
+                    event.type == pg.KEYDOWN
+                    and event.key == pg.K_j
+                    and not self.scene.cue_objects[0].displace_cue
+                ):
+                    self.scene.cue_objects[0].rotate_flag = True
+                    self.scene.cue_objects[0].rotate_direction = -1
+                elif event.type == pg.KEYUP and event.key == pg.K_k:
+                    self.scene.cue_objects[0].rotate_flag = False
+                    self.scene.cue_objects[0].rotate_direction = 0
+                elif event.type == pg.KEYUP and event.key == pg.K_j:
+                    self.scene.cue_objects[0].rotate_flag = False
+                    self.scene.cue_objects[0].rotate_direction = 0
+                elif event.type == pg.MOUSEBUTTONDOWN and not self.scene.cue_objects[0].rotate_flag:
+                    self.scene.cue_objects[0].displace_cue = True
+                elif event.type == pg.MOUSEBUTTONUP and not self.scene.cue_objects[0].rotate_flag:
+                    self.scene.cue_objects[0].displace_cue = False
+                    self.scene.cue_objects[0].reset_pos = False
+
+            
 
     def render(self):
         # clear framebuffer
@@ -153,11 +162,28 @@ class GraphicsEngine:
         pg.display.flip()
 
     def run(self):
+
+        last_timestamp = time.time()
+        played_time = 0
+
         while True:
+
             self.check_events()
-            self.camera.update()
-            self.render()
-            self.delta_time = self.clock.tick(60)
+
+            if self.pause:
+                pg.event.set_grab(False)
+                self.quit = pause_manager()
+                pg.event.set_grab(True)
+                self.pause = False
+                last_timestamp = time.time()
+                pg.event.clear()
+
+            else:
+                self.camera.update()
+                self.render()
+
+                played_time, last_timestamp = progress_manager(played_time, last_timestamp, time.time())
+                self.delta_time = self.clock.tick(60)
 
 
 if __name__ == "__main__":
