@@ -2,7 +2,7 @@ import itertools
 import glm
 import numpy as np
 
-friction = 0.99
+friction = 0.01
 edge_collision_loss = 0.99
 ball_collision_loss = 0.9
 radius = 1
@@ -151,11 +151,11 @@ def movement(ball):
         if abs(ball.velocityX) < 0.01:
             ball.velocityX = 0
 
-    ball.velocityX = ball.velocityX * friction
-    ball.velocityZ = ball.velocityZ * friction
+    ball.velocityX = ball.velocityX * (1 - friction)
+    ball.velocityZ = ball.velocityZ * (1 - friction)
     ball.pos = (ball.pos[0]+ball.velocityX, ball.pos[1], ball.pos[2] + ball.velocityZ)
 
-    translation = glm.mat4()
+    translation = glm.mat4()   
     translation = glm.translate(translation, ball.pos)
 
     ### Ball Rotation

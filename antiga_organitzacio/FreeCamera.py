@@ -43,12 +43,7 @@ class Camera:
         self.up = glm.normalize(glm.cross(self.right, self.forward))
 
     def set_bird_camera(self):
-        #self.m_view = glm.lookAt(glm.vec3(0,50,0), glm.vec3(0), glm.vec3(-1,0,0))
-
-        pos = glm.vec3(      23.0077,      54.1003,       42.303 )
-        forw = glm.vec3(   -0.0174524,    -0.999848,  -8.7392e-17 )
-        up = glm.vec3(    -0.999848,    0.0174524, -5.00668e-15 )
-        self.m_view = glm.lookAt(pos, pos+forw, up)
+        self.m_view = glm.lookAt(glm.vec3(0,50,0), glm.vec3(0), glm.vec3(-1,0,0))
         
 
     def move(self):
@@ -71,6 +66,7 @@ class Camera:
 
 
     def get_view_matrix(self):
+
         return glm.lookAt(self.position, self.position + self.forward, self.up)
     
     def get_projection_matrix(self):
