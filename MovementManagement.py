@@ -20,8 +20,8 @@ def checkBallsCollisions(objects):
 
     for ball_1, ball_2 in itertools.combinations(objects, 2):
 
-        v1 = np.array((ball_1.velocityX, 0, ball_1.velocityZ))
-        v2 = np.array((ball_2.velocityX, 0, ball_2.velocityZ))
+        v1 = ball_1.velocity #np.array((ball_1.velocityX, 0, ball_1.velocityZ))
+        v2 = ball_2.velocity #np.array((ball_2.velocityX, 0, ball_2.velocityZ))
         
         if np.sum(abs(v1)) != 0 or np.sum(abs(v2)) != 0:
             
@@ -87,8 +87,8 @@ def ballCollision(ball_1, ball_2, v1, v2):
     v1f *= ball_collision_loss
     v2f *= ball_collision_loss
 
-    ball_1.velocityX, ball_1.velocityZ = v1f[0], v1f[2]
-    ball_2.velocityX, ball_2.velocityZ = v2f[0], v2f[2]
+    ball_1.velocity[0], ball_1.velocity[2] = v1f[0], v1f[2]
+    ball_2.velocity[0], ball_2.velocity[2] = v2f[0], v2f[2]
 
 
 def getImpactVelocityTwoMovingObjects(v1, v2, m1, m2, x1, x2):
@@ -122,38 +122,38 @@ def checkEdgeCollisions(objects):
 
         # X-edges of table
         if (ball.pos[0] - 1) <= 0:
-            ball.velocityX = abs(ball.velocityX) * edge_collision_loss
+            ball.velocity[0] = abs(ball.velocity[0]) * edge_collision_loss
 
         elif (ball.pos[0] + 1 ) >= width_table:
-            ball.velocityX = -abs(ball.velocityX) * edge_collision_loss
+            ball.velocity[0] = -abs(ball.velocity[0]) * edge_collision_loss
 
         # Z-edges of table
         elif (ball.pos[2] - 1) <= 0:
-            ball.velocityZ = abs(ball.velocityZ) * edge_collision_loss
+            ball.velocity[2] = abs(ball.velocity[2]) * edge_collision_loss
 
         elif (ball.pos[2] + 1) >= lenght_table:
-            ball.velocityZ = -abs(ball.velocityZ) * edge_collision_loss
+            ball.velocity[2] = -abs(ball.velocity[2]) * edge_collision_loss
  
 
 def movement(ball):
     # Controls the movement of the balls adding friction and rotation
 
-    if abs(ball.velocityX) < 0.001:
-        ball.velocityX = 0
+    if abs(ball.velocity[0]) < 0.001:
+        ball.velocity[0] = 0
 
-        if abs(ball.velocityZ) < 0.01:
-            ball.velocityZ = 0
+        if abs(ball.velocity[2]) < 0.01:
+            ball.velocity[2] = 0
 
 
-    elif abs(ball.velocityZ) < 0.001:
-        ball.velocityZ = 0
+    elif abs(ball.velocity[2]) < 0.001:
+        ball.velocity[2] = 0
 
-        if abs(ball.velocityX) < 0.01:
-            ball.velocityX = 0
+        if abs(ball.velocity[0]) < 0.01:
+            ball.velocity[0] = 0
 
-    ball.velocityX = ball.velocityX * (1 - friction)
-    ball.velocityZ = ball.velocityZ * (1 - friction)
-    ball.pos = (ball.pos[0]+ball.velocityX, ball.pos[1], ball.pos[2] + ball.velocityZ)
+    ball.velocity[0]= ball.velocity[0] * (1 - friction)
+    ball.velocity[2] = ball.velocity[2] * (1 - friction)
+    ball.pos = (ball.pos[0]+ball.velocity[0], ball.pos[1], ball.pos[2] + ball.velocity[2])
 
     translation = glm.mat4()   
     translation = glm.translate(translation, ball.pos)
@@ -168,7 +168,7 @@ def ballRotation(ball):
 
     radi = 1
     perimeter = 2*np.pi*radi
-    vX, vZ = ball.velocityX, ball.velocityZ
+    vX, vZ = ball.velocity[0], ball.velocity[2]
     velocity = np.sqrt(vX**2 + vZ**2)
 
     if velocity != 0:

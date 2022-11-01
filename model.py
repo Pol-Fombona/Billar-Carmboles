@@ -112,8 +112,9 @@ class Sphere(BaseModel):
         #self.color = color
 
         ## velocity and friction
-        self.velocityX = 0
-        self.velocityZ = 0
+        #self.velocityX = 0
+        #self.velocityZ = 0
+        self.velocity = np.array((0,0,0), dtype=float)
 
         self.slices = slices
         self.stacks = stacks
@@ -162,8 +163,9 @@ class SubdivisionSphere(BaseModel):
         #self.color = color
 
         ## velocity and friction
-        self.velocityX = 0
-        self.velocityZ = 0
+        self.velocity = np.array((0,0,0), dtype=float)
+        #self.velocityX = 0
+        #self.velocityZ = 0
 
         #self.rot = glm.vec3([glm.radians(a) for a in rot])
         #self.scale = scale
@@ -268,8 +270,10 @@ class Cue(BaseModel):
 
     def update(self):
         self.texture.use()
-        if self.app.scene.ball_objects[0].velocityX == self.app.scene.ball_objects[0].velocityZ == 0:
-            if self.app.scene.ball_objects[1].velocityX == self.app.scene.ball_objects[1].velocityZ == 0:
+        #if self.app.scene.ball_objects[0].velocityX == self.app.scene.ball_objects[0].velocityZ == 0:
+        if self.app.scene.ball_objects[0].velocity[0] == self.app.scene.ball_objects[0].velocity[2] == 0:
+        #    if self.app.scene.ball_objects[1].velocityX == self.app.scene.ball_objects[1].velocityZ == 0:
+            if self.app.scene.ball_objects[1].velocity[1] == self.app.scene.ball_objects[1].velocity[2] == 0:
                 if self.moving == True:
                     if self.turn == 1:
                         change_objective(self, self.app.scene.ball_objects[0])
