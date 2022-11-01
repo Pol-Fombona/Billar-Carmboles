@@ -12,26 +12,26 @@ def progress_manager(played_time, last_timestamp, actual_timestamp):
 
     if elapsed_time >= 1: # Més d'un segons
 
+        played_time += int(elapsed_time)
+
         clear_terminal()
         print_onColored("#### Game in Progress ####")
-        played_time, formatted_time = get_played_time(played_time, elapsed_time)
+        formatted_time = format_time(played_time)
         print("Playing time:", formatted_time)
+
         return played_time, actual_timestamp
 
     else:
         return played_time, last_timestamp
 
 
-def get_played_time(played_time, elapsed_time):
-    # Returns total time played in seconds and formatedd ("hh:mm:ss")
-    played_time += int(elapsed_time)
-    formatted_time = datetime.timedelta(seconds=played_time)
+def format_time(time):
+    # Returns total time played in format ("hh:mm:ss")
 
-    return played_time, formatted_time
+    return datetime.timedelta(seconds=time)
 
 
-
-def pause_manager():
+def pause_manager(game):
 
     pause = True
     exit_game = False
@@ -66,10 +66,15 @@ def pause_manager():
     clear_terminal()
 
     if exit_game:
-        print_onColored("#### Game Finalished #### ")
+        game_ended(game)
 
     return exit_game
 
+def game_ended(game):
+    print_onColored("#### Game Finalished #### ")
+    print("Played Time:", format_time(game.played_time))
+    print("Score:", game.get_scores())
+    print("\n")
 
 def modify_friction():
 
