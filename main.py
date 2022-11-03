@@ -12,6 +12,7 @@ from MenuManager import pause_manager, progress_manager
 from Light import Light
 from MovementManagement import checkBallsCollisions, checkEdgeCollisions
 from GameManager import *
+from SoundManager import *
 
 
 
@@ -29,7 +30,8 @@ TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 
 
 class GraphicsEngine:
-    def __init__(self, win_size=(1600, 900)):
+    #def __init__(self, win_size=(1600, 900)):
+    def __init__(self, win_size=(900, 500)):
         # init pygame modules
         pg.init()
         # window size
@@ -73,6 +75,10 @@ class GraphicsEngine:
         self.pause = False
         self.quit = False
         self.game = None
+        self.sound = SoundManager()
+        self.sound.loadSongs()
+        self.sound.loadSounds()
+        self.sound.playSong(0,0)
 
 
     def check_events(self):
@@ -139,7 +145,13 @@ class GraphicsEngine:
                     self.scene.cue_objects[0].displace_cue = False
                     self.scene.cue_objects[0].reset_pos = False
 
-            
+                if event.type == pg.KEYDOWN and event.key == pg.K_m:
+                    if self.sound.song_playing:
+                        self.sound.song_playing = False
+                        self.sound.stopSong(0)
+                    else:
+                        self.sound.song_playing = True
+                        self.sound.playSong(0,-1)       
 
     def render(self):
         # clear framebuffer
@@ -147,9 +159,14 @@ class GraphicsEngine:
         # render scene
         self.scene.render()
 
-        checkBallsCollisions(self.scene.ball_objects)
-        checkEdgeCollisions(self.scene.ball_objects)
-
+        bcollision,blvel = checkBallsCollisions(self.scene.ball_objects)
+        ecollision,elvel = checkEdgeCollisions(self.scene.ball_objects)
+        if bcollision:
+            self.sound.intensityBall(blvel)
+            self.sound.playSound(0,0)
+        if ecollision:
+            self.sound.intensityEdge(elvel)
+            self.sound.playSound(2,0)
         #pg.display.set_caption(f" | {self.scene.pinfo} | {self.camera.pinfo}")
         # swap buffers
         pg.display.flip()

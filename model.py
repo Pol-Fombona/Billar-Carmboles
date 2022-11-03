@@ -292,8 +292,11 @@ class Cue(BaseModel):
                     self.reset_pos = True
                     if self.turn == 1:
                         cue_hit_ball(self, self.app.scene.ball_objects[0])
+                        self.app.sound.intensityCue(self.app.scene.ball_objects[0].velocity)
                     else:
                         cue_hit_ball(self, self.app.scene.ball_objects[1])
+                        self.app.sound.intensityCue(self.app.scene.ball_objects[1].velocity)
+                    self.app.sound.playSound(3,0)
                     self.turn *= -1
                     self.pos = copy.deepcopy(self.axis)
                     self.pos[0] = self.dist_ball

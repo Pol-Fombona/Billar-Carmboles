@@ -17,7 +17,8 @@ PECR = True
 
 def checkBallsCollisions(objects):
     #Si la suma dels dos radis es superior a la distancia entre les dues esferes (punt central), col·lisio
-
+    collision = False
+    lvel = []
     for ball_1, ball_2 in itertools.combinations(objects, 2):
 
         v1 = ball_1.velocity #np.array((ball_1.velocityX, 0, ball_1.velocityZ))
@@ -34,6 +35,10 @@ def checkBallsCollisions(objects):
 
                 ballCollision(ball_1, ball_2, v1, v2)
                 correctOverlap(ball_1, ball_2, dist, x1, x2)
+                collision = True 
+                lvel = [v1,v2]
+
+    return collision,lvel
 
 
 def correctOverlap(ball_1, ball_2, dist, x1, x2):
@@ -117,23 +122,33 @@ def getImpactVelocityOneMovingObject(x1, x2, v1, v2):
 
 
 def checkEdgeCollisions(objects):
-
+    collision = False
+    lvel = [0,0,0]
     for ball in objects:
 
         # X-edges of table
         if (ball.pos[0] - 1) <= 0:
+            lvel[0] = ball.velocity[0]
             ball.velocity[0] = abs(ball.velocity[0]) * edge_collision_loss
+            collision = True
 
         elif (ball.pos[0] + 1 ) >= width_table:
+            lvel[0] = ball.velocity[0]
             ball.velocity[0] = -abs(ball.velocity[0]) * edge_collision_loss
+            collision = True
 
         # Z-edges of table
         elif (ball.pos[2] - 1) <= 0:
+            lvel[2] = ball.velocity[2]
             ball.velocity[2] = abs(ball.velocity[2]) * edge_collision_loss
+            collision = True
 
         elif (ball.pos[2] + 1) >= lenght_table:
+            lvel[2] = ball.velocity[2]
             ball.velocity[2] = -abs(ball.velocity[2]) * edge_collision_loss
- 
+            collision = True
+    
+    return collision, lvel
 
 def movement(ball):
     # Controls the movement of the balls adding friction and rotation
