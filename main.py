@@ -159,7 +159,7 @@ class GraphicsEngine:
         # render scene
         self.scene.render()
 
-        checkCollisions(self.scene.ball_objects)
+        checkCollisions(self.scene.ball_objects, self.sound)
         '''
         bcollision,blvel = checkBallsCollisions(self.scene.ball_objects)
         ecollision,elvel = checkEdgeCollisions(self.scene.ball_objects)

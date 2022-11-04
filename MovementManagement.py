@@ -15,7 +15,7 @@ lenght_table = 83.28 # Z-edge
 PECR = True
 
 
-def checkCollisions(objects):
+def checkCollisions(objects, sound):
     # Checks collisions between spheres and between spheres and table
     
     # Between spheres
@@ -23,6 +23,8 @@ def checkCollisions(objects):
 
     # Between table and sphere
     checkEdgeCollisions(objects)
+
+    return
 
 
 def checkBallsCollisions(objects):
@@ -69,41 +71,47 @@ def correctOverlap(ball_1, ball_2, dist, x1, x2):
 
     return
 
+
 def ballCollision(ball_1, ball_2, v1, v2):
     
     x1 = np.array(ball_1.pos)
     x2 = np.array(ball_2.pos)
 
-    temp = np.sum(abs(v1)+abs(v2))
     if np.sum(abs(v1)) != 0 and np.sum(abs(v2)) != 0:
+        # If the two spheres are moving
         v1f = getImpactVelocityTwoMovingObjects(v1, v2, 1, 1, x1, x2)
         v2f = getImpactVelocityTwoMovingObjects(v2, v1, 1, 1, x2, x1)
 
     else:
-        #  Quan una bola està en repós
-        ####  
+        # If one sphere is resting
         v1f, v2f = getImpactVelocityOneMovingObject(x1, x2, v1, v2)
 
-
     if (PECR == True):
-        if np.sum(abs(v1f)) == 0:
-            if np.sum(abs(v1)) * 0.1 < 0.01:
-                v1f = v1 * 0.2
-            else:
-                v1f = v1 * 0.1
-        elif np.sum(abs(v2f)) == 0:
-            
-            if np.sum(abs(v2)) * 0.1 < 0.01:
-                v2f = v2 * 0.2
-            else:
-                v2f = v2 * 0.1
+       v1f, v2f = addPECR(v1, v1f, v2, v2f)
+
+    ball_1.velocity = v1f * ball_collision_loss
+    ball_2.velocity = v2f * ball_collision_loss  
+
+    return 
 
 
-    v1f *= ball_collision_loss
-    v2f *= ball_collision_loss
+def addPECR(v1, v1f, v2, v2f):
+    # Add residual velocity if perfect colision happens
+    # to the sphere moving initially
 
-    ball_1.velocity[0], ball_1.velocity[2] = v1f[0], v1f[2]
-    ball_2.velocity[0], ball_2.velocity[2] = v2f[0], v2f[2]
+    if np.sum(abs(v1f)) == 0:
+        if np.sum(abs(v1)) * 0.1 < 0.01:
+            v1f = v1 * 0.2
+        else:
+            v1f = v1 * 0.1
+
+    elif np.sum(abs(v2f)) == 0:
+        if np.sum(abs(v2)) * 0.1 < 0.01:
+            v2f = v2 * 0.2
+        else:
+            v2f = v2 * 0.1
+
+    return v1f, v2f
 
 
 def getImpactVelocityTwoMovingObjects(v1, v2, m1, m2, x1, x2):
@@ -112,6 +120,7 @@ def getImpactVelocityTwoMovingObjects(v1, v2, m1, m2, x1, x2):
     v = v1 - (2 * m2 / (m1 + m2)) * np.dot(v1 - v2, x1 - x2) / (np.linalg.norm(x1 - x2) ** 2) * (x1 - x2)
     
     return v
+
 
 def getImpactVelocityOneMovingObject(x1, x2, v1, v2):
     # https://github.com/OneLoneCoder/Javidx9/blob/master/ConsoleGameEngine/BiggerProjects/Balls/OneLoneCoder_Balls1.cpp
@@ -159,6 +168,7 @@ def checkEdgeCollisions(objects):
             collision = True
     
     return collision, lvel
+
 
 def movement(ball):
     # Controls the movement of the balls adding friction and rotation
