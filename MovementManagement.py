@@ -151,43 +151,29 @@ def checkEdgeCollisions(objects):
     lvel = [0,0,0]
     
     for sphere in objects:
-
-        # X-edges of table
-        '''
-        if (sphere.pos[0] - 1) <= 0:
-            lvel[0] = sphere.velocity[0]
-            sphere.velocity[0] = abs(sphere.velocity[0]) * edge_collision_loss
-            collision = True
-
-        elif (sphere.pos[0] + 1 ) >= width_table:
-            lvel[0] = sphere.velocity[0]
-            sphere.velocity[0] = -abs(sphere.velocity[0]) * edge_collision_loss
-            collision = True
-
-        # Z-edges of table
-        elif (sphere.pos[2] - 1) <= 0:
-            lvel[2] = sphere.velocity[2]
-            sphere.velocity[2] = abs(sphere.velocity[2]) * edge_collision_loss
-            collision = True
-
-        elif (sphere.pos[2] + 1) >= lenght_table:
-            lvel[2] = sphere.velocity[2]
-            sphere.velocity[2] = -abs(sphere.velocity[2]) * edge_collision_loss
-            collision = True
-        '''
         if sum(abs(sphere.velocity)) > 0:
-            
+
             # X-edges of table
-            if (sphere.pos[0] - radius) <= 0 or (sphere.pos[0] + radius) >= width_table:
+            if (sphere.pos[0] - 1) <= 0:
+                lvel[0] = sphere.velocity[0]
+                sphere.velocity[0] = abs(sphere.velocity[0]) * edge_collision_loss
                 collision = True
-                lvel = sphere.velocity
-                sphere.velocity[0] *= -1 * edge_collision_loss
+
+            elif (sphere.pos[0] + 1 ) >= width_table:
+                lvel[0] = sphere.velocity[0]
+                sphere.velocity[0] = -abs(sphere.velocity[0]) * edge_collision_loss
+                collision = True
 
             # Z-edges of table
-            elif (sphere.pos[2] - radius) <= 0 or (sphere.pos[2] + radius) >= lenght_table:
+            elif (sphere.pos[2] - 1) <= 0:
+                lvel[2] = sphere.velocity[2]
+                sphere.velocity[2] = abs(sphere.velocity[2]) * edge_collision_loss
                 collision = True
-                lvel = sphere.velocity
-                sphere.velocity[2] *= -1 * edge_collision_loss
+
+            elif (sphere.pos[2] + 1) >= lenght_table:
+                lvel[2] = sphere.velocity[2]
+                sphere.velocity[2] = -abs(sphere.velocity[2]) * edge_collision_loss
+                collision = True
             
     return collision, lvel
 
