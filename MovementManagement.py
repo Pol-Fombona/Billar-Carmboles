@@ -28,16 +28,20 @@ def checkCollisions(objects, sound):
 
 
 def checkBallsCollisions(objects):
-    #Si la suma dels dos radis es superior a la distancia entre les dues esferes (punt central), col·lisio
+    # If the distance between the spheres is less than the sum of radius
+    # there is a collision
+    
     collision = False
     lvel = []
-    for ball_1, ball_2 in itertools.combinations(objects, 2):
 
-        v1 = ball_1.velocity #np.array((ball_1.velocityX, 0, ball_1.velocityZ))
-        v2 = ball_2.velocity #np.array((ball_2.velocityX, 0, ball_2.velocityZ))
+    for ball_1, ball_2 in itertools.combinations(objects, 2):
+        # Iterates over every pair of spheres
+
+        v1 = ball_1.velocity 
+        v2 = ball_2.velocity
         
         if np.sum(abs(v1)) != 0 or np.sum(abs(v2)) != 0:
-            
+            # If atleast one of the two spheres in the pair is moving
 
             x1 = np.array(ball_1.pos)
             x2 = np.array(ball_2.pos)
@@ -45,8 +49,9 @@ def checkBallsCollisions(objects):
 
             if (dist <= (radius * 2)):
 
-                ballCollision(ball_1, ball_2, v1, v2)
+                ballCollision(ball_1, ball_2, v1, v2, x1, x2)
                 correctOverlap(ball_1, ball_2, dist, x1, x2)
+                
                 collision = True 
                 lvel = [v1,v2]
 
@@ -72,10 +77,8 @@ def correctOverlap(ball_1, ball_2, dist, x1, x2):
     return
 
 
-def ballCollision(ball_1, ball_2, v1, v2):
-    
-    x1 = np.array(ball_1.pos)
-    x2 = np.array(ball_2.pos)
+def ballCollision(ball_1, ball_2, v1, v2, x1, x2):
+    # Returns velocity after colision
 
     if np.sum(abs(v1)) != 0 and np.sum(abs(v2)) != 0:
         # If the two spheres are moving
@@ -141,32 +144,51 @@ def getImpactVelocityOneMovingObject(x1, x2, v1, v2):
 
 
 def checkEdgeCollisions(objects):
+    # Checks collisions between the edges of the table
+    # and a sphere
+
     collision = False
     lvel = [0,0,0]
-    for ball in objects:
+    
+    for sphere in objects:
 
         # X-edges of table
-        if (ball.pos[0] - 1) <= 0:
-            lvel[0] = ball.velocity[0]
-            ball.velocity[0] = abs(ball.velocity[0]) * edge_collision_loss
+        '''
+        if (sphere.pos[0] - 1) <= 0:
+            lvel[0] = sphere.velocity[0]
+            sphere.velocity[0] = abs(sphere.velocity[0]) * edge_collision_loss
             collision = True
 
-        elif (ball.pos[0] + 1 ) >= width_table:
-            lvel[0] = ball.velocity[0]
-            ball.velocity[0] = -abs(ball.velocity[0]) * edge_collision_loss
+        elif (sphere.pos[0] + 1 ) >= width_table:
+            lvel[0] = sphere.velocity[0]
+            sphere.velocity[0] = -abs(sphere.velocity[0]) * edge_collision_loss
             collision = True
 
         # Z-edges of table
-        elif (ball.pos[2] - 1) <= 0:
-            lvel[2] = ball.velocity[2]
-            ball.velocity[2] = abs(ball.velocity[2]) * edge_collision_loss
+        elif (sphere.pos[2] - 1) <= 0:
+            lvel[2] = sphere.velocity[2]
+            sphere.velocity[2] = abs(sphere.velocity[2]) * edge_collision_loss
             collision = True
 
-        elif (ball.pos[2] + 1) >= lenght_table:
-            lvel[2] = ball.velocity[2]
-            ball.velocity[2] = -abs(ball.velocity[2]) * edge_collision_loss
+        elif (sphere.pos[2] + 1) >= lenght_table:
+            lvel[2] = sphere.velocity[2]
+            sphere.velocity[2] = -abs(sphere.velocity[2]) * edge_collision_loss
             collision = True
-    
+        '''
+        if sum(abs(sphere.velocity)) > 0:
+            
+            # X-edges of table
+            if (sphere.pos[0] - radius) <= 0 or (sphere.pos[0] + radius) >= width_table:
+                collision = True
+                lvel = sphere.velocity
+                sphere.velocity[0] *= -1 * edge_collision_loss
+
+            # Z-edges of table
+            elif (sphere.pos[2] - radius) <= 0 or (sphere.pos[2] + radius) >= lenght_table:
+                collision = True
+                lvel = sphere.velocity
+                sphere.velocity[2] *= -1 * edge_collision_loss
+            
     return collision, lvel
 
 
@@ -186,12 +208,10 @@ def movement(ball):
         if abs(ball.velocity[0]) < 0.01:
             ball.velocity[0] = 0
 
-    ball.velocity[0]= ball.velocity[0] * (1 - friction)
-    ball.velocity[2] = ball.velocity[2] * (1 - friction)
-    ball.pos = (ball.pos[0]+ball.velocity[0], ball.pos[1], ball.pos[2] + ball.velocity[2])
+    ball.velocity *= 1 - friction
+    ball.pos = tuple(ball.pos + ball.velocity)
 
-    translation = glm.mat4()   
-    translation = glm.translate(translation, ball.pos)
+    translation = glm.translate(glm.mat4(), ball.pos)
 
     ### Ball Rotation
     rotation = ballRotation(ball)
@@ -200,6 +220,7 @@ def movement(ball):
 
 
 def ballRotation(ball):
+    # Returns rotation matrix
 
     radi = 1
     perimeter = 2*np.pi*radi
@@ -210,8 +231,9 @@ def ballRotation(ball):
 
         angle_to_rotate = 360 * (velocity / perimeter)
         coords = np.cross(np.array((vX, 0, vZ)), np.array((0,1,0)))
-        rotation = glm.mat4()
-        return glm.rotate(rotation, glm.radians(-angle_to_rotate), (coords[0], coords[1], coords[2]))
+        rotation = glm.rotate(glm.mat4(), glm.radians(-angle_to_rotate), (coords[0], coords[1], coords[2]))
 
     else:
-        return None
+        rotation = None
+
+    return rotation
