@@ -15,6 +15,16 @@ lenght_table = 83.28 # Z-edge
 PECR = True
 
 
+def checkCollisions(objects):
+    # Checks collisions between spheres and between spheres and table
+    
+    # Between spheres
+    checkBallsCollisions(objects)
+
+    # Between table and sphere
+    checkEdgeCollisions(objects)
+
+
 def checkBallsCollisions(objects):
     #Si la suma dels dos radis es superior a la distancia entre les dues esferes (punt central), col·lisio
     collision = False

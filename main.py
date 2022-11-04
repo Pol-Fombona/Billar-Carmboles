@@ -10,7 +10,7 @@ from scene import Scene
 from MenuManager import pause_manager, progress_manager
 
 from Light import Light
-from MovementManagement import checkBallsCollisions, checkEdgeCollisions
+from MovementManagement import checkCollisions
 from GameManager import *
 from SoundManager import *
 
@@ -159,6 +159,8 @@ class GraphicsEngine:
         # render scene
         self.scene.render()
 
+        checkCollisions(self.scene.ball_objects)
+        '''
         bcollision,blvel = checkBallsCollisions(self.scene.ball_objects)
         ecollision,elvel = checkEdgeCollisions(self.scene.ball_objects)
         if bcollision:
@@ -167,6 +169,7 @@ class GraphicsEngine:
         if ecollision:
             self.sound.intensityEdge(elvel)
             self.sound.playSound(2,0)
+        '''
         #pg.display.set_caption(f" | {self.scene.pinfo} | {self.camera.pinfo}")
         # swap buffers
         pg.display.flip()
