@@ -7,7 +7,7 @@ from model import *
 from FreeCamera import *
 from mesh import Mesh
 from scene import Scene
-from MenuManager import pause_manager, progress_manager
+from MenuManager import pause_manager, progress_manager, format_time
 
 from Light import Light
 from MovementManagement import checkCollisions
@@ -69,7 +69,6 @@ class GraphicsEngine:
         self.mesh = Mesh(self)
         self.scene = Scene(self)
         self.scene.pinfo = "Object: ON"
-        self.scene.o = True
         self.delta_time = 0
         self.mode_bird_cam = True
         self.pause = False
@@ -170,9 +169,21 @@ class GraphicsEngine:
             self.sound.intensityEdge(elvel)
             self.sound.playSound(2,0)
         '''
-        #pg.display.set_caption(f" | {self.scene.pinfo} | {self.camera.pinfo}")
+
+        pg.display.set_caption(self.get_info())
         # swap buffers
         pg.display.flip()
+
+    def get_info(self):
+        # Returns info text (scores, time...) to show on top of window
+
+        time_info = "Playing time: " + str(format_time(self.game.played_time))
+        p1_score_info = "Scores: [" + self.game.player1.name + " - " + str(self.game.player1.score) + "; "
+        p2_score_info = self.game.player2.name + " - " + str(self.game.player2.score) + "]"
+        
+        info = time_info + " | " + p1_score_info + p2_score_info + " | "
+        return info
+
 
     def unpause(self):
         self.pause = False
@@ -202,7 +213,7 @@ class GraphicsEngine:
                 self.camera.update()
                 self.render()
                 self.delta_time = self.clock.tick(60)
-                #self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
+                self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
 
 
 if __name__ == "__main__":

@@ -13,11 +13,12 @@ def progress_manager(played_time, last_timestamp, actual_timestamp):
     if elapsed_time >= 1: # Més d'un segons
 
         played_time += int(elapsed_time)
-
+        '''
         clear_terminal()
         print_onColored("#### Game in Progress ####")
         formatted_time = format_time(played_time)
         print("Playing time:", formatted_time)
+        '''
 
         return played_time, actual_timestamp
 
