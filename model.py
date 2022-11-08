@@ -85,6 +85,10 @@ class TableFloor(BaseModel):
         self.program["m_view"].write(self.camera.m_view)
 
     def on_init(self):
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
         # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
@@ -96,8 +100,19 @@ class TableFloor(BaseModel):
 
 
 class Sphere(BaseModel):
-    def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1),
-        color=(0, 0, 0), radi=1, slices=10, stacks=10, vao_name="balls", tex_id=3):
+    def __init__(
+        self,
+        app,
+        pos=(0, 0, 0),
+        rot=(0, 0, 0),
+        scale=(1, 1, 1),
+        color=(0, 0, 0),
+        radi=1,
+        slices=10,
+        stacks=10,
+        vao_name="balls",
+        tex_id=3,
+    ):
 
         # Position intial, useful when resseting position
         self.initial_position = pos
@@ -109,18 +124,18 @@ class Sphere(BaseModel):
         self.rotation = glm.mat4()
 
         self.radi = radi
-        #self.color = color
+        # self.color = color
 
         ## velocity and friction
-        #self.velocityX = 0
-        #self.velocityZ = 0
-        self.velocity = np.array((0,0,0), dtype=float)
+        # self.velocityX = 0
+        # self.velocityZ = 0
+        self.velocity = np.array((0, 0, 0), dtype=float)
 
         self.slices = slices
         self.stacks = stacks
 
-        #self.rot = glm.vec3([glm.radians(a) for a in rot])
-        #self.scale = scale
+        # self.rot = glm.vec3([glm.radians(a) for a in rot])
+        # self.scale = scale
         self.on_init()
 
     def on_init(self):
@@ -147,8 +162,9 @@ class Sphere(BaseModel):
 
 
 class SubdivisionSphere(BaseModel):
-    def __init__(self, app, pos=(0, 0, 0), radi=1, 
-        vao_name="subdivision_balls", tex_id=4):
+    def __init__(
+        self, app, pos=(0, 0, 0), radi=1, vao_name="subdivision_balls", tex_id=4
+    ):
 
         # Position intial, useful when resseting position
         self.initial_position = pos
@@ -160,15 +176,15 @@ class SubdivisionSphere(BaseModel):
         self.rotation = glm.mat4()
 
         self.radi = radi
-        #self.color = color
+        # self.color = color
 
         ## velocity and friction
-        self.velocity = np.array((0,0,0), dtype=float)
-        #self.velocityX = 0
-        #self.velocityZ = 0
+        self.velocity = np.array((0, 0, 0), dtype=float)
+        # self.velocityX = 0
+        # self.velocityZ = 0
 
-        #self.rot = glm.vec3([glm.radians(a) for a in rot])
-        #self.scale = scale
+        # self.rot = glm.vec3([glm.radians(a) for a in rot])
+        # self.scale = scale
         self.on_init()
 
     def on_init(self):
@@ -195,11 +211,12 @@ class SubdivisionSphere(BaseModel):
         self.program["m_model"].write(m_model)
         self.program["camPos"].write(self.app.camera.position)
 
+
 class Cue(BaseModel):
     def __init__(
         self,
         app,
-        tex_id = 5,
+        tex_id=5,
         axis=glm.vec3((0, 0, 0)),
         rot=(0, 0, 0),
         scale=(1, 1, 1),
@@ -207,14 +224,14 @@ class Cue(BaseModel):
         width=0,
         heigth=0,
         dist_ball=0,
-        vao_name = "cue"
+        vao_name="cue",
     ):
         self.rot = glm.vec3([glm.radians(a) for a in rot])
         self.scale = scale
         self.axis = axis
 
         super().__init__(app, vao_name, tex_id, axis)
-       
+
         self.length = length
         self.width = width
         self.heigth = heigth
@@ -226,17 +243,17 @@ class Cue(BaseModel):
         self.reset_pos = True
         self.turn = 1
         self.moving = False
-        #self.shader_program = self.get_shader_program()
-        #self.vao = self.get_vao()
-        #self.axis = axis
+        # self.shader_program = self.get_shader_program()
+        # self.vao = self.get_vao()
+        # self.axis = axis
         self.pos = copy.deepcopy(self.axis)
         self.pos[0] += copy.deepcopy(self.dist_ball)
         self.pos_orig = glm.vec3(self.dist_ball, 0, 0)
         # self.pos_reset = copy.deepcopy(self.pos)
-        #self.rot = glm.vec3([glm.radians(a) for a in rot])
-        #self.scale = scale
-        #self.m_model = self.get_model_matrix()
-        #self.texture = self.get_texture(path="textures/cue.PNG")
+        # self.rot = glm.vec3([glm.radians(a) for a in rot])
+        # self.scale = scale
+        # self.m_model = self.get_model_matrix()
+        # self.texture = self.get_texture(path="textures/cue.PNG")
         self.on_init()
 
     def get_model_matrix(self):
@@ -250,7 +267,7 @@ class Cue(BaseModel):
         m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
         m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
         m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
-        
+
         # scale
         m_model = glm.scale(m_model, self.scale)
 
@@ -270,10 +287,18 @@ class Cue(BaseModel):
 
     def update(self):
         self.texture.use()
-        #if self.app.scene.ball_objects[0].velocityX == self.app.scene.ball_objects[0].velocityZ == 0:
-        if self.app.scene.ball_objects[0].velocity[0] == self.app.scene.ball_objects[0].velocity[2] == 0:
-        #    if self.app.scene.ball_objects[1].velocityX == self.app.scene.ball_objects[1].velocityZ == 0:
-            if self.app.scene.ball_objects[1].velocity[1] == self.app.scene.ball_objects[1].velocity[2] == 0:
+        # if self.app.scene.ball_objects[0].velocityX == self.app.scene.ball_objects[0].velocityZ == 0:
+        if (
+            self.app.scene.ball_objects[0].velocity[0]
+            == self.app.scene.ball_objects[0].velocity[2]
+            == 0
+        ):
+            #    if self.app.scene.ball_objects[1].velocityX == self.app.scene.ball_objects[1].velocityZ == 0:
+            if (
+                self.app.scene.ball_objects[1].velocity[1]
+                == self.app.scene.ball_objects[1].velocity[2]
+                == 0
+            ):
                 if self.moving == True:
                     if self.turn == 1:
                         change_objective(self, self.app.scene.ball_objects[0])
@@ -292,11 +317,15 @@ class Cue(BaseModel):
                     self.reset_pos = True
                     if self.turn == 1:
                         cue_hit_ball(self, self.app.scene.ball_objects[0])
-                        self.app.sound.intensityCue(self.app.scene.ball_objects[0].velocity)
+                        self.app.sound.intensityCue(
+                            self.app.scene.ball_objects[0].velocity
+                        )
                     else:
                         cue_hit_ball(self, self.app.scene.ball_objects[1])
-                        self.app.sound.intensityCue(self.app.scene.ball_objects[1].velocity)
-                    self.app.sound.playSound(3,0)
+                        self.app.sound.intensityCue(
+                            self.app.scene.ball_objects[1].velocity
+                        )
+                    self.app.sound.playSound(3, 0)
                     self.turn *= -1
                     self.pos = copy.deepcopy(self.axis)
                     self.pos[0] = self.dist_ball

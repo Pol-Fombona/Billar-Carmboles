@@ -278,8 +278,8 @@ class TableVBO(BaseVBO):
 class TableFloorVBO(BaseVBO):
     def __init__(self, app):
         super().__init__(app.ctx)
-        self.format = "2f 3f"
-        self.attrib = ["in_texcoord_0", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices):
@@ -332,6 +332,18 @@ class TableFloorVBO(BaseVBO):
         ]
 
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
+
+        normals = [
+            (0, 0, 1) * 6,
+            (1, 0, 0) * 6,
+            (0, 0, -1) * 6,
+            (-1, 0, 0) * 6,
+            (0, 1, 0) * 6,
+        ]
+
+        normals = np.array(normals, dtype="f4").reshape(30, 3)
+
+        vertex_data = np.hstack([normals, vertex_data])
 
         vertex_data = np.hstack([tex_coord_data, vertex_data])
 
