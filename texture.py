@@ -12,10 +12,11 @@ class Texture:
             path="textures/wooden-textured-background.jpg"
         )
         self.textures[2] = self.get_texture(path="textures/test_mantel.png")
-        #self.textures[3] = None # Falta per crear les textures de les boles
-        #self.textures[4] = None # Falta per crear les textures de les boles subdivisions
+        # self.textures[3] = None # Falta per crear les textures de les boles
+        # self.textures[4] = None # Falta per crear les textures de les boles subdivisions
         self.textures[5] = self.get_texture(path="textures/cue.png")
-
+        self.textures[6] = self.get_texture(path="textures/pool_table2.jpg")
+        self.textures[7] = self.get_texture(path="textures/brixton_finish.jpg")
 
     def get_texture(self, path):
         texture = pg.image.load(path).convert()

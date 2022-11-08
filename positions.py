@@ -34,9 +34,9 @@ TABLE_FLOOR = (
 SLICES = 20
 STACKS = 20
 RADIUS = 1
-BALL_COLOR = (1,0,1)
+BALL_COLOR = (1, 0, 1)
 
 # SubDivision ball colour
-SDCOLOR1 = (1,0,0)
-SDCOLOR2 = (1,1,0)
+SDCOLOR1 = (1, 0, 0)
+SDCOLOR2 = (1, 1, 0)
 SDDEPTH = 4

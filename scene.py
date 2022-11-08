@@ -27,37 +27,37 @@ class Scene:
         add_ball = self.add_ball
         add_cue = self.add_cue
 
-        add(Legs(app, pos=LEG_1))
-        add(Legs(app, pos=LEG_2))
-        add(Legs(app, pos=LEG_3))
-        add(Legs(app, pos=LEG_4))
-        add(Table(app, pos=TABLE_POSITION))
-        add(TableFloor(app, pos=(0, 0, 0), tex_id=0))
+        add(Legs(app, pos=LEG_1, tex_id=7))
+        add(Legs(app, pos=LEG_2, tex_id=7))
+        add(Legs(app, pos=LEG_3, tex_id=7))
+        add(Legs(app, pos=LEG_4, tex_id=7))
+        add(Table(app, pos=TABLE_POSITION, tex_id=7))
+        add(TableFloor(app, pos=(0, 0, 0), tex_id=6))
 
-        #add_ball(Sphere(app, pos=(20,1,10), tex_id=3))
-        add_ball(SubdivisionSphere(app, pos=(20,1,10), tex_id=3))
+        # add_ball(Sphere(app, pos=(20,1,10), tex_id=3))
+        add_ball(SubdivisionSphere(app, pos=(20, 1, 10), tex_id=3))
 
-        #add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
-        add_ball(Sphere(app, pos=(21,1,60), tex_id=3))
-        add_ball(Sphere(app, pos=(19,1,60), tex_id=3))
+        # add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
+        add_ball(Sphere(app, pos=(21, 1, 60), tex_id=3))
+        add_ball(Sphere(app, pos=(19, 1, 60), tex_id=3))
 
-        add_ball(Sphere(app, pos=(26,1,65), tex_id=3))
-        add_ball(Sphere(app, pos=(23,1,65), tex_id=3))
-        add_ball(Sphere(app, pos=(20,1,65), tex_id=3))
-        add_ball(Sphere(app, pos=(17,1,65), tex_id=3))
-        add_ball(Sphere(app, pos=(14,1,65), tex_id=3))
+        add_ball(Sphere(app, pos=(26, 1, 65), tex_id=3))
+        add_ball(Sphere(app, pos=(23, 1, 65), tex_id=3))
+        add_ball(Sphere(app, pos=(20, 1, 65), tex_id=3))
+        add_ball(Sphere(app, pos=(17, 1, 65), tex_id=3))
+        add_ball(Sphere(app, pos=(14, 1, 65), tex_id=3))
 
-        add_ball(Sphere(app, pos=(29,1,75), tex_id=3))
-        add_ball(Sphere(app, pos=(26,1,75), tex_id=3))
-        add_ball(Sphere(app, pos=(23,1,75), tex_id=3))
-        add_ball(Sphere(app, pos=(20,1,75), tex_id=3))
-        add_ball(Sphere(app, pos=(17,1,75), tex_id=3))
-        add_ball(Sphere(app, pos=(14,1,75), tex_id=3))
-        add_ball(Sphere(app, pos=(11,1,75), tex_id=3))
+        add_ball(Sphere(app, pos=(29, 1, 75), tex_id=3))
+        add_ball(Sphere(app, pos=(26, 1, 75), tex_id=3))
+        add_ball(Sphere(app, pos=(23, 1, 75), tex_id=3))
+        add_ball(Sphere(app, pos=(20, 1, 75), tex_id=3))
+        add_ball(Sphere(app, pos=(17, 1, 75), tex_id=3))
+        add_ball(Sphere(app, pos=(14, 1, 75), tex_id=3))
+        add_ball(Sphere(app, pos=(11, 1, 75), tex_id=3))
 
-        add_ball(Sphere(app, pos=(20,1,80), tex_id=3))
+        add_ball(Sphere(app, pos=(20, 1, 80), tex_id=3))
 
-        add_cue(Cue(app,axis=glm.vec3((20,1,10)),tex_id=5))
+        add_cue(Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5))
 
         self.objects = self.objects + self.ball_objects + self.cue_objects
 

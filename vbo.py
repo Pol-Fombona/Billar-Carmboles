@@ -217,48 +217,53 @@ class TableVBO(BaseVBO):
 
         tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
         tex_coord_indices = [
-            (0, 2, 3),
+            # First
             (0, 1, 2),
             (0, 2, 3),
             (0, 1, 2),
+            (0, 2, 3),
             (2, 3, 0),
-            (0, 1, 2),
-            (0, 1, 2),
+            (2, 0, 1),
             (2, 3, 0),
+            (2, 0, 1),
             (0, 1, 2),
-            (2, 3, 0),
+            (0, 2, 3),
+            # Second
+            (0, 1, 2),
             (0, 2, 3),
             (0, 1, 2),
             (0, 2, 3),
-            (0, 1, 2),
             (2, 3, 0),
-            (0, 1, 2),
-            (0, 1, 2),
+            (2, 0, 1),
             (2, 3, 0),
+            (2, 0, 1),
             (0, 1, 2),
-            (2, 3, 0),
+            (0, 2, 3),
+            # Third
+            (0, 1, 2),
             (0, 2, 3),
             (0, 1, 2),
             (0, 2, 3),
-            (0, 1, 2),
             (2, 3, 0),
-            (0, 1, 2),
-            (0, 1, 2),
+            (2, 0, 1),
             (2, 3, 0),
+            (2, 0, 1),
             (0, 1, 2),
-            (2, 3, 0),
+            (0, 2, 3),
+            # Fourth
+            (0, 1, 2),
             (0, 2, 3),
             (0, 1, 2),
             (0, 2, 3),
-            (0, 1, 2),
             (2, 3, 0),
-            (0, 1, 2),
-            (0, 1, 2),
+            (2, 0, 1),
             (2, 3, 0),
+            (2, 0, 1),
             (0, 1, 2),
-            (2, 3, 0),
+            (0, 2, 3),
+            # Under
             (0, 1, 2),
-            (2, 3, 0),
+            (0, 2, 3),
         ]
 
         vertex_data = self.get_data(vertices, indices)
@@ -314,16 +319,16 @@ class TableFloorVBO(BaseVBO):
 
         tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
         tex_coord_indices = [
-            (0, 2, 3),
             (0, 1, 2),
             (0, 2, 3),
             (0, 1, 2),
-            (0, 1, 2),
-            (2, 3, 0),
+            (0, 2, 3),
             (2, 3, 0),
             (2, 0, 1),
-            (0, 2, 3),
+            (2, 3, 0),
+            (2, 0, 1),
             (0, 1, 2),
+            (0, 2, 3),
         ]
 
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
@@ -347,12 +352,12 @@ class BallVBO(BaseVBO):
     def get_vertex_data(self):
 
         vertex_data = []
-        '''
+        """
         color = self.color
         slices = self.slices
         stacks = self.stacks
         radius = self.radi
-        '''
+        """
         color = BALL_COLOR
         slices = SLICES
         stacks = STACKS
@@ -418,7 +423,7 @@ class BallVBO(BaseVBO):
                 vertex_data.append((color, v6, v6))
 
         vertex_data = np.array(vertex_data, dtype="f4")
-        
+
         return vertex_data
 
 
@@ -553,6 +558,7 @@ class SubdivisionBallVBO(BaseVBO):
             new_data = self.tessel(new_data, depth)
 
             return new_data
+
 
 class CueVBO(BaseVBO):
     def __init__(self, app):
