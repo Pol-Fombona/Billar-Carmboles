@@ -195,7 +195,7 @@ class GraphicsEngine:
         last_timestamp = time.time()
         
         player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
-        player2 = Player(name = "P2", ball = self.scene.ball_objects[2])
+        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
 
         self.game = Game(player1, player2, self.scene.ball_objects)
         

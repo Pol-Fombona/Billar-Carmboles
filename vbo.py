@@ -353,8 +353,8 @@ class TableFloorVBO(BaseVBO):
 class BallVBO(BaseVBO):
     def __init__(self, app):
         super().__init__(app.ctx)
-        self.format = "3f 3f 3f"
-        self.attrib = ["in_color", "in_normal", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices):
@@ -364,6 +364,8 @@ class BallVBO(BaseVBO):
     def get_vertex_data(self):
 
         vertex_data = []
+        normal_data = []
+        tex_data = []
         """
         color = self.color
         slices = self.slices
@@ -422,19 +424,63 @@ class BallVBO(BaseVBO):
 
             for i in range(slices):
                 v1 = (sintemp2 * sinCache1a[i], sintemp2 * cosCache1a[i], zHigh)
+                n1 = (sinCache2a[i] * sintemp3, cosCache2a[i] * sintemp3, costemp3)
+
                 v2 = (sintemp1 * sinCache1a[i], sintemp1 * cosCache1a[i], zLow)
+                n2 = (sinCache2a[i] * sintemp4, cosCache2a[i] * sintemp4, costemp4)
+
                 v3 = (sintemp1 * sinCache1a[i + 1], sintemp1 * cosCache1a[i + 1], zLow)
+                n3 = (sinCache2a[i+1] * sintemp4, cosCache2a[i+1] * sintemp4, costemp4)
+
                 v4 = (sintemp1 * sinCache1a[i + 1], sintemp1 * cosCache1a[i + 1], zLow)
+                n4 = (sinCache2a[i+1] * sintemp4, cosCache2a[i+1] * sintemp4, costemp4)
+
                 v5 = (sintemp2 * sinCache1a[i + 1], sintemp2 * cosCache1a[i + 1], zHigh)
+                n5 = (sinCache2a[i+1] * sintemp3, cosCache2a[i+1]*sintemp3, costemp3)
+
                 v6 = (sintemp2 * sinCache1a[i], sintemp2 * cosCache1a[i], zHigh)
-                vertex_data.append((color, v1, v1))
-                vertex_data.append((color, v2, v2))
-                vertex_data.append((color, v3, v3))
-                vertex_data.append((color, v4, v4))
-                vertex_data.append((color, v5, v5))
-                vertex_data.append((color, v6, v6))
+                n6 = (sinCache2a[i] * sintemp3, cosCache2a[i] * sintemp3, costemp3)
+
+                #texture1 = (1 - i / slices, 1 - (j + i) / stacks)
+                #texture2 = (1 - i / slices, 1 - j / stacks)
+                #texture3 = (1 - (i + 1) / slices, 1 - j / stacks)
+                #texture4 = (1 - (i + 1) / slices, 1 - j / stacks)
+                #texture5 = (1 - (i + 1) / slices, 1 - (j+i) / stacks)
+                #texture6 = (1 - i / slices, 1 - (j+i) / stacks)
+                texture1 = (i/slices, j / stacks)
+                texture2 = (i/slices, j / stacks)
+                texture3 = (i/slices, j / stacks)
+                texture4 = (i/slices, j / stacks)
+                texture5 = (i/slices, j / stacks)
+                texture6 = (i/slices, j / stacks)
+
+                normal_data.append(n1), vertex_data.append(v1), tex_data.append(texture1)
+                normal_data.append(n2), vertex_data.append(v2), tex_data.append(texture2)
+                normal_data.append(n3), vertex_data.append(v3), tex_data.append(texture3)
+                normal_data.append(n4), vertex_data.append(v4), tex_data.append(texture4)
+                normal_data.append(n5), vertex_data.append(v5), tex_data.append(texture5)
+                normal_data.append(n6), vertex_data.append(v6), tex_data.append(texture6)
+
+                '''
+                vertex_data.append((texture1, v1, v1))
+                vertex_data.append((texture2, v2, v2))
+                vertex_data.append((texture3, v3, v3))
+                vertex_data.append((texture4, v4, v4))
+                vertex_data.append((texture5, v5, v5))
+                vertex_data.append((texture6, v6, v6))
+                '''
+        
+        #normals = np.array(normals, dtype="f4").reshape(30, 3)
+        #vertex_data = np.hstack([normals, vertex_data])
+
+        #vertex_data = np.hstack([tex_coord_data, vertex_data])
 
         vertex_data = np.array(vertex_data, dtype="f4")
+        normal_data = np.array(normal_data, dtype="f4")
+        tex_data = np.array(tex_data, dtype="f4")
+
+        vertex_data = np.hstack([normal_data, vertex_data])
+        vertex_data = np.hstack([tex_data, vertex_data])
 
         return vertex_data
 

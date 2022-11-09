@@ -143,12 +143,17 @@ class Sphere(BaseModel):
         self.program["light.Ia"].write(self.app.light.Ia)
         self.program["light.Id"].write(self.app.light.Id)
 
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+
         self.program["m_proj"].write(self.app.camera.m_proj)
         self.program["m_view"].write(self.app.camera.m_view)
         self.program["m_model"].write(self.m_model)
 
     def update(self):
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
+        self.texture.use()
         self.program["m_view"].write(self.app.camera.m_view)
 
         self.translation, new_rotation = movement(self)
