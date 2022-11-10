@@ -441,18 +441,12 @@ class BallVBO(BaseVBO):
                 v6 = (sintemp2 * sinCache1a[i], sintemp2 * cosCache1a[i], zHigh)
                 n6 = (sinCache2a[i] * sintemp3, cosCache2a[i] * sintemp3, costemp3)
 
-                #texture1 = (1 - i / slices, 1 - (j + i) / stacks)
-                #texture2 = (1 - i / slices, 1 - j / stacks)
-                #texture3 = (1 - (i + 1) / slices, 1 - j / stacks)
-                #texture4 = (1 - (i + 1) / slices, 1 - j / stacks)
-                #texture5 = (1 - (i + 1) / slices, 1 - (j+i) / stacks)
-                #texture6 = (1 - i / slices, 1 - (j+i) / stacks)
-                texture1 = (i/slices, j / stacks)
-                texture2 = (i/slices, j / stacks)
-                texture3 = (i/slices, j / stacks)
-                texture4 = (i/slices, j / stacks)
-                texture5 = (i/slices, j / stacks)
-                texture6 = (i/slices, j / stacks)
+                texture1 = (float(i)/slices, float(j+1) / stacks)
+                texture2 = (float(i)/slices, float(j) / stacks)
+                texture3 = (float(i+1)/slices, float(j) / stacks)
+                texture4 = (float(i+1)/slices, float(j) / stacks)
+                texture5 = (float(i+1)/slices, float(j+1) / stacks)
+                texture6 = (float(i)/slices, float(j+1) / stacks)
 
                 normal_data.append(n1), vertex_data.append(v1), tex_data.append(texture1)
                 normal_data.append(n2), vertex_data.append(v2), tex_data.append(texture2)
@@ -461,19 +455,6 @@ class BallVBO(BaseVBO):
                 normal_data.append(n5), vertex_data.append(v5), tex_data.append(texture5)
                 normal_data.append(n6), vertex_data.append(v6), tex_data.append(texture6)
 
-                '''
-                vertex_data.append((texture1, v1, v1))
-                vertex_data.append((texture2, v2, v2))
-                vertex_data.append((texture3, v3, v3))
-                vertex_data.append((texture4, v4, v4))
-                vertex_data.append((texture5, v5, v5))
-                vertex_data.append((texture6, v6, v6))
-                '''
-        
-        #normals = np.array(normals, dtype="f4").reshape(30, 3)
-        #vertex_data = np.hstack([normals, vertex_data])
-
-        #vertex_data = np.hstack([tex_coord_data, vertex_data])
 
         vertex_data = np.array(vertex_data, dtype="f4")
         normal_data = np.array(normal_data, dtype="f4")
