@@ -86,13 +86,13 @@ class TableFloor(BaseModel):
 class Sphere(BaseModel):
     def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1),
                     radi=1, slices=10, stacks=10, vao_name="balls", 
-                    tex_id="sphere1"):
+                    tex_id="sphere1",id = 0):
 
         super().__init__(app, vao_name, tex_id, pos)
 
         # Initial position, useful when resseting position        
         self.initial_position = pos
-
+        self.id = id
         self.translation = glm.mat4()
         self.rotation = glm.mat4()
 
@@ -121,13 +121,13 @@ class Sphere(BaseModel):
 
 class SubdivisionSphere(BaseModel):
     def __init__(
-        self, app, pos=(0, 0, 0), radi=1, vao_name="subdivision_balls", tex_id=4
+        self, app, pos=(0, 0, 0), radi=1, vao_name="subdivision_balls", tex_id=4,id = 0
     ):
 
         # Position intial, useful when resseting position
         self.initial_position = pos
         self.pos = pos
-
+        self.id = id
         super().__init__(app, vao_name, tex_id, pos)
 
         self.translation = glm.mat4()
@@ -275,15 +275,10 @@ class Cue(BaseModel):
                     self.reset_pos = True
                     if self.turn == 1:
                         cue_hit_ball(self, self.app.scene.ball_objects[0])
-                        self.app.sound.intensityCue(
-                            self.app.scene.ball_objects[0].velocity
-                        )
+                      
                     else:
                         cue_hit_ball(self, self.app.scene.ball_objects[1])
-                        self.app.sound.intensityCue(
-                            self.app.scene.ball_objects[1].velocity
-                        )
-                    self.app.sound.playSound(3, 0)
+                     
                     self.turn *= -1
                     self.pos = copy.deepcopy(self.axis)
                     self.pos[0] = self.dist_ball

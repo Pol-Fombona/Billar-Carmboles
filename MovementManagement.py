@@ -19,20 +19,17 @@ def checkCollisions(objects, sound):
     # Checks collisions between spheres and between spheres and table
     
     # Between spheres
-    checkBallsCollisions(objects)
+    checkBallsCollisions(objects,sound)
 
     # Between table and sphere
-    checkEdgeCollisions(objects)
+    checkEdgeCollisions(objects,sound)
 
     return
 
 
-def checkBallsCollisions(objects):
+def checkBallsCollisions(objects,sound):
     # If the distance between the spheres is less than the sum of radius
     # there is a collision
-    
-    collision = False
-    lvel = []
 
     for ball_1, ball_2 in itertools.combinations(objects, 2):
         # Iterates over every pair of spheres
@@ -52,10 +49,9 @@ def checkBallsCollisions(objects):
                 ballCollision(ball_1, ball_2, v1, v2, x1, x2)
                 correctOverlap(ball_1, ball_2, dist, x1, x2)
                 
-                collision = True 
-                lvel = [v1,v2]
+                sound.playSound([ball_1,ball_2],0)
 
-    return collision,lvel
+    return 
 
 
 def correctOverlap(ball_1, ball_2, dist, x1, x2):
@@ -143,13 +139,10 @@ def getImpactVelocityOneMovingObject(x1, x2, v1, v2):
     return v1f, v2f
 
 
-def checkEdgeCollisions(objects):
+def checkEdgeCollisions(objects,sound):
     # Checks collisions between the edges of the table
     # and a sphere
 
-    collision = False
-    lvel = [0,0,0]
-    
     for sphere in objects:
 
         if sum(abs(sphere.velocity)) > 0:
@@ -157,34 +150,29 @@ def checkEdgeCollisions(objects):
 
             # X-edges of table
             if (sphere.pos[0] - 1) <= 0:
-                lvel[0] = sphere.velocity[0]
                 sphere.velocity[0] *=  -edge_collision_loss
                 overlap_x = sphere.pos[0] - 1
-                collision = True
-
+                sound.playSound([sphere,overlap_x],2)
             elif (sphere.pos[0] + 1 ) >= width_table:
-                lvel[0] = sphere.velocity[0]
                 sphere.velocity[0] *= -edge_collision_loss
                 overlap_x = (sphere.pos[0] + 1) - width_table
-                collision = True
+                sound.playSound([sphere,overlap_x],2)
 
             # Z-edges of table
             elif (sphere.pos[2] - 1) <= 0:
-                lvel[2] = sphere.velocity[2]
                 sphere.velocity[2] *= -edge_collision_loss
                 overlap_z = sphere.pos[2] - 1
-                collision = True
+                sound.playSound([sphere,overlap_z],2)
 
             elif (sphere.pos[2] + 1) >= lenght_table:
-                lvel[2] = sphere.velocity[2]
                 sphere.velocity[2] *= -edge_collision_loss
                 overlap_z = (sphere.pos[2] + 1) - lenght_table
-                collision = True
+                sound.playSound([sphere,overlap_z],2)
 
             # Corrects overlap with table edge
             sphere.pos = (sphere.pos[0] - overlap_x, sphere.pos[1], sphere.pos[2] - overlap_z)        
     
-    return collision, lvel
+    return 
 
 
 def movement(ball):

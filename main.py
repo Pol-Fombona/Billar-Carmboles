@@ -12,7 +12,7 @@ from MenuManager import pause_manager, progress_manager, format_time
 from Light import Light
 from MovementManagement import checkCollisions
 from GameManager import *
-from SoundManager import *
+from SoundManager3D import *
 
 
 
@@ -74,10 +74,8 @@ class GraphicsEngine:
         self.pause = False
         self.quit = False
         self.game = None
-        self.sound = SoundManager()
-        self.sound.loadSongs()
-        self.sound.loadSounds()
-        self.sound.playSong(0,0)
+        self.sound = SoundManager(self)
+        self.sound.playSong()
 
 
     def check_events(self):
@@ -150,7 +148,7 @@ class GraphicsEngine:
                         self.sound.stopSong(0)
                     else:
                         self.sound.song_playing = True
-                        self.sound.playSong(0,-1)       
+                        self.sound.playSong()       
 
     def render(self):
         # clear framebuffer
@@ -159,17 +157,7 @@ class GraphicsEngine:
         self.scene.render()
 
         checkCollisions(self.scene.ball_objects, self.sound)
-        '''
-        bcollision,blvel = checkBallsCollisions(self.scene.ball_objects)
-        ecollision,elvel = checkEdgeCollisions(self.scene.ball_objects)
-        if bcollision:
-            self.sound.intensityBall(blvel)
-            self.sound.playSound(0,0)
-        if ecollision:
-            self.sound.intensityEdge(elvel)
-            self.sound.playSound(2,0)
-        '''
-
+       
         pg.display.set_caption(self.get_info())
         # swap buffers
         pg.display.flip()
@@ -211,6 +199,7 @@ class GraphicsEngine:
             else:   
 
                 self.camera.update()
+                self.sound.update()
                 self.render()
                 self.delta_time = self.clock.tick(60)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
