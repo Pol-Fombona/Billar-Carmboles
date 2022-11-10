@@ -3,10 +3,12 @@ import MovementManagement
 import os
 import datetime
 from termcolor import colored
-import time
+from tabulate import tabulate
+import pandas as pd
 
 
 def progress_manager(played_time, last_timestamp, actual_timestamp):
+    # Manage played time
     
     elapsed_time = actual_timestamp - last_timestamp
 
@@ -33,6 +35,7 @@ def format_time(time):
 
 
 def pause_manager(game):
+    # Manages menu options 
 
     pause = True
     exit_game = False
@@ -56,6 +59,10 @@ def pause_manager(game):
                     show_options()
 
                 case 3:
+                    show_ranking()
+                    show_options()
+
+                case 4:
                     exit_game = True
 
                 case _:
@@ -72,13 +79,68 @@ def pause_manager(game):
     return exit_game
 
 def game_ended(game):
-    print_onColored("#### Game Finalished #### ")
+    # Prints summary of the game and
+    # updates ranking file
+
+    print_onColored("#### Game Finished #### ")
     print("Played Time:", format_time(game.played_time))
     print("Score:", game.get_scores())
     print("\n")
 
-def modify_friction():
+    update_ranking(game)
 
+
+def update_ranking(game):
+    # Update ranking file
+
+    ranking_data = pd.read_csv('results/ranking.csv')
+
+    game_data = [(game.player1.name, game.player1.score),
+                    (game.player2.name, game.player2.score)]
+    
+    game_data = pd.DataFrame(game_data, columns=["Player", "Score"])
+
+    ranking_data = pd.concat([ranking_data, game_data], ignore_index=True)
+    ranking_data = ranking_data.sort_values(by=["Score"], ascending=False)
+    ranking_data = ranking_data.head(10)
+
+    ranking_data.to_csv('results/ranking.csv', sep=",", index=False)
+
+    return
+
+
+def show_ranking():
+    # Show ranking data in terminal
+
+    ranking_data = pd.read_csv('results/ranking.csv')
+
+    clear_terminal()
+
+    print(tabulate(ranking_data, headers = 'keys', tablefmt = 'psql'))
+    print_colored("\nEnter '1' to return: ")
+
+    while True:
+        
+        option = input("\nEnter choice: ").strip()
+
+        try:
+            if (int(option)) == 1:
+                break
+        
+            else:
+                print_onColored("Invalid value", "on_red")
+        
+        except:
+            print_onColored("Invalid value", "on_red")
+
+    clear_terminal()
+
+    return 
+
+
+def modify_friction():
+    # Updates friction value by input
+     
     clear_terminal()
     
     print_onColored("#### Modify Friction ####")
@@ -100,22 +162,34 @@ def modify_friction():
             print_onColored("Invalid value", "on_red")
 
     clear_terminal()
+
     return
 
 
 def clear_terminal():
+    # Clears terminal (linux & windows)
+
     os.system('cls' if os.name=='nt' else 'clear')
 
 
 def print_onColored(text, color="on_green"):
+    # Print text with highlighted colour
+
     print(colored(text, on_color = color))
 
+
 def print_colored(text, color="green"):
+    # Print text with colored letters
+
     print(colored(text, color))
 
+
 def show_options():
+    # Prints menu options 
+
     print_onColored("#### Pause Menu ####")
     print("\nOptions:")
     print("     1) Resume game")
     print("     2) Modify friction")
-    print("     3) Exit game")
+    print("     3) Show Ranking")
+    print("     4) Exit game")
