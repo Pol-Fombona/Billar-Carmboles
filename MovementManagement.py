@@ -151,30 +151,39 @@ def checkEdgeCollisions(objects):
     lvel = [0,0,0]
     
     for sphere in objects:
+
         if sum(abs(sphere.velocity)) > 0:
+            overlap_x, overlap_z = 0, 0
 
             # X-edges of table
             if (sphere.pos[0] - 1) <= 0:
                 lvel[0] = sphere.velocity[0]
-                sphere.velocity[0] = abs(sphere.velocity[0]) * edge_collision_loss
+                sphere.velocity[0] *=  -edge_collision_loss
+                overlap_x = sphere.pos[0] - 1
                 collision = True
 
             elif (sphere.pos[0] + 1 ) >= width_table:
                 lvel[0] = sphere.velocity[0]
-                sphere.velocity[0] = -abs(sphere.velocity[0]) * edge_collision_loss
+                sphere.velocity[0] *= -edge_collision_loss
+                overlap_x = (sphere.pos[0] + 1) - width_table
                 collision = True
 
             # Z-edges of table
             elif (sphere.pos[2] - 1) <= 0:
                 lvel[2] = sphere.velocity[2]
-                sphere.velocity[2] = abs(sphere.velocity[2]) * edge_collision_loss
+                sphere.velocity[2] *= -edge_collision_loss
+                overlap_z = sphere.pos[2] - 1
                 collision = True
 
             elif (sphere.pos[2] + 1) >= lenght_table:
                 lvel[2] = sphere.velocity[2]
-                sphere.velocity[2] = -abs(sphere.velocity[2]) * edge_collision_loss
+                sphere.velocity[2] *= -edge_collision_loss
+                overlap_z = (sphere.pos[2] + 1) - lenght_table
                 collision = True
-            
+
+            # Corrects overlap with table edge
+            sphere.pos = (sphere.pos[0] - overlap_x, sphere.pos[1], sphere.pos[2] - overlap_z)        
+    
     return collision, lvel
 
 
