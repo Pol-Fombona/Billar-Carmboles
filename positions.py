@@ -3,6 +3,7 @@ TABLE_LENGTH = 83.28
 TABLE_HEIGHT = 0.5
 MARGIN_WIDTH = 1
 LEGS_HEIGHT = 500
+LEGS_SIZE = 0.5
 TABLE_PROF = (
     TABLE_HEIGHT / 2
 )  # Aixo es la profunditat de la moqueta a l'interor de la taula
