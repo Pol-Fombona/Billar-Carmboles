@@ -13,6 +13,7 @@ from Light import Light
 from MovementManagement import checkCollisions
 from GameManager import *
 from SoundManager3D import *
+from ScoreManager import *
 
 
 
@@ -151,16 +152,26 @@ class GraphicsEngine:
                         self.sound.playSong()       
 
     def render(self):
-        # clear framebuffer
-        self.ctx.clear(color=(0.08, 0.16, 0.18))
-        # render scene
-        self.scene.render()
+        # Default render
 
-        checkCollisions(self.scene.ball_objects, self.sound)
-       
+        self.ctx.clear(color=(0.08, 0.16, 0.18))
+        self.scene.render()
+        #checkCollisions(self.scene.ball_objects, self.sound, self.game.current_player)
         pg.display.set_caption(self.get_info())
-        # swap buffers
         pg.display.flip()
+
+
+    def render_status_played(self):
+        # Add collision checker to the render,
+        # only when turn status is "played" because 
+        # the spheres are moving
+
+        self.ctx.clear(color=(0.08, 0.16, 0.18))
+        self.scene.render()
+        checkCollisions(self.scene.ball_objects, self.sound, self.game.current_player)
+        pg.display.set_caption(self.get_info())
+        pg.display.flip()
+
 
     def get_info(self):
         # Returns info text (scores, time...) to show on top of window
@@ -173,20 +184,30 @@ class GraphicsEngine:
         return info
 
 
-    def unpause(self):
-        self.pause = False
-        pg.event.clear()
-        return time.time()
-
-    def run(self):
-
-        last_timestamp = time.time()
+    def init_game_params(self):
+        # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
         player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
 
         self.game = Game(player1, player2, self.scene.ball_objects)
-        
+        self.game.mode = FreeCarambole()
+
+
+    def unpause(self):
+        # Returns current time to not include
+        # paused time into the total playtime
+
+        self.pause = False
+        pg.event.clear()
+
+        return time.time()
+
+
+    def run(self):
+
+        last_timestamp = time.time()
+
         while True:
 
             self.check_events()
@@ -195,16 +216,39 @@ class GraphicsEngine:
                 self.quit = pause_manager(self.game)
                 last_timestamp = self.unpause()
 
-
-            else:   
+            else:
 
                 self.camera.update()
                 self.sound.update()
-                self.render()
+
+                match self.game.getTurnStatus() :
+
+                    case "initial":
+                        # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
+                        self.render()
+
+                        # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
+                        # de la seva bola no és zero. Aixo s'haura de canviar per a 
+                        # modificar l'status de played quan s'allibera el pal, 
+                        # es a dir quan s'ha fet el tir
+                        if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                            self.game.current_player.played = True
+
+                    case "played":
+                        # Shot made but spheres are in movement
+                        self.render_status_played()
+                    
+                    case "ended":
+                        # Shot made and all spheres have stopped
+                        self.render()
+                        scored = self.game.mode.update_score(self.game.current_player)
+                        self.game.changeCurrentPlayer(scored)
+
                 self.delta_time = self.clock.tick(60)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
 
 
 if __name__ == "__main__":
     app = GraphicsEngine()
+    app.init_game_params()
     app.run()
