@@ -76,6 +76,9 @@ def pause_manager(game):
     if exit_game:
         game_ended(game)
 
+    else:
+        print_onColored("#### Game Resumed ####")
+
     return exit_game
 
 def game_ended(game):

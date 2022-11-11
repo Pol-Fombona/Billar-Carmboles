@@ -15,19 +15,19 @@ lenght_table = 83.28 # Z-edge
 PECR = True
 
 
-def checkCollisions(objects, sound):
+def checkCollisions(objects, sound, player):
     # Checks collisions between spheres and between spheres and table
     
     # Between spheres
-    checkBallsCollisions(objects,sound)
+    checkBallsCollisions(objects, sound, player)
 
     # Between table and sphere
-    checkEdgeCollisions(objects,sound)
+    checkEdgeCollisions(objects, sound, player)
 
     return
 
 
-def checkBallsCollisions(objects,sound):
+def checkBallsCollisions(objects, sound, player):
     # If the distance between the spheres is less than the sum of radius
     # there is a collision
 
@@ -48,10 +48,22 @@ def checkBallsCollisions(objects,sound):
 
                 ballCollision(ball_1, ball_2, v1, v2, x1, x2)
                 correctOverlap(ball_1, ball_2, dist, x1, x2)
-                
+                addCollisionDetails(player, ball_1, ball_2)
+
                 sound.playSound([ball_1,ball_2],0)
 
     return 
+
+def addCollisionDetails(player, sphere1, sphere2):
+    # Adds collision details to the current player record 
+    # only if one of the spheres "belongs" to the player
+                    
+    if (player.ball == sphere1):
+        player.collision_record.append(("Sphere", sphere2))
+    elif (player.ball == sphere2):
+        player.collision_record.append(("Sphere", sphere1))
+
+    return
 
 
 def correctOverlap(ball_1, ball_2, dist, x1, x2):
@@ -139,7 +151,7 @@ def getImpactVelocityOneMovingObject(x1, x2, v1, v2):
     return v1f, v2f
 
 
-def checkEdgeCollisions(objects,sound):
+def checkEdgeCollisions(objects, sound, player):
     # Checks collisions between the edges of the table
     # and a sphere
 
@@ -147,30 +159,41 @@ def checkEdgeCollisions(objects,sound):
 
         if sum(abs(sphere.velocity)) > 0:
             overlap_x, overlap_z = 0, 0
+            collision_info = None # Info to get score
 
             # X-edges of table
             if (sphere.pos[0] - 1) <= 0:
+
                 sphere.velocity[0] *=  -edge_collision_loss
                 overlap_x = sphere.pos[0] - 1
+                collision_info = ("Edge", "X")
                 sound.playSound([sphere,overlap_x],2)
+                
             elif (sphere.pos[0] + 1 ) >= width_table:
                 sphere.velocity[0] *= -edge_collision_loss
                 overlap_x = (sphere.pos[0] + 1) - width_table
+                collision_info = ("Edge", "X")
                 sound.playSound([sphere,overlap_x],2)
 
             # Z-edges of table
             elif (sphere.pos[2] - 1) <= 0:
                 sphere.velocity[2] *= -edge_collision_loss
                 overlap_z = sphere.pos[2] - 1
+                collision_info = ("Edge", "Z")
                 sound.playSound([sphere,overlap_z],2)
 
             elif (sphere.pos[2] + 1) >= lenght_table:
                 sphere.velocity[2] *= -edge_collision_loss
                 overlap_z = (sphere.pos[2] + 1) - lenght_table
+                collision_info = ("Edge", "Z")
                 sound.playSound([sphere,overlap_z],2)
 
             # Corrects overlap with table edge
-            sphere.pos = (sphere.pos[0] - overlap_x, sphere.pos[1], sphere.pos[2] - overlap_z)        
+            sphere.pos = (sphere.pos[0] - overlap_x, sphere.pos[1], sphere.pos[2] - overlap_z)
+
+            # Add collision info if the sphere "belongs" to the current player
+            if (sphere == player.ball and collision_info != None):
+                player.collision_record.append(collision_info)        
     
     return 
 
