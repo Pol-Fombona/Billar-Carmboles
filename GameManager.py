@@ -5,6 +5,7 @@ class Player():
 
         self.name = name
         self.score = 0
+        self.collision_record = [] 
         self.ball = ball
         self.played = False
 
@@ -17,32 +18,46 @@ class Game():
         self.current_player = self.player1
         self.spheres = spheres
         self.played_time = 0
+        self.mode = ""
 
     def get_scores(self):
-        # Returns players scores
-        return None
+        # Returns players scores in str format
 
-    def changeCurrentPlayer(self):
-        # Changes active player
+        scores = "[ {0}: {1} --- {2}: {3} ]"
+        scores = scores.format(self.player1.name, self.player1.score,
+                                self.player2.name, self.player2.score)
+        return scores
+
+    def changeCurrentPlayer(self, scored):
+        # Changes active player only
+        # If the current player has scored
+        # it keeps playing
 
         self.current_player.played = False
 
-        if self.current_player == self.player1:
-            self.current_player = self.player2
+        if not scored:
+            if self.current_player == self.player1:
+                self.current_player = self.player2
 
-        else:
-            self.current_player = self.player1
+            else:
+                self.current_player = self.player1
+
+        return
 
     
-    def checkTurnEnded(self):
-        # Check if active player turn has ended
+    def getTurnStatus(self):
+        # Returns status:
+        #   - "initial" = player has not made a shot yet
+        #   - "played"  = player has made a shoty and spheres are 
+        #                 still in movement
+        #   - "ended"   = turn has ended
 
         if not self.current_player.played:
-            return False
+            return "initial"
 
         for sphere in self.spheres:
             if sum(abs(sphere.velocity)) != 0:
-                return False
+                return "played"
         
-        return True
+        return "ended"
     
