@@ -8,6 +8,8 @@ class Player():
         self.collision_record = [] 
         self.ball = ball
         self.played = False
+        self.turn_count = 1
+        
 
 class Game():
 
@@ -36,6 +38,9 @@ class Game():
         self.current_player.played = False
 
         if not scored:
+            
+            self.current_player.turn_count += 1
+
             if self.current_player == self.player1:
                 self.current_player = self.player2
 

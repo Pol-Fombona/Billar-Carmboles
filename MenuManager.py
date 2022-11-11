@@ -98,13 +98,13 @@ def update_ranking(game):
 
     ranking_data = pd.read_csv('results/ranking.csv')
 
-    game_data = [(game.player1.name, game.player1.score),
-                    (game.player2.name, game.player2.score)]
+    game_data = [(game.player1.name, game.player1.score, game.player1.turn_count),
+                    (game.player2.name, game.player2.score, game.player2.turn_count)]
     
-    game_data = pd.DataFrame(game_data, columns=["Player", "Score"])
+    game_data = pd.DataFrame(game_data, columns=["Player", "Score", "Turns"])
 
     ranking_data = pd.concat([ranking_data, game_data], ignore_index=True)
-    ranking_data = ranking_data.sort_values(by=["Score"], ascending=False)
+    ranking_data = ranking_data.sort_values(by=["Score", "Turns"], ascending=[False, True])
     ranking_data = ranking_data.head(10)
 
     ranking_data.to_csv('results/ranking.csv', sep=",", index=False)
