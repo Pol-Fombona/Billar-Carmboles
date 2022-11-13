@@ -2,6 +2,7 @@ import pygame as pg
 import moderngl as mgl
 import time
 import sys
+import pandas as pd
 
 from model import *
 from FreeCamera import *
@@ -14,6 +15,7 @@ from MovementManagement import checkCollisions
 from GameManager import *
 from SoundManager3D import *
 from ScoreManager import *
+from PickleManager import save_game_record_to_pickle
 
 
 
@@ -30,24 +32,66 @@ TABLE_PROF = (
 TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 
 
-class GraphicsEngine:
-    #def __init__(self, win_size=(1600, 900)):
-    def __init__(self, win_size=(900, 500)):
-        # init pygame modules
-        pg.init()
-        # window size
-        self.WIN_SIZE = win_size
-        # set opengl attr
+class Engine():
+    # Base game engine
+
+    def __init__(self) -> None:
+        pass
+
+    def set_pg_attributes(self):
+
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)
-        pg.display.gl_set_attribute(
-            pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE
-        )
-        # create opengl context
+        pg.display.gl_set_attribute( pg.GL_CONTEXT_PROFILE_MASK, 
+                                        pg.GL_CONTEXT_PROFILE_CORE)
         pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
         pg.event.set_grab(True)
         pg.mouse.set_visible(False)
-        # detect and use exixting opengl context
+
+
+    def get_info(self):
+        # Returns info text (scores, time...) to show on top of window
+
+        time_info = "Playing time: " + str(format_time(self.game.played_time))
+        p1_score_info = "Scores: [" + self.game.player1.name + " - " + str(self.game.player1.score) + "; "
+        p2_score_info = self.game.player2.name + " - " + str(self.game.player2.score) + "]"
+        
+        info = time_info + " | " + p1_score_info + p2_score_info + " | "
+        return info
+
+
+    def render(self):
+        # Default render
+
+        self.ctx.clear(color=(0.08, 0.16, 0.18))
+        self.scene.render()
+        pg.display.set_caption(self.get_info())
+        pg.display.flip()
+
+
+    def unpause(self):
+        # Returns current time to not include
+        # paused time into the total playtime
+
+        self.pause = False
+        pg.event.clear()
+
+        return time.time()
+
+
+class GraphicsEngine(Engine):
+    #def __init__(self, win_size=(1600, 900)):
+    def __init__(self, win_size=(900, 500)):
+
+        # Init pygame module
+        pg.init()
+
+        self.WIN_SIZE = win_size
+        
+        # Set PyGame attributes
+        self.set_pg_attributes()
+
+        # Detect and use exixting opengl context
         self.ctx = mgl.create_context()
         self.ctx.enable(flags=mgl.DEPTH_TEST)
         # self.ctx.viewport(0,0,self.WIN_SIZE[0]/2,self.WIN_SIZE[1]/2)
@@ -69,20 +113,24 @@ class GraphicsEngine:
         self.light = Light()
         self.mesh = Mesh(self)
         self.scene = Scene(self)
-        self.scene.pinfo = "Object: ON"
         self.delta_time = 0
-        self.mode_bird_cam = True
         self.pause = False
         self.quit = False
         self.game = None
         self.sound = SoundManager(self)
         self.sound.playSong()
 
+        # Game history 
+        # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 
+        #   p1.score, p2.score)
+        self.game_record = [] 
+
 
     def check_events(self):
         if self.quit:
             self.mesh.destroy()
             pg.quit()
+            self.save_game_record()
             sys.exit()
 
         for event in pg.event.get():
@@ -93,13 +141,7 @@ class GraphicsEngine:
         
                 elif event.type == pg.KEYDOWN and event.key == pg.K_b:
 
-                    self.mode_bird_cam = not self.mode_bird_cam
-
-                    if self.mode_bird_cam:
-                        self.camera.bird_camera = True
-
-                    else:
-                        self.camera.bird_camera = False   
+                    self.camera.bird_camera = not self.camera.bird_camera
 
                 elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
                     self.scene.ball_objects[0].velocity[0] += -0.5
@@ -151,15 +193,6 @@ class GraphicsEngine:
                         self.sound.song_playing = True
                         self.sound.playSong()       
 
-    def render(self):
-        # Default render
-
-        self.ctx.clear(color=(0.08, 0.16, 0.18))
-        self.scene.render()
-        #checkCollisions(self.scene.ball_objects, self.sound, self.game.current_player)
-        pg.display.set_caption(self.get_info())
-        pg.display.flip()
-
 
     def render_status_played(self):
         # Add collision checker to the render,
@@ -173,17 +206,6 @@ class GraphicsEngine:
         pg.display.flip()
 
 
-    def get_info(self):
-        # Returns info text (scores, time...) to show on top of window
-
-        time_info = "Playing time: " + str(format_time(self.game.played_time))
-        p1_score_info = "Scores: [" + self.game.player1.name + " - " + str(self.game.player1.score) + "; "
-        p2_score_info = self.game.player2.name + " - " + str(self.game.player2.score) + "]"
-        
-        info = time_info + " | " + p1_score_info + p2_score_info + " | "
-        return info
-
-
     def init_game_params(self):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
@@ -193,20 +215,33 @@ class GraphicsEngine:
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole()
 
+    
+    def record_frame_data(self):
+        # Save current frame data
 
-    def unpause(self):
-        # Returns current time to not include
-        # paused time into the total playtime
+        frame_data = [self.scene.ball_objects[0].pos, self.scene.ball_objects[1].pos, self.scene.ball_objects[0].pos,
+                        self.game.player1.score, self.game.player2.score] # Faltaria afegir les dades del pal
 
-        self.pause = False
-        pg.event.clear()
+        self.game_record.append(frame_data)
 
-        return time.time()
+        return
+
+    
+    def save_game_record(self):
+        # Saves game record as csv file
+
+        columns=["Ball1Pos", "Ball2Pos", "Ball3Pos", "P1Score", "P2Score"]
+        game_data = pd.DataFrame(self.game_record, columns=columns)
+
+        save_game_record_to_pickle(game_data)
+        
+        return
 
 
     def run(self):
 
         last_timestamp = time.time()
+        record_game = True # Allow to save a record of the game 
 
         while True:
 
@@ -247,8 +282,77 @@ class GraphicsEngine:
                 self.delta_time = self.clock.tick(60)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
 
+            if record_game:
+                self.record_frame_data()
+
+
+class ReplayEngine(Engine):
+    # Engine used when replaying a game
+
+    def __init__(self, win_size=(900, 500)):
+        
+        # Init pygame module
+        pg.init()
+
+        self.WIN_SIZE = win_size
+        
+        # Set PyGame attributes
+        self.set_pg_attributes()
+
+        # Detect and use exixting opengl context
+        self.ctx = mgl.create_context()
+        self.ctx.enable(flags=mgl.DEPTH_TEST)
+
+        self.clock = pg.time.Clock()
+        self.camera = Camera(self)
+        self.light = Light()
+        self.mesh = Mesh(self)
+        self.scene = Scene(self)
+
+        self.delta_time = 0
+
+        self.mode_bird_cam = True
+        self.pause = False
+        self.quit = False
+
+    
+    def check_events(self):
+        # Key events
+
+        if self.quit:
+            self.mesh.destroy()
+            pg.quit()
+            sys.exit()
+
+        else:
+            for event in pg.event.get():
+
+                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                    # Enter pause status
+                    self.pause = True
+
+                elif event.type == pg.KEYDOWN and event.key == pg.K_b:
+                    # Changes between bird and free cam mode
+                    self.camera.bird_camera = not self.camera.bird_camera
+
+    def init_game_params(self):
+        # Aqui és on preguntarem nom dels jugador i mode que volen jugar
+        
+        player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
+        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
+
+        self.game = Game(player1, player2, self.scene.ball_objects)
+        self.game.mode = FreeCarambole()
+
+
+    def run(self):
+        ...
+
+
+
 
 if __name__ == "__main__":
+
     app = GraphicsEngine()
     app.init_game_params()
     app.run()
