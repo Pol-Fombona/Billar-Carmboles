@@ -45,3 +45,23 @@ def change_objective(cue,ball):
     cue.pos = copy.deepcopy(cue.axis)
     cue.pos[0] += cue.dist_ball
     cue.pos_orig = glm.vec3(cue.dist_ball,0,0)
+
+def manage_move(cue):
+    if (
+            cue.app.game.getTurnStatus() == "initial"
+        ):    
+            if cue.moving:
+                change_objective(cue, cue.app.game.current_player.ball)    
+                cue.moving = False
+            if cue.rotate_flag:
+                rotate_cue(cue)
+            if (
+                cue.displace_cue == True
+                and points_distance(cue.axis, cue.pos) <= cue.max_distance
+            ):
+                displace_cue(cue)
+            if not cue.displace_cue and not cue.reset_pos:
+                reset_displace_cue(cue)
+                cue.reset_pos = True
+                cue_hit_ball(cue, cue.app.game.current_player.ball)
+                cue.moving = True

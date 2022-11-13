@@ -9,7 +9,7 @@ class Scene:
         self.app = app
         self.objects = []
         self.ball_objects = []
-        self.cue_objects = []
+        self.cue = None
         self.load()
 
     def add_object(self, obj):
@@ -18,14 +18,10 @@ class Scene:
     def add_ball(self, obj):
         self.ball_objects.append(obj)
 
-    def add_cue(self, obj):
-        self.cue_objects.append(obj)
-
     def load(self):
         app = self.app
         add = self.add_object
         add_ball = self.add_ball
-        add_cue = self.add_cue
 
         add(Legs(app, pos=LEG_1, tex_id=7))
         add(Legs(app, pos=LEG_2, tex_id=7))
@@ -57,10 +53,16 @@ class Scene:
 
         add_ball(Sphere(app, pos=(20, 1, 80), tex_id="sphere15",id = 16))
 
-        add_cue(Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5))
+        self.cue = Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5)
 
-        self.objects = self.objects + self.ball_objects + self.cue_objects
+        self.objects = self.objects + self.ball_objects
 
     def render(self):
         for obj in self.objects:
             obj.render()
+
+    def render_with_cue(self):
+        for obj in self.objects:
+            obj.render()
+        self.cue.render()
+        

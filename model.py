@@ -183,6 +183,7 @@ class Cue(BaseModel):
         heigth=0,
         dist_ball=0,
         vao_name="cue",
+        max_distance = 20
     ):
         self.rot = glm.vec3([glm.radians(a) for a in rot])
         self.scale = scale
@@ -194,6 +195,7 @@ class Cue(BaseModel):
         self.width = width
         self.heigth = heigth
         self.dist_ball = dist_ball
+        self.max_distance = max_distance
         self.rotate_flag = False
         self.rotate_direction = 0
         self.angle = 0
@@ -201,17 +203,9 @@ class Cue(BaseModel):
         self.reset_pos = True
         self.turn = 1
         self.moving = False
-        # self.shader_program = self.get_shader_program()
-        # self.vao = self.get_vao()
-        # self.axis = axis
         self.pos = copy.deepcopy(self.axis)
         self.pos[0] += copy.deepcopy(self.dist_ball)
         self.pos_orig = glm.vec3(self.dist_ball, 0, 0)
-        # self.pos_reset = copy.deepcopy(self.pos)
-        # self.rot = glm.vec3([glm.radians(a) for a in rot])
-        # self.scale = scale
-        # self.m_model = self.get_model_matrix()
-        # self.texture = self.get_texture(path="textures/cue.PNG")
         self.on_init()
 
     def get_model_matrix(self):
@@ -245,45 +239,8 @@ class Cue(BaseModel):
 
     def update(self):
         self.texture.use()
-        # if self.app.scene.ball_objects[0].velocityX == self.app.scene.ball_objects[0].velocityZ == 0:
-        if (
-            self.app.scene.ball_objects[0].velocity[0]
-            == self.app.scene.ball_objects[0].velocity[2]
-            == 0
-        ):
-            #    if self.app.scene.ball_objects[1].velocityX == self.app.scene.ball_objects[1].velocityZ == 0:
-            if (
-                self.app.scene.ball_objects[1].velocity[1]
-                == self.app.scene.ball_objects[1].velocity[2]
-                == 0
-            ):
-                if self.moving == True:
-                    if self.turn == 1:
-                        change_objective(self, self.app.scene.ball_objects[0])
-                    else:
-                        change_objective(self, self.app.scene.ball_objects[1])
-                    self.moving = False
-                if self.rotate_flag == True:
-                    rotate_cue(self)
-                if (
-                    self.displace_cue == True
-                    and points_distance(self.axis, self.pos) <= 20
-                ):
-                    displace_cue(self)
-                if self.displace_cue == False and self.reset_pos == False:
-                    reset_displace_cue(self)
-                    self.reset_pos = True
-                    if self.turn == 1:
-                        cue_hit_ball(self, self.app.scene.ball_objects[0])
-                      
-                    else:
-                        cue_hit_ball(self, self.app.scene.ball_objects[1])
-                     
-                    self.turn *= -1
-                    self.pos = copy.deepcopy(self.axis)
-                    self.pos[0] = self.dist_ball
-                    self.pos_orig = glm.vec3(self.dist_ball, 0, 0)
-                    self.moving = True
+        manage_move(self)
+        
         self.program["m_proj"].write(self.app.camera.m_proj)
         self.program["m_view"].write(self.app.camera.m_view)
         self.program["m_model"].write(self.m_model)

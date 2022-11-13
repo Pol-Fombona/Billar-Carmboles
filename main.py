@@ -68,6 +68,13 @@ class Engine():
         pg.display.set_caption(self.get_info())
         pg.display.flip()
 
+    def render_with_cue(self):
+        # render with cue
+
+        self.ctx.clear(color=(0.08, 0.16, 0.18))
+        self.scene.render_with_cue()
+        pg.display.set_caption(self.get_info())
+        pg.display.flip()
 
     def unpause(self):
         # Returns current time to not include
@@ -162,28 +169,28 @@ class GraphicsEngine(Engine):
                 elif (
                     event.type == pg.KEYDOWN
                     and event.key == pg.K_k
-                    and not self.scene.cue_objects[0].displace_cue
+                    and not self.scene.cue.displace_cue
                 ):
-                    self.scene.cue_objects[0].rotate_flag = True
-                    self.scene.cue_objects[0].rotate_direction = 1
+                    self.scene.cue.rotate_flag = True
+                    self.scene.cue.rotate_direction = 1
                 elif (
                     event.type == pg.KEYDOWN
                     and event.key == pg.K_j
-                    and not self.scene.cue_objects[0].displace_cue
+                    and not self.scene.cue.displace_cue
                 ):
-                    self.scene.cue_objects[0].rotate_flag = True
-                    self.scene.cue_objects[0].rotate_direction = -1
+                    self.scene.cue.rotate_flag = True
+                    self.scene.cue.rotate_direction = -1
                 elif event.type == pg.KEYUP and event.key == pg.K_k:
-                    self.scene.cue_objects[0].rotate_flag = False
-                    self.scene.cue_objects[0].rotate_direction = 0
+                    self.scene.cue.rotate_flag = False
+                    self.scene.cue.rotate_direction = 0
                 elif event.type == pg.KEYUP and event.key == pg.K_j:
-                    self.scene.cue_objects[0].rotate_flag = False
-                    self.scene.cue_objects[0].rotate_direction = 0
-                elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE and not self.scene.cue_objects[0].rotate_flag:
-                    self.scene.cue_objects[0].displace_cue = True
-                elif event.type == pg.KEYUP and event.key == pg.K_SPACE and not self.scene.cue_objects[0].rotate_flag:
-                    self.scene.cue_objects[0].displace_cue = False
-                    self.scene.cue_objects[0].reset_pos = False
+                    self.scene.cue.rotate_flag = False
+                    self.scene.cue.rotate_direction = 0
+                elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE and not self.scene.cue.rotate_flag:
+                    self.scene.cue.displace_cue = True
+                elif event.type == pg.KEYUP and event.key == pg.K_SPACE and not self.scene.cue.rotate_flag:
+                    self.scene.cue.displace_cue = False
+                    self.scene.cue.reset_pos = False
 
                 if event.type == pg.KEYDOWN and event.key == pg.K_m:
                     if self.sound.song_playing:
@@ -260,7 +267,7 @@ class GraphicsEngine(Engine):
 
                     case "initial":
                         # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
-                        self.render()
+                        self.render_with_cue()
 
                         # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
                         # de la seva bola no és zero. Aixo s'haura de canviar per a 
