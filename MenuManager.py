@@ -96,7 +96,7 @@ def game_ended(game):
 def update_ranking(game):
     # Update ranking file
 
-    ranking_data = pd.read_csv('results/ranking.csv')
+    ranking_data = pd.read_csv('GameData/Rankings/ranking.csv')
 
     game_data = [(game.player1.name, game.player1.score, game.player1.turn_count),
                     (game.player2.name, game.player2.score, game.player2.turn_count)]
@@ -107,7 +107,7 @@ def update_ranking(game):
     ranking_data = ranking_data.sort_values(by=["Score", "Turns"], ascending=[False, True])
     ranking_data = ranking_data.head(10)
 
-    ranking_data.to_csv('results/ranking.csv', sep=",", index=False)
+    ranking_data.to_csv('GameData/Rankings/ranking.csv', sep=",", index=False)
 
     return
 
@@ -115,7 +115,7 @@ def update_ranking(game):
 def show_ranking():
     # Show ranking data in terminal
 
-    ranking_data = pd.read_csv('results/ranking.csv')
+    ranking_data = pd.read_csv('GameData/Rankings/ranking.csv')
 
     clear_terminal()
 
