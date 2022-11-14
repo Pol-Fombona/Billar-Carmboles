@@ -14,12 +14,14 @@ def Ry(theta):
                    [ 0           , 1, 0           ],
                    [-np.sin(theta), 0, np.cos(theta)]])
     
-def displace_cue(cue):
-    cue.pos_orig +=glm.vec3(1,0,0)*0.25
+def displace_cue(cue,mode):
+    if mode == "b":
+        displace = glm.vec3(1,0,0)*0.25
+    elif mode == "f":
+        displace = -glm.vec3(1,0,0)*0.25
+    cue.pos_orig +=displace
     cue.pos = Ry(glm.radians(cue.angle))*cue.pos_orig+cue.axis
-
-    #cue.pos += Ry(glm.radians(cue.angle))*glm.vec3(1,0,0)*0.25
-    cue.m_model =  glm.translate(cue.m_model,glm.vec3(1,0,0)*0.25)
+    cue.m_model =  glm.translate(cue.m_model,displace)
    
 def points_distance(point1,point2):
         return math.sqrt((point1[0]-point2[0])**2+(point1[1]-point2[1])**2+(point1[2]-point2[2])**2)
@@ -57,10 +59,18 @@ def manage_move(cue):
                 rotate_cue(cue)
             if (
                 cue.state == "backward"
-                and points_distance(cue.axis, cue.pos) <= cue.max_distance
+                #and points_distance(cue.axis, cue.pos) <= cue.max_distance
             ):
-                displace_cue(cue)
-            if cue.state == "reset":
+                displace_cue(cue,"b")
+                if points_distance(cue.axis, cue.pos) >= cue.max_distance:
+                    cue.state = "forward"
+            elif (
+                cue.state == "forward"
+            ):
+                displace_cue(cue,"f")
+                if points_distance(cue.axis, cue.pos) <= cue.dist_ball+0.5:
+                    cue.state = "backward"
+            elif cue.state == "reset":
                 reset_displace_cue(cue)
                 cue.state = "stop"
                 cue_hit_ball(cue, cue.app.game.current_player.ball)
