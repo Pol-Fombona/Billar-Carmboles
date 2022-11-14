@@ -196,6 +196,7 @@ class Cue(BaseModel):
         self.heigth = heigth
         self.dist_ball = dist_ball
         self.max_distance = max_distance
+        self.state = "stop"
         self.rotate_flag = False
         self.rotate_direction = 0
         self.angle = 0

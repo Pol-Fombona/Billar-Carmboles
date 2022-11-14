@@ -18,7 +18,7 @@ def displace_cue(cue):
     cue.pos_orig +=glm.vec3(1,0,0)*0.25
     cue.pos = Ry(glm.radians(cue.angle))*cue.pos_orig+cue.axis
 
-    cue.pos += Ry(glm.radians(cue.angle))*glm.vec3(1,0,0)*0.25
+    #cue.pos += Ry(glm.radians(cue.angle))*glm.vec3(1,0,0)*0.25
     cue.m_model =  glm.translate(cue.m_model,glm.vec3(1,0,0)*0.25)
    
 def points_distance(point1,point2):
@@ -56,12 +56,12 @@ def manage_move(cue):
             if cue.rotate_flag:
                 rotate_cue(cue)
             if (
-                cue.displace_cue == True
+                cue.state == "backward"
                 and points_distance(cue.axis, cue.pos) <= cue.max_distance
             ):
                 displace_cue(cue)
-            if not cue.displace_cue and not cue.reset_pos:
+            if cue.state == "reset":
                 reset_displace_cue(cue)
-                cue.reset_pos = True
+                cue.state = "stop"
                 cue_hit_ball(cue, cue.app.game.current_player.ball)
                 cue.moving = True

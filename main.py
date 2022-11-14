@@ -169,14 +169,14 @@ class GraphicsEngine(Engine):
                 elif (
                     event.type == pg.KEYDOWN
                     and event.key == pg.K_k
-                    and not self.scene.cue.displace_cue
+                    and self.scene.cue.state == "stop"
                 ):
                     self.scene.cue.rotate_flag = True
                     self.scene.cue.rotate_direction = 1
                 elif (
                     event.type == pg.KEYDOWN
                     and event.key == pg.K_j
-                    and not self.scene.cue.displace_cue
+                    and self.scene.cue.state == "stop"
                 ):
                     self.scene.cue.rotate_flag = True
                     self.scene.cue.rotate_direction = -1
@@ -187,10 +187,9 @@ class GraphicsEngine(Engine):
                     self.scene.cue.rotate_flag = False
                     self.scene.cue.rotate_direction = 0
                 elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE and not self.scene.cue.rotate_flag:
-                    self.scene.cue.displace_cue = True
+                    self.scene.cue.state = "backward"
                 elif event.type == pg.KEYUP and event.key == pg.K_SPACE and not self.scene.cue.rotate_flag:
-                    self.scene.cue.displace_cue = False
-                    self.scene.cue.reset_pos = False
+                    self.scene.cue.state = "reset"
 
                 if event.type == pg.KEYDOWN and event.key == pg.K_m:
                     if self.sound.song_playing:
