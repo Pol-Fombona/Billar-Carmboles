@@ -288,7 +288,7 @@ class GraphicsEngine(Engine):
                         scored = self.game.mode.update_score(self.game.current_player)
                         self.game.changeCurrentPlayer(scored)
 
-                self.delta_time = self.clock.tick(60)
+                self.delta_time = self.clock.tick(self.game.game_speed)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
 
             if record_game:

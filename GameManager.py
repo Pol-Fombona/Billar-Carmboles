@@ -21,6 +21,7 @@ class Game():
         self.spheres = spheres
         self.played_time = 0
         self.mode = ""
+        self.game_speed = 60 # FPS
 
     def get_scores(self):
         # Returns players scores in str format

@@ -55,11 +55,11 @@ def pause_manager(game):
                     pause = False
 
                 case 2:
-                    modify_friction()
+                    extended_options(game)
                     show_options()
 
                 case 3:
-                    show_ranking()
+                    show_controls()
                     show_options()
 
                 case 4:
@@ -112,6 +112,71 @@ def update_ranking(game):
     return
 
 
+def extended_options(game):
+    # More options menu manager
+
+    clear_terminal()
+    show_extended_options()
+
+    back = False
+
+    while not back:
+        choice = input("\nEnter choice: ").strip()
+
+        try:
+            choice = int(choice)
+
+            match choice:
+
+                case 1:
+                    show_ranking()
+                    show_extended_options()
+
+                case 2:
+                    modify_friction()
+                    show_extended_options()
+
+                case 3:
+                    modify_game_speed(game)
+                    show_extended_options()
+
+                case 4:
+                    back = True
+
+                case _:
+                    print_onColored("Invalid choice input", "on_red")
+        
+        except:
+            print_onColored("Invalid choice input", "on_red")
+
+    clear_terminal()
+    
+
+def show_controls():
+    # Show keybinds
+
+    clear_terminal()
+    print_colored("TODO")
+    print("Press 1 to return")
+
+    while True:
+        
+        option = input("\nEnter choice: ").strip()
+
+        try:
+            if (int(option)) == 1:
+                break
+
+            else:
+                print_onColored("Invalid value", "on_red")
+
+        except:
+            print_onColored("Invalid value", "on_red")
+
+    clear_terminal()
+    return
+
+
 def show_ranking():
     # Show ranking data in terminal
 
@@ -139,6 +204,38 @@ def show_ranking():
     clear_terminal()
 
     return 
+
+
+def modify_game_speed(game):
+    # Modifies game speed (fps)
+
+    clear_terminal()
+
+    accepted_values = [0.5, 1, 2, 4]
+
+    print_onColored("#### Modify Game Speed ####")
+    print_colored("\nCurrent speed: " + str(game.game_speed / 60))
+    print("Accepted values are (" + str(accepted_values)[1:-1] + ")!")
+
+    while True:
+        new_speed = input("New Game Speed value: ").strip()
+
+        try: 
+            new_speed = float(new_speed)
+            
+            if new_speed in accepted_values:
+                game.game_speed = int(60 * new_speed)
+                break
+
+            else:
+                print_onColored("Invalid value", "on_red")
+
+        except:
+            print_onColored("Invalid value", "on_red")
+
+    clear_terminal()
+
+    return
 
 
 def modify_friction():
@@ -193,6 +290,17 @@ def show_options():
     print_onColored("#### Pause Menu ####")
     print("\nOptions:")
     print("     1) Resume game")
-    print("     2) Modify friction")
-    print("     3) Show Ranking")
-    print("     4) Exit game")
+    print("     2) More Options")
+    print("     3) Show Controls")
+    print("     4) Exit Game")
+
+
+def show_extended_options():
+    # Extended options menu
+
+    print_onColored("#### Pause Menu ####")
+    print("\nExtended Options:")
+    print("     1) Show Ranking")
+    print("     2) Modify Friction")
+    print("     3) Modify Game Speed")
+    print("     4) Return")
