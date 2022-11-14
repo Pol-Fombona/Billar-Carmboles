@@ -55,8 +55,9 @@ class Engine():
         time_info = "Playing time: " + str(format_time(self.game.played_time))
         p1_score_info = "Scores: [" + self.game.player1.name + " - " + str(self.game.player1.score) + "; "
         p2_score_info = self.game.player2.name + " - " + str(self.game.player2.score) + "]"
+        curent_player_info = "Current player: " + self.game.current_player.name
         
-        info = time_info + " | " + p1_score_info + p2_score_info + " | "
+        info = time_info + " | " + curent_player_info + " | " + p1_score_info + p2_score_info + " | "
         return info
 
 
@@ -68,6 +69,7 @@ class Engine():
         pg.display.set_caption(self.get_info())
         pg.display.flip()
 
+
     def render_with_cue(self):
         # render with cue
 
@@ -75,6 +77,7 @@ class Engine():
         self.scene.render_with_cue()
         pg.display.set_caption(self.get_info())
         pg.display.flip()
+
 
     def unpause(self):
         # Returns current time to not include
@@ -247,7 +250,7 @@ class GraphicsEngine(Engine):
     def run(self):
 
         last_timestamp = time.time()
-        record_game = True # Allow to save a record of the game 
+        record_game = False # Allow to save a record of the game 
 
         while True:
 
