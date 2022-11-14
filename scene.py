@@ -7,13 +7,13 @@ from positions import *
 class Scene:
     def __init__(self, app):
         self.app = app
-        self.objects = []
+        self.table_objects = []
         self.ball_objects = []
         self.cue = None
         self.load()
 
     def add_object(self, obj):
-        self.objects.append(obj)
+        self.table_objects.append(obj)
 
     def add_ball(self, obj):
         self.ball_objects.append(obj)
@@ -36,7 +36,6 @@ class Scene:
         # add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
         add_ball(Sphere(app, pos=(21, 1, 60), tex_id="sphere1",id = 2))
         add_ball(Sphere(app, pos=(19, 1, 60), tex_id="sphere2",id = 3))
-
         add_ball(Sphere(app, pos=(26, 1, 65), tex_id="sphere3",id = 4))
         add_ball(Sphere(app, pos=(23, 1, 65), tex_id="sphere4",id = 5))
         add_ball(Sphere(app, pos=(20, 1, 65), tex_id="sphere5",id = 6))
@@ -55,14 +54,32 @@ class Scene:
 
         self.cue = Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5)
 
-        self.objects = self.objects + self.ball_objects
+        self.all_objects = self.table_objects + self.ball_objects + [self.cue]
+
 
     def render(self):
-        for obj in self.objects:
+        # Render table + spheres
+
+        for obj in self.table_objects:
             obj.render()
 
+        for sphere in self.ball_objects:
+            sphere.render()
+
+
     def render_with_cue(self):
-        for obj in self.objects:
+        # Render table + spheres + cue
+
+        for obj in self.all_objects:
             obj.render()
-        self.cue.render()
+
+
+    def replay_render(self):
+        # Render table + special render spheres
+
+        for obj in self.table_objects:
+            obj.render()
+
+        for sphere in self.ball_objects:
+            sphere.replay_render()
         

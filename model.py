@@ -104,6 +104,10 @@ class Sphere(BaseModel):
 
         self.on_init()
 
+    def replay_render(self):
+        self.replay_update()
+        self.vao.render()
+
     def update(self):
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
         self.texture.use()
@@ -115,8 +119,14 @@ class Sphere(BaseModel):
             self.rotation = new_rotation * self.rotation
 
         m_model = self.translation * self.rotation
-
+        self.m_model = m_model
         self.program["m_model"].write(m_model)
+
+    def replay_update(self):
+        # self.shader_program['m_proj'].write(self.app.camera.m_proj)
+        self.texture.use()
+        self.program["m_view"].write(self.app.camera.m_view)
+        self.program["m_model"].write(self.m_model)
 
 
 class SubdivisionSphere(BaseModel):
@@ -166,9 +176,20 @@ class SubdivisionSphere(BaseModel):
             self.rotation = new_rotation * self.rotation
 
         m_model = self.translation * self.rotation
+        self.m_model = m_model
         self.program["m_model"].write(m_model)
         self.program["camPos"].write(self.app.camera.position)
 
+    def replay_render(self):
+        self.replay_update()
+        self.vao.render()
+
+    def replay_update(self):
+        # self.shader_program['m_proj'].write(self.app.camera.m_proj)
+        self.program["m_proj"].write(self.app.camera.m_proj)
+        self.program["m_view"].write(self.app.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+        self.program["camPos"].write(self.app.camera.position)
 
 class Cue(BaseModel):
     def __init__(

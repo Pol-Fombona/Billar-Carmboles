@@ -228,7 +228,7 @@ class GraphicsEngine(Engine):
     def record_frame_data(self):
         # Save current frame data
 
-        frame_data = [self.scene.ball_objects[0].pos, self.scene.ball_objects[1].pos, self.scene.ball_objects[0].pos,
+        frame_data = [self.scene.ball_objects[0].m_model, self.scene.ball_objects[1].m_model, self.scene.ball_objects[2].m_model,
                         self.game.player1.score, self.game.player2.score] # Faltaria afegir les dades del pal
 
         self.game_record.append(frame_data)
@@ -239,7 +239,7 @@ class GraphicsEngine(Engine):
     def save_game_record(self):
         # Saves game record as csv file
 
-        columns=["Ball1Pos", "Ball2Pos", "Ball3Pos", "P1Score", "P2Score"]
+        columns=["Ball1Model", "Ball2Model", "Ball3Model", "P1Score", "P2Score"]
         game_data = pd.DataFrame(self.game_record, columns=columns)
 
         save_game_record_to_pickle(game_data)
@@ -324,7 +324,19 @@ class ReplayEngine(Engine):
         self.pause = False
         self.quit = False
 
-    
+        # ReplayData
+        self.replay_data = pd.read_pickle("GameData\\Replays\\2022-11-14_19-10-47.pkl")
+        self.replay_data_iterator = self.replay_data.iterrows()
+
+
+    def render(self):
+        # Default render
+
+        self.ctx.clear(color=(0.08, 0.16, 0.18))
+        self.scene.replay_render()
+        pg.display.set_caption(self.get_info())
+        pg.display.flip()
+
     def check_events(self):
         # Key events
 
@@ -353,10 +365,49 @@ class ReplayEngine(Engine):
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole()
 
+    
+    def set_frame_data(self):
+        # Use frame data to update object position and scores
+
+        try:
+            _, data = next(self.replay_data_iterator)
+
+            self.scene.ball_objects[0].m_model = data["Ball1Model"]
+            self.scene.ball_objects[1].m_model = data["Ball2Model"]
+            self.scene.ball_objects[2].m_model = data["Ball3Model"]
+
+            self.game.player1.score = data["P1Score"]
+            self.game.player2.score = data["P2Score"]
+
+        except:
+            print("\nReplay Ended")
+            sys.exit()
+
+        return
+
 
     def run(self):
-        ...
+        
+        last_timestamp = time.time()
 
+        while True:
+
+            self.set_frame_data()
+
+            self.check_events()
+
+            if self.pause:
+                    self.quit = pause_manager(self.game)
+                    last_timestamp = self.unpause()
+
+            else:
+
+                self.camera.update()
+                self.render()
+            
+                self.delta_time = self.clock.tick(self.game.game_speed)
+                self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
+                
 
 
 
