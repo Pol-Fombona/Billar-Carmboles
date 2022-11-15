@@ -139,6 +139,7 @@ class GraphicsEngine(Engine):
     def check_events(self):
         if self.quit:
             self.mesh.destroy()
+            self.scene.destroy()
             pg.quit()
             self.save_game_record()
             sys.exit()

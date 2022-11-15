@@ -11,6 +11,7 @@ class BaseModel:
         self.pos = pos
         self.m_model = self.get_model_matrix()
         self.tex_id = tex_id
+        self.vao_name = vao_name
         self.vao = app.mesh.vao.vaos[vao_name]
         self.program = self.vao.program
         self.camera = self.app.camera
@@ -21,7 +22,20 @@ class BaseModel:
 
         return m_model
 
+    def update_shadow(self):
+        self.shadow_program['m_model'].write(self.m_model)
+
+    def render_shadow(self):
+        self.update_shadow()
+        self.shadow_vao.render()
+
     def on_init(self):
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
         # light
         self.program["light.position"].write(self.app.light.position)
         self.program["light.Ia"].write(self.app.light.Ia)

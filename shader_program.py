@@ -10,6 +10,7 @@ class ShaderProgram:
         self.programs["balls"] = self.get_program("balls")
         self.programs["subdivision_balls"] = self.get_program("subdivision_balls")
         self.programs["cue"] = self.get_program("cue")
+        self.programs["shadow_map"] = self.get_program("shadow_map")
 
 
     def get_program(self, shader_program_name):

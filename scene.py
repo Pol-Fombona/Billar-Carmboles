@@ -10,7 +10,17 @@ class Scene:
         self.table_objects = []
         self.ball_objects = []
         self.cue = None
+        #depth texture
+        self.depth_texture = self.app.mesh.texture.textures['depth_texture']
+        self.depth_fbo = self.app.ctx.framebuffer(depth_attachment=self.depth_texture)
+
         self.load()
+
+    def render_shadow(self):
+        self.depth_fbo.clear()
+        self.depth_fbo.use()
+        for obj in self.ball_objects:
+            obj.render_shadow()
 
     def add_object(self, obj):
         self.table_objects.append(obj)
@@ -31,7 +41,7 @@ class Scene:
         add(TableFloor(app, pos=(0, 0, 0), tex_id=6))
 
         # add_ball(Sphere(app, pos=(20,1,10), tex_id=3))
-        add_ball(SubdivisionSphere(app, pos=(20, 1, 10), tex_id=3,id = 1))
+        #add_ball(SubdivisionSphere(app, pos=(20, 1, 10), tex_id=3,id = 1))
 
         # add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
         add_ball(Sphere(app, pos=(21, 1, 60), tex_id="sphere1",id = 2))
@@ -58,7 +68,12 @@ class Scene:
 
 
     def render(self):
+        print('hoo')
         # Render table + spheres
+
+
+        self.render_shadow()
+        self.app.ctx.screen.use()
 
         for obj in self.table_objects:
             obj.render()
@@ -70,16 +85,26 @@ class Scene:
     def render_with_cue(self):
         # Render table + spheres + cue
 
+        self.render_shadow()
+        self.app.ctx.screen.use()
+
         for obj in self.all_objects:
             obj.render()
 
 
     def replay_render(self):
+        print('hey')
         # Render table + special render spheres
+
+        self.render_shadow()
+        self.app.ctx.screen.use()
 
         for obj in self.table_objects:
             obj.render()
 
         for sphere in self.ball_objects:
             sphere.replay_render()
+
+    def destroy(self):
+        self.depth_fbo.release()
         
