@@ -14,16 +14,20 @@ struct Light {
 };
 
 uniform Light light;
+uniform Light light2;
 uniform sampler2D u_texture_0;
 
 vec3 getLight(vec3 color){
     vec3 Normal = normalize(normal);
     // ambient
-    vec3 ambient = light.Ia;
+    // vec3 ambient = (light.Ia + light2.Ia)/2;
+    vec3 ambient = light.Ia * 0.2;
     //diffuse
+    //vec3 lightDir = normalize((light.position + light2.position)/2 - fragPos);
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(0, dot(lightDir, Normal));
-    vec3 diffuse = diff * light.Id;
+    //vec3 diffuse = diff * (light.Id + light2.Id)/2;
+    vec3 diffuse = diff * light.Id * 0.2;
 
     return color * (ambient + diffuse);
 }

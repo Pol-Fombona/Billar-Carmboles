@@ -21,20 +21,6 @@ class BaseModel:
 
         return m_model
 
-    def on_init(self):
-        # light
-        self.program["light.position"].write(self.app.light.position)
-        self.program["light.Ia"].write(self.app.light.Ia)
-        self.program["light.Id"].write(self.app.light.Id)
-        # texture
-        self.texture = self.app.mesh.texture.textures[self.tex_id]
-        self.program["u_texture_0"] = 0
-        self.texture.use()
-        # mvp
-        self.program["m_proj"].write(self.camera.m_proj)
-        self.program["m_view"].write(self.camera.m_view)
-        self.program["m_model"].write(self.m_model)
-
     def update(self):
         self.texture.use()
         self.program["m_view"].write(self.camera.m_view)
@@ -82,13 +68,31 @@ class TableFloor(BaseModel):
         super().__init__(app, vao_name, tex_id, pos)
         self.on_init()
 
+    def on_init(self):
+        # texture
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        #light2
+        """
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        """
+
 
 class Sphere(BaseModel):
     def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1),
                     radi=1, slices=10, stacks=10, vao_name="balls", 
                     tex_id="sphere1",id = 0):
-
-        super().__init__(app, vao_name, tex_id, pos)
 
         # Initial position, useful when resseting position        
         self.initial_position = pos
@@ -102,7 +106,29 @@ class Sphere(BaseModel):
         self.slices = slices
         self.stacks = stacks
 
+        super().__init__(app, vao_name, tex_id, pos)
+
         self.on_init()
+
+    def on_init(self):
+        # texture
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        #light2
+        """
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        """
 
     def replay_render(self):
         self.replay_update()

@@ -10,7 +10,7 @@ from mesh import Mesh
 from scene import Scene
 from MenuManager import pause_manager, progress_manager, format_time
 
-from Light import Light
+from Light import Light, Light2
 from MovementManagement import checkCollisions
 from GameManager import *
 from SoundManager3D import *
@@ -121,6 +121,7 @@ class GraphicsEngine(Engine):
         self.camera = Camera(self)
         # scene
         self.light = Light()
+        self.light2 = Light2()
         self.mesh = Mesh(self)
         self.scene = Scene(self)
         self.delta_time = 0

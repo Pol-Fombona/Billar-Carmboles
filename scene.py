@@ -31,9 +31,20 @@ class Scene:
         add(TableFloor(app, pos=(0, 0, 0), tex_id=6))
 
         # add_ball(Sphere(app, pos=(20,1,10), tex_id=3))
+        """
         add_ball(SubdivisionSphere(app, pos=(20, 1, 10), tex_id=3,id = 1))
 
-        # add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
+        add_ball(SubdivisionSphere(app, pos=(21, 1, 60), tex_id=3,id = 2))
+        add_ball(SubdivisionSphere(app, pos=(19, 1, 60), tex_id=3,id = 3))
+        add_ball(SubdivisionSphere(app, pos=(26, 1, 65), tex_id=3,id = 4))
+        add_ball(SubdivisionSphere(app, pos=(23, 1, 65), tex_id=3,id = 5))
+        add_ball(SubdivisionSphere(app, pos=(20, 1, 65), tex_id=3,id = 6))
+        add_ball(SubdivisionSphere(app, pos=(17, 1, 65), tex_id=3,id = 7))
+
+        """
+
+        add_ball(Sphere(app, pos=(20,1, 10), tex_id="sphere1", id=1))
+        """
         add_ball(Sphere(app, pos=(21, 1, 60), tex_id="sphere1",id = 2))
         add_ball(Sphere(app, pos=(19, 1, 60), tex_id="sphere2",id = 3))
         add_ball(Sphere(app, pos=(26, 1, 65), tex_id="sphere3",id = 4))
@@ -51,6 +62,7 @@ class Scene:
         add_ball(Sphere(app, pos=(11, 1, 75), tex_id="sphere14",id = 15))
 
         add_ball(Sphere(app, pos=(20, 1, 80), tex_id="sphere15",id = 16))
+        """
 
         self.cue = Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5)
 
