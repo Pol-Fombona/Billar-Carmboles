@@ -7,7 +7,7 @@ class ShaderProgram:
         self.programs["table"] = self.get_program("table")
         self.programs["table_floor"] = self.get_program("table_floor")
         self.programs["axis"] = self.get_program("axis")
-        self.programs["balls"] = self.get_program("balls")
+        self.programs["balls"] = self.get_program("balls_2")
         self.programs["subdivision_balls"] = self.get_program("subdivision_balls")
         self.programs["cue"] = self.get_program("cue")
 
