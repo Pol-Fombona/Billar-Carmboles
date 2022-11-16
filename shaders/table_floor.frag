@@ -19,11 +19,11 @@ uniform sampler2D u_texture_0;
 vec3 getLight(vec3 color){
     vec3 Normal = normalize(normal);
     // ambient
-    vec3 ambient = light.Ia;
+    vec3 ambient = light.Ia * 0.5;
     //diffuse
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(0, dot(lightDir, Normal));
-    vec3 diffuse = diff * light.Id;
+    vec3 diffuse = diff * light.Id * 0.4;
 
     return color * (ambient + diffuse);
 }

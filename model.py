@@ -21,20 +21,6 @@ class BaseModel:
 
         return m_model
 
-    def on_init(self):
-        # light
-        self.program["light.position"].write(self.app.light.position)
-        self.program["light.Ia"].write(self.app.light.Ia)
-        self.program["light.Id"].write(self.app.light.Id)
-        # texture
-        self.texture = self.app.mesh.texture.textures[self.tex_id]
-        self.program["u_texture_0"] = 0
-        self.texture.use()
-        # mvp
-        self.program["m_proj"].write(self.camera.m_proj)
-        self.program["m_view"].write(self.camera.m_view)
-        self.program["m_model"].write(self.m_model)
-
     def update(self):
         self.texture.use()
         self.program["m_view"].write(self.camera.m_view)
@@ -82,6 +68,20 @@ class TableFloor(BaseModel):
         super().__init__(app, vao_name, tex_id, pos)
         self.on_init()
 
+    def on_init(self):
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        # texture
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+
 
 class Sphere(BaseModel):
     def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1),
@@ -104,6 +104,22 @@ class Sphere(BaseModel):
 
         self.on_init()
 
+    def on_init(self):
+        # light
+        print('aa')
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        self.program["light.Is"].write(self.app.light.Is)
+        # texture
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+
     def replay_render(self):
         self.replay_update()
         self.vao.render()
@@ -112,6 +128,7 @@ class Sphere(BaseModel):
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
         self.texture.use()
         self.program["m_view"].write(self.app.camera.m_view)
+        self.program['camPos'].write(self.app.camera.position)
 
         self.translation, new_rotation = movement(self)
 
