@@ -121,6 +121,7 @@ class GraphicsEngine(Engine):
         self.camera = Camera(self)
         # scene
         self.light = Light()
+        self.light2 = Light(position=(0, 5, 100))
         self.mesh = Mesh(self)
         self.scene = Scene(self)
         self.delta_time = 0

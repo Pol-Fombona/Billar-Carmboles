@@ -14,6 +14,7 @@ struct Light {
 };
 
 uniform Light light;
+uniform Light light2;
 uniform sampler2D u_texture_0;
 uniform vec3 camPos;
 
@@ -21,19 +22,26 @@ vec3 getLight(vec3 color){
     vec3 Normal = normalize(normal);
     // ambient
     vec3 ambient = light.Ia;
+    vec3 ambient2 = light2.Ia;
     //diffuse
     vec3 lightDir = normalize(light.position - fragPos);
+    vec3 lightDir2 = normalize(light2.position - fragPos);
     // vec3 lightDir2 = normalize(light.position - fragPos);
     float diff = max(0, dot(lightDir, Normal));
+    float diff2 = max(0, dot(lightDir2, Normal));
     vec3 diffuse = diff * light.Id;
+    vec3 diffuse2 = diff2 * light2.Id;
 
     // specular
     vec3 viewDir = normalize(camPos - fragPos);
     vec3 reflectDir = reflect(-lightDir, Normal);
+    vec3 reflectDir2 = reflect(-lightDir2, Normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0), 12);
+    float spec2 = pow(max(dot(viewDir, reflectDir2), 0), 12);
     vec3 specular = spec * light.Is * 2;
+    vec3 specular2 = spec2 * light2.Is * 2;
 
-    return color * (ambient + diffuse + specular);
+    return color * (ambient + diffuse + specular + ambient2 + diffuse2 + specular2);
 }
 
 

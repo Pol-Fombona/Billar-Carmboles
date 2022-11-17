@@ -106,11 +106,14 @@ class Sphere(BaseModel):
 
     def on_init(self):
         # light
-        print('aa')
         self.program["light.position"].write(self.app.light.position)
         self.program["light.Ia"].write(self.app.light.Ia)
         self.program["light.Id"].write(self.app.light.Id)
         self.program["light.Is"].write(self.app.light.Is)
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        self.program["light2.Is"].write(self.app.light2.Is)
         # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
