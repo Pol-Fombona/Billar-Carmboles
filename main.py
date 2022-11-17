@@ -91,7 +91,7 @@ class Engine():
 
 class GraphicsEngine(Engine):
     #def __init__(self, win_size=(1600, 900)):
-    def __init__(self, win_size=(900, 500)):
+    def __init__(self, win_size=(1280, 720)):
 
         # Init pygame module
         pg.init()
@@ -299,7 +299,7 @@ class GraphicsEngine(Engine):
 class ReplayEngine(Engine):
     # Engine used when replaying a game
 
-    def __init__(self, win_size=(900, 500)):
+    def __init__(self, win_size=(1280, 720)):
         
         # Init pygame module
         pg.init()
