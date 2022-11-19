@@ -266,28 +266,28 @@ class GraphicsEngine(Engine):
                 self.camera.update()
                 self.sound.update()
 
-                match self.game.getTurnStatus() :
+                turn_status = self.game.getTurnStatus()
 
-                    case "initial":
-                        # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
-                        self.render_with_cue()
+                if turn_status == "initial":
+                    # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
+                    self.render_with_cue()
 
-                        # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
-                        # de la seva bola no és zero. Aixo s'haura de canviar per a 
-                        # modificar l'status de played quan s'allibera el pal, 
-                        # es a dir quan s'ha fet el tir
-                        if sum(abs(self.game.current_player.ball.velocity)) != 0:
-                            self.game.current_player.played = True
+                    # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
+                    # de la seva bola no és zero. Aixo s'haura de canviar per a 
+                    # modificar l'status de played quan s'allibera el pal, 
+                    # es a dir quan s'ha fet el tir
+                    if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                        self.game.current_player.played = True
 
-                    case "played":
-                        # Shot made but spheres are in movement
-                        self.render_status_played()
-                    
-                    case "ended":
-                        # Shot made and all spheres have stopped
-                        self.render()
-                        scored = self.game.mode.update_score(self.game.current_player)
-                        self.game.changeCurrentPlayer(scored)
+                elif turn_status == "played":
+                    # Shot made but spheres are in movement
+                    self.render_status_played()
+                
+                elif turn_status == "ended":
+                    # Shot made and all spheres have stopped
+                    self.render()
+                    scored = self.game.mode.update_score(self.game.current_player)
+                    self.game.changeCurrentPlayer(scored)
 
                 self.delta_time = self.clock.tick(self.game.game_speed)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
