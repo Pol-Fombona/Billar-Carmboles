@@ -118,6 +118,7 @@ class GraphicsEngine(Engine):
             table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
         )
         '''
+        self.game_started = False
         self.camera = Camera(self)
         # scene
         self.light = Light()
@@ -247,8 +248,68 @@ class GraphicsEngine(Engine):
         
         return
 
+    def start_game(self):
+        last_timestamp = time.time()
+        shots_taken = 0
+
+        while True and shots_taken < 2:
+
+            self.check_events()
+
+            if self.pause:
+                self.quit = pause_manager(self.game)
+                last_timestamp = self.unpause()
+
+            else:
+
+                self.camera.update()
+                self.sound.update()
+
+                match self.game.getTurnStatus() :
+
+                    case "initial":
+                        # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
+                        self.render_with_cue()
+
+                        # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
+                        # de la seva bola no és zero. Aixo s'haura de canviar per a 
+                        # modificar l'status de played quan s'allibera el pal, 
+                        # es a dir quan s'ha fet el tir
+                        if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                            self.game.current_player.played = True
+
+                    case "played":
+                        # Shot made but spheres are in movement
+                        self.render_status_played()
+                    
+                    case "ended":
+                        # Shot made and all spheres have stopped
+                        self.render()
+                        scored = self.game.mode.update_score(self.game.current_player)
+                        self.game.changeCurrentPlayer(scored)
+                        shots_taken += 1
+
+
+                self.delta_time = self.clock.tick(self.game.game_speed)
+                self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
+        
+        z_pos = self.game.get_sphere_position_z()
+        min_z = 100
+        player1 = None
+        for index, z in enumerate(z_pos):
+            if z < min_z:
+                min_z = z
+                player1 = index
+
+        # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
+
+        self.game_started = True
+
+
 
     def run(self):
+        # Render the scene with all the spheres again
+        self.scene = Scene(self)
 
         last_timestamp = time.time()
         record_game = False # Allow to save a record of the game 
@@ -416,4 +477,5 @@ if __name__ == "__main__":
 
     app = GraphicsEngine()
     app.init_game_params()
+    app.start_game()
     app.run()

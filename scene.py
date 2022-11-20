@@ -10,7 +10,10 @@ class Scene:
         self.table_objects = []
         self.ball_objects = []
         self.cue = None
-        self.load()
+        if self.app.game_started:
+            self.load()
+        else:
+            self.load_decision_starting()
 
     def add_object(self, obj):
         self.table_objects.append(obj)
@@ -57,6 +60,29 @@ class Scene:
         self.cue = Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5)
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue]
+
+    def load_decision_starting(self):
+        app = self.app
+        add = self.add_object
+        add_ball = self.add_ball
+
+        add(Legs(app, pos=LEG_1, tex_id=7))
+        add(Legs(app, pos=LEG_2, tex_id=7))
+        add(Legs(app, pos=LEG_3, tex_id=7))
+        add(Legs(app, pos=LEG_4, tex_id=7))
+        add(Table(app, pos=TABLE_POSITION, tex_id=7))
+        add(TableFloor(app, pos=(0, 0, 0), tex_id=6))
+
+        pos_sphere_1 = FIRST_BALLS_POSITION[0]
+        pos_sphere_2 = FIRST_BALLS_POSITION[1]
+
+        add_ball(Sphere(app, pos=pos_sphere_1, tex_id="sphere1",id = 1))
+        add_ball(Sphere(app, pos=pos_sphere_2, tex_id="sphere2",id = 2))
+
+        self.cue = Cue(app, axis=glm.vec3(pos_sphere_1), tex_id=5)
+
+        self.all_objects = self.table_objects + self.ball_objects + [self.cue]
+
 
 
     def render(self):
