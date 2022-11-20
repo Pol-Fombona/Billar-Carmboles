@@ -15,19 +15,19 @@ lenght_table = 83.28 # Z-edge
 PECR = True
 
 
-def checkCollisions(objects, sound, player):
+def checkCollisions(objects, sound, player, IA_mode = False):
     # Checks collisions between spheres and between spheres and table
     
     # Between spheres
-    checkBallsCollisions(objects, sound, player)
+    checkBallsCollisions(objects, sound, player, IA_mode)
 
     # Between table and sphere
-    checkEdgeCollisions(objects, sound, player)
+    checkEdgeCollisions(objects, sound, player, IA_mode)
 
     return
 
 
-def checkBallsCollisions(objects, sound, player):
+def checkBallsCollisions(objects, sound, player, IA_mode):
     # If the distance between the spheres is less than the sum of radius
     # there is a collision
 
@@ -50,7 +50,7 @@ def checkBallsCollisions(objects, sound, player):
                 correctOverlap(ball_1, ball_2, dist, x1, x2)
                 addCollisionDetails(player, ball_1, ball_2)
 
-                sound.playSound([ball_1,ball_2],0)
+                if not IA_mode: sound.playSound([ball_1,ball_2],0)
 
     return 
 
@@ -58,10 +58,10 @@ def addCollisionDetails(player, sphere1, sphere2):
     # Adds collision details to the current player record 
     # only if one of the spheres "belongs" to the player
                     
-    if (player.ball == sphere1):
-        player.collision_record.append(("Sphere", sphere2))
-    elif (player.ball == sphere2):
-        player.collision_record.append(("Sphere", sphere1))
+    if (player.ball_id == sphere1.id):
+        player.collision_record.append(("Sphere", sphere2.id))
+    elif (player.ball_id == sphere2.id):
+        player.collision_record.append(("Sphere", sphere1.id))
 
     return
 
@@ -151,7 +151,7 @@ def getImpactVelocityOneMovingObject(x1, x2, v1, v2):
     return v1f, v2f
 
 
-def checkEdgeCollisions(objects, sound, player):
+def checkEdgeCollisions(objects, sound, player, IA_mode):
     # Checks collisions between the edges of the table
     # and a sphere
 
@@ -167,32 +167,32 @@ def checkEdgeCollisions(objects, sound, player):
                 sphere.velocity[0] *=  -edge_collision_loss
                 overlap_x = sphere.pos[0] - 1
                 collision_info = ("Edge", "X")
-                sound.playSound([sphere,overlap_x],2)
+                if not IA_mode: sound.playSound([sphere,overlap_x],2)
                 
             elif (sphere.pos[0] + 1 ) >= width_table:
                 sphere.velocity[0] *= -edge_collision_loss
                 overlap_x = (sphere.pos[0] + 1) - width_table
                 collision_info = ("Edge", "X")
-                sound.playSound([sphere,overlap_x],2)
+                if not IA_mode: sound.playSound([sphere,overlap_x],2)
 
             # Z-edges of table
             elif (sphere.pos[2] - 1) <= 0:
                 sphere.velocity[2] *= -edge_collision_loss
                 overlap_z = sphere.pos[2] - 1
                 collision_info = ("Edge", "Z")
-                sound.playSound([sphere,overlap_z],2)
+                if not IA_mode: sound.playSound([sphere,overlap_z],2)
 
             elif (sphere.pos[2] + 1) >= lenght_table:
                 sphere.velocity[2] *= -edge_collision_loss
                 overlap_z = (sphere.pos[2] + 1) - lenght_table
                 collision_info = ("Edge", "Z")
-                sound.playSound([sphere,overlap_z],2)
+                if not IA_mode: sound.playSound([sphere,overlap_z],2)
 
             # Corrects overlap with table edge
             sphere.pos = (sphere.pos[0] - overlap_x, sphere.pos[1], sphere.pos[2] - overlap_z)
 
             # Add collision info if the sphere "belongs" to the current player
-            if (sphere == player.ball and collision_info != None):
+            if (sphere.id == player.ball_id and collision_info != None):
                 player.collision_record.append(collision_info)        
     
     return 
@@ -223,6 +223,29 @@ def movement(ball):
     rotation = ballRotation(ball)
 
     return translation, rotation
+
+
+def IA_movement(ball):
+    # Controls the movement of the balls adding friction and rotation
+    # Optimized for IA turn simulation (removed sphere rotation and m_model)
+
+    if abs(ball.velocity[0]) < 0.001:
+        ball.velocity[0] = 0
+
+        if abs(ball.velocity[2]) < 0.01:
+            ball.velocity[2] = 0
+
+
+    elif abs(ball.velocity[2]) < 0.001:
+        ball.velocity[2] = 0
+
+        if abs(ball.velocity[0]) < 0.01:
+            ball.velocity[0] = 0
+
+    ball.velocity *= 1 - friction
+    ball.pos = tuple(ball.pos + ball.velocity)
+
+    return
 
 
 def ballRotation(ball):

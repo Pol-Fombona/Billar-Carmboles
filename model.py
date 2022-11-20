@@ -1,7 +1,7 @@
 import moderngl as mgl
 import numpy as np
 import glm
-from MovementManagement import movement
+from MovementManagement import movement, IA_movement
 from MoveCue import *
 
 
@@ -147,6 +147,10 @@ class Sphere(BaseModel):
         self.texture.use()
         self.program["m_view"].write(self.app.camera.m_view)
         self.program["m_model"].write(self.m_model)
+
+
+    def IA_update(self):
+        IA_movement(self)
 
 
 class SubdivisionSphere(BaseModel):
