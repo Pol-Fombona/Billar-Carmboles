@@ -33,6 +33,29 @@ class FreeCarambole():
 
         return False
 
+    
+    def update_score_IA_simulation(self, player):
+        # Return 1 if scored, 0.5 if colision with one other sphere
+        # O if no colision
+        
+        sphere_collisioned = set()
+
+        for coll_type, detail in player.collision_record:
+            if coll_type == "Sphere":
+                sphere_collisioned.add(detail)
+                
+        # Empty list for next turn
+        player.collision_record.clear()
+
+        if len(sphere_collisioned) >= 2:
+            return 1
+            
+        elif len(sphere_collisioned) == 1:
+            return 0.5
+
+        else:
+            return 0
+
 
 
             

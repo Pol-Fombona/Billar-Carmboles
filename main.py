@@ -16,6 +16,7 @@ from GameManager import *
 from SoundManager3D import *
 from ScoreManager import *
 from PickleManager import save_game_record_to_pickle
+from IAManager import make_turn
 
 
 
@@ -77,6 +78,11 @@ class Engine():
         self.scene.render_with_cue()
         pg.display.set_caption(self.get_info())
         pg.display.flip()
+
+    
+    def renderIA(self):
+        pg.display.set_caption(self.get_info())
+        #pg.display.flip()
 
 
     def unpause(self):
@@ -152,7 +158,6 @@ class GraphicsEngine(Engine):
                     self.pause = True
         
                 elif event.type == pg.KEYDOWN and event.key == pg.K_b:
-
                     self.camera.bird_camera = not self.camera.bird_camera
 
                 elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
@@ -221,7 +226,7 @@ class GraphicsEngine(Engine):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
-        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
+        player2 = Player(name = "P2", ball = self.scene.ball_objects[1], type="IA")
 
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole()
@@ -304,8 +309,20 @@ class GraphicsEngine(Engine):
         # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
 
         self.game_started = True
+    
+    def simulate_IA_turn(self):
+        # Simulates turn made by IA
 
+        #self.camera.bird_camera = True # Bird camera is defaulted when IA plays
+        #self.camera.update()
+        #self.render()
+        pg.display.set_caption("Processing IA turn...")
+        turn_data = make_turn(50, self.scene.ball_objects, self.game)
+        self.game.current_player.ball.velocity = turn_data
+        self.game.current_player.played = True
+        pg.event.clear()
 
+        return
 
     def run(self):
         # Render the scene with all the spheres again
@@ -327,9 +344,13 @@ class GraphicsEngine(Engine):
                 self.camera.update()
                 self.sound.update()
 
-                match self.game.getTurnStatus() :
+                turn_status = self.game.getTurnStatus()
 
-                    case "initial":
+                if turn_status == "IA":
+                    self.simulate_IA_turn()
+
+                else:
+                    if turn_status == "initial":
                         # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
                         self.render_with_cue()
 
@@ -340,11 +361,12 @@ class GraphicsEngine(Engine):
                         if sum(abs(self.game.current_player.ball.velocity)) != 0:
                             self.game.current_player.played = True
 
-                    case "played":
+
+                    elif turn_status == "played":
                         # Shot made but spheres are in movement
                         self.render_status_played()
                     
-                    case "ended":
+                    elif turn_status == "ended":
                         # Shot made and all spheres have stopped
                         self.render()
                         scored = self.game.mode.update_score(self.game.current_player)
@@ -377,6 +399,7 @@ class ReplayEngine(Engine):
         self.clock = pg.time.Clock()
         self.camera = Camera(self)
         self.light = Light()
+        self.light2 = Light(position=(0, 5, 100))
         self.mesh = Mesh(self)
         self.scene = Scene(self)
 
@@ -387,7 +410,7 @@ class ReplayEngine(Engine):
         self.quit = False
 
         # ReplayData
-        self.replay_data = pd.read_pickle("GameData\\Replays\\2022-11-14_19-10-47.pkl")
+        self.replay_data = pd.read_pickle("GameData\\Replays\\2022-11-19_19-37-08.pkl")
         self.replay_data_iterator = self.replay_data.iterrows()
 
 

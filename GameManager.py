@@ -1,14 +1,16 @@
 
 
 class Player():
-    def __init__(self, ball, name="CPU"):
+    def __init__(self, ball, name="CPU", type = None):
 
         self.name = name
         self.score = 0
         self.collision_record = [] 
         self.ball = ball
+        self.ball_id = ball.id
         self.played = False
         self.turn_count = 1
+        self.type = type
         
 
 class Game():
@@ -57,8 +59,12 @@ class Game():
         #   - "played"  = player has made a shoty and spheres are 
         #                 still in movement
         #   - "ended"   = turn has ended
+        #   - "IA"      = IA turn simulation in progress
 
-        if not self.current_player.played:
+        if self.current_player.type == "IA" and not self.current_player.played:
+            return "IA"
+
+        elif not self.current_player.played:
             return "initial"
 
         for sphere in self.spheres:
