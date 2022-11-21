@@ -12,7 +12,7 @@ LEGS_HEIGHT = 18
 LEGS_SIZE = 4
 MARGIN_LEG_TABLE = TABLE_WIDTH/6
 TABLE_PROF = (
-    TABLE_HEIGHT / 3
+    TABLE_HEIGHT / 2
 )  # Aixo es la profunditat de la moqueta a l'interor de la taula
 # Per a tenir la moqueta de la taula a 0,0,0 aquestes son les coordenades de la taula => (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
