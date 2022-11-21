@@ -124,7 +124,7 @@ class GraphicsEngine(Engine):
             table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
         )
         '''
-        self.game_started = True
+        self.game_started = False
         self.camera = Camera(self)
         # scene
         self.light = Light()
@@ -135,13 +135,6 @@ class GraphicsEngine(Engine):
         self.pause = False
         self.quit = False
         self.game = None
-        self.sound = SoundManager(self)
-        self.sound.playSong()
-
-        # Game history 
-        # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 
-        #   p1.score, p2.score)
-        self.game_record = [] 
 
 
     def check_events(self):
@@ -231,6 +224,14 @@ class GraphicsEngine(Engine):
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole()
 
+        self.sound = SoundManager(self)
+        self.sound.playSong()
+
+        # Game history 
+        # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 
+        #   p1.score, p2.score)
+        self.game_record = [] 
+
     
     def record_frame_data(self):
         # Save current frame data
@@ -310,6 +311,10 @@ class GraphicsEngine(Engine):
             # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
 
             self.game_started = True
+            # self.mesh.vao.destroy()
+            self.scene = Scene(self)
+            self.init_game_params()
+
     
     def simulate_IA_turn(self):
         # Simulates turn made by IA
@@ -327,7 +332,6 @@ class GraphicsEngine(Engine):
 
     def run(self):
         # Render the scene with all the spheres again
-        self.scene = Scene(self)
 
         last_timestamp = time.time()
         record_game = False # Allow to save a record of the game 
