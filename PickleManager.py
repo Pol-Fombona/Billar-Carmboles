@@ -1,23 +1,63 @@
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+import zipfile as zp
+import os
 
 
 def save_game_record_to_pickle(df):
-    # Saves game data as pickle format with bz2 compression
+    # Saves game data as pickle format with zip compression
 
-    # 5 min aprox de partida: 19362 rows
-    #   csv: 1.3 Mb
-    #   pickle: 2.63 Mb
+    try:
+        filename = "GameData/Replays/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")# + ".pkl"
+        filepath_pkl = Path(filename + ".pkl")
+        filepath_zip = Path(filename + ".zip")
 
-    filename = "GameData/Replays/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".pkl"
-    filepath = Path(filename)
-    filepath.parent.mkdir(parents=True, exist_ok=True)
+        filepath_pkl.parent.mkdir(parents=True, exist_ok=True)
+        df.to_pickle(filepath_pkl)
 
-    df.to_pickle(filepath)
+        with zp.ZipFile(filepath_zip, "w", zp.ZIP_DEFLATED) as zip_file:
+            zip_file.write(filepath_pkl, filename.split("/")[2]+".pkl")
+
+        os.remove(filepath_pkl) # Removes pkl file since zip was created
+
+    except:
+        print("Error while saving game replay")
 
     return
 
+def clean_replay_data_file(file):
+    # Removes "pkl" file unzipped
+
+    try:
+        file = file.split("zip")[0] + "pkl"
+        os.remove(file)
+
+    except:
+        print("File", file, "does not exist")
+    
+    return
+    
+
+def load_replay_data(file):
+    # Unzips replay data and returns pd Dataframe
+    # load from pickle
+    
+    try:
+        path_to_unzip = file.rsplit("\\",1)[0]
+        path_to_df = file.split("zip")[0] + "pkl"
+
+        with zp.ZipFile(file, "r") as zip_file:
+            zip_file.extractall(path_to_unzip)
+
+        df = pd.read_pickle(path_to_df)
+        
+        return df
+
+    except:
+        print("File", file, "does not exist")
+        return None
+    
 
 def get_game_replay_data(file):
     # Returns panda dataframe with game data

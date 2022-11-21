@@ -15,7 +15,8 @@ from MovementManagement import checkCollisions
 from GameManager import *
 from SoundManager3D import *
 from ScoreManager import *
-from PickleManager import save_game_record_to_pickle
+from PickleManager import (save_game_record_to_pickle, clean_replay_data_file, 
+                        load_replay_data)
 from IAManager import make_turn
 
 
@@ -415,7 +416,9 @@ class ReplayEngine(Engine):
         self.quit = False
 
         # ReplayData
-        self.replay_data = pd.read_pickle("GameData\\Replays\\2022-11-19_19-37-08.pkl")
+        #self.replay_data = pd.read_pickle("GameData\\Replays\\2022-11-19_19-37-08.pkl")
+        self.replay_file = "GameData\\Replays\\2022-11-21_13-41-44.zip"
+        self.replay_data = load_replay_data(self.replay_file)
         self.replay_data_iterator = self.replay_data.iterrows()
 
 
@@ -470,12 +473,17 @@ class ReplayEngine(Engine):
             self.game.player2.score = data["P2Score"]
 
         except:
-            print("\nReplay Ended")
-            sys.exit()
+            self.end_replay()
 
         return
 
-
+    def end_replay(self):
+        clean_replay_data_file(self.replay_file)
+        print("\nReplay Ended")
+        self.mesh.destroy()
+        pg.quit()
+        sys.exit()
+        
     def run(self):
         
         last_timestamp = time.time()

@@ -34,7 +34,7 @@ def format_time(time):
     return datetime.timedelta(seconds=time)
 
 
-def pause_manager(game):
+def pause_manager(game, replay=False):
     # Manages menu options 
 
     pause = True
@@ -73,7 +73,7 @@ def pause_manager(game):
 
     clear_terminal()
 
-    if exit_game:
+    if not replay and exit_game:
         game_ended(game)
 
     else:
