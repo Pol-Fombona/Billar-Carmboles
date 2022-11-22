@@ -29,6 +29,15 @@ class VAO:
         self.vaos["cue"] = self.get_vao(program=self.program.programs["cue"],
             vbo=self.vbo.vbos["cue"]
         )
+        self.vaos["terra"] = self.get_vao(program=self.program.programs["terra"],
+            vbo=self.vbo.vbos["terra"]
+        )
+        self.vaos["sostre"] = self.get_vao(program=self.program.programs["sostre"],
+            vbo=self.vbo.vbos["sostre"]
+        )
+        self.vaos["line"] = self.get_vao(program=self.program.programs["line"],
+            vbo=self.vbo.vbos["line"]
+        )
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)])

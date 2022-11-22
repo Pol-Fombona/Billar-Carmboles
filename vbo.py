@@ -13,6 +13,9 @@ class VBO:
         self.vbos["balls"] = BallVBO(app)
         self.vbos["subdivision_balls"] = SubdivisionBallVBO(app)
         self.vbos["cue"] = CueVBO(app)
+        self.vbos["terra"] = TerraVBO(app)
+        self.vbos["sostre"] = SostreVBO(app)
+        self.vbos["line"] = LineVBO(app)
 
     def destroy(self):
         [vbo.destroy() for vbo in self.vbos.values()]
@@ -920,3 +923,83 @@ class CueVBO(BaseVBO):
 
         vertex_data = np.hstack([tex_coord_data, vertex_data])
         return vertex_data
+
+class TerraVBO(BaseVBO):
+    def __init__(self, app):
+        super().__init__(app.ctx)
+        self.format = "2f 3f"
+        self.attrib = ["in_texcoord_0", "in_position"]
+
+    @staticmethod
+    def get_data(vertices, indices): 
+        data = [vertices[ind] for linea in indices for ind in linea]
+        return np.array(data, dtype='f4')
+
+    def get_vertex_data(self): #sobre eix y
+        
+        vertices = [(-150,-20.5,-150),(T_X,-20.5,T_Z),(-150,-20.5,T_Z),(T_X,-20.5,-150)]
+        indices = [(0,1,3),(0,2,1)]
+        
+
+        
+        vertex_data = self.get_data(vertices, indices)
+        
+        tex_coord = [(-150,-150),(T_X,T_Z),(-150,T_Z),(T_X,-150)]
+        
+        tex_coord_indices = [(0,1,3),(0,2,1)]
+        tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
+        
+        vertex_data = np.hstack([tex_coord_data,vertex_data])
+        
+        return vertex_data
+
+class SostreVBO(BaseVBO):
+    def __init__(self, app):
+        super().__init__(app.ctx)
+        self.format = "2f 3f"
+        self.attrib = ["in_texcoord_0", "in_position"]
+
+    @staticmethod
+    def get_data(vertices, indices): 
+        data = [vertices[ind] for linea in indices for ind in linea]
+        return np.array(data, dtype='f4')
+
+    def get_vertex_data(self): #sobre eix y
+        
+        vertices = [(-150,S_HEIGHT,-150),(S_X,S_HEIGHT,S_Z),(-150,S_HEIGHT,S_Z),(S_X,S_HEIGHT,-150)]
+        indices = [(0,1,3),(0,2,1)]
+        
+
+        
+        vertex_data = self.get_data(vertices, indices)
+        
+        tex_coord = [(-150,-150),(S_X,S_Z),(-150,S_Z),(S_X,-150)]
+        
+        tex_coord_indices = [(0,1,3),(0,2,1)]
+        tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
+        
+        vertex_data = np.hstack([tex_coord_data,vertex_data])
+        
+        return vertex_data
+
+class LineVBO(BaseVBO):
+    def __init__(self, app):
+        super().__init__(app.ctx)
+        self.format = "3f"
+        self.attrib = ["in_position"]
+
+    @staticmethod
+    def get_data(vertices, indices):
+        data = [vertices[ind] for triangle in indices for ind in triangle]
+        return np.array(data, dtype="f4")
+    def get_vertex_data(self):
+        vertices = [
+            (0,0,0),
+            (-30,0,0)
+        ]
+        indices = [
+            (0,1)
+        ]
+        vertex_data = self.get_data(vertices, indices)
+        return vertex_data
+        

@@ -10,6 +10,7 @@ class Scene:
         self.table_objects = []
         self.ball_objects = []
         self.cue = None
+        self.line = None
         if self.app.game_started:
             self.load()
         else:
@@ -59,7 +60,12 @@ class Scene:
 
         self.cue = Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5)
 
-        self.all_objects = self.table_objects + self.ball_objects + [self.cue]
+        add(Terra(app, pos=(0,0,0),tex_id = 8))
+        add(Sostre(app, pos=(0,0,0),tex_id = 9))
+
+        self.line = Line(app, axis = glm.vec3(20, 1, 10))
+
+        self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
     def load_decision_starting(self):
         app = self.app
@@ -81,7 +87,12 @@ class Scene:
 
         self.cue = Cue(app, axis=glm.vec3(pos_sphere_1), tex_id=5)
 
-        self.all_objects = self.table_objects + self.ball_objects + [self.cue]
+        add(Terra(app, pos=(0,0,0),tex_id = 8))
+        add(Sostre(app, pos=(0,0,0),tex_id = 9))
+
+        self.line = Line(app, axis = glm.vec3(pos_sphere_1))
+
+        self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
 
 

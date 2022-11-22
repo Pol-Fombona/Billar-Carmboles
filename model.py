@@ -3,6 +3,8 @@ import numpy as np
 import glm
 from MovementManagement import movement, IA_movement
 from MoveCue import *
+import MoveLine
+import copy
 
 
 class BaseModel:
@@ -290,3 +292,155 @@ class Cue(BaseModel):
         self.program["m_proj"].write(self.app.camera.m_proj)
         self.program["m_view"].write(self.app.camera.m_view)
         self.program["m_model"].write(self.m_model)
+
+class Terra(BaseModel):
+    def __init__(
+        self, 
+        app, 
+        vao_name="terra", 
+        tex_id = 8, 
+        pos=(0, 0, 0),
+        rot=(0, 0, 0),
+        scale=(1, 1, 1),
+    ):
+        self.rot = glm.vec3([glm.radians(a) for a in rot])
+        self.scale = scale
+        super().__init__(app, vao_name, tex_id, pos)
+        self.on_init()
+
+    def get_model_matrix(self):
+
+        m_model = glm.mat4()
+
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
+
+        # scale
+        m_model = glm.scale(m_model, self.scale)
+
+        # translate
+        m_model = glm.translate(m_model, self.pos)
+
+        return m_model
+    
+    def on_init(self):
+        
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+        
+        self.program['m_proj'].write(self.app.camera.m_proj)
+        self.program['m_view'].write(self.app.camera.m_view)
+        self.program['m_model'].write(self.m_model)
+
+class Sostre(BaseModel):
+    def __init__(
+        self, 
+        app, 
+        vao_name = "sostre", 
+        tex_id = 9, 
+        pos=(0, 0, 0),
+        rot=(0, 0, 0),
+        scale=(1, 1, 1),
+    ):
+        self.rot = glm.vec3([glm.radians(a) for a in rot])
+        self.scale = scale
+
+        super().__init__(app, vao_name, tex_id, pos)
+        self.on_init()
+
+    def get_model_matrix(self):
+
+        m_model = glm.mat4()
+
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
+
+        # scale
+        m_model = glm.scale(m_model, self.scale)
+
+        # translate
+        m_model = glm.translate(m_model, self.pos)
+
+        return m_model
+    
+    def on_init(self):
+        
+        self.texture = self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_0"] = 0
+        self.texture.use()
+        
+        self.program['m_proj'].write(self.app.camera.m_proj)
+        self.program['m_view'].write(self.app.camera.m_view)
+        self.program['m_model'].write(self.m_model)
+
+class Line(BaseModel):
+    def __init__(
+        self,
+        app, 
+        tex_id=None,
+        vao_name = "line",
+        axis = glm.vec3((0, 0, 0)),
+        rot=(0, 0, 0),
+        scale=(1, 1, 1),
+        ):
+        self.app = app
+        self.rot = glm.vec3([glm.radians(a) for a in rot])
+        self.scale = scale
+        self.axis = glm.vec3(axis)
+        self.angle = 0
+        self.dist_ball = 0
+        self.pos = copy.deepcopy(self.axis)
+        self.pos[0] += copy.deepcopy(self.dist_ball)
+        self.pos_orig = glm.vec3(self.dist_ball, 0, 0)
+        self.moving = False
+        self.perc = 1
+
+        super().__init__(app, vao_name, tex_id, self.axis)
+        self.on_init()
+    
+    def get_model_matrix(self):
+
+        m_model = glm.mat4()
+
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
+
+        # scale
+        m_model = glm.scale(m_model, self.scale)
+
+        # translate
+        m_model = glm.translate(m_model, self.axis)
+
+        return m_model
+
+    def on_init(self):
+        MoveLine.scale_line(self)
+        self.m_model = glm.scale(self.m_model,(self.perc,1,1))
+        self.program["m_proj"].write(self.app.camera.m_proj)
+        self.program["m_view"].write(self.app.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+
+    def update(self):
+        MoveLine.manage_move(self)
+        self.program["m_proj"].write(self.app.camera.m_proj)
+        self.program["m_view"].write(self.app.camera.m_view)
+        self.program["m_model"].write(self.m_model)
+    def render(self):
+        self.update()
+        self.vao.render(mgl.LINE_LOOP)

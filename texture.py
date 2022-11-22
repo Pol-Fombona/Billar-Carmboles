@@ -15,6 +15,8 @@ class Texture:
         self.textures[5] = self.get_texture(path="textures/cue.png")
         self.textures[6] = self.get_texture(path="textures/pool_table2.jpg")
         self.textures[7] = self.get_texture(path="textures/brixton_finish.jpg")
+        self.textures[8] = self.get_texture(path="textures/terra.jpg")
+        self.textures[9] = self.get_texture(path="textures/suelo.jpg")
 
         # Spheres  [https://sharecg.com/v/12975/view/6/Texture/Billiard-Ball-N%B0-10]
         self.textures["sphere1"] = self.get_texture(path="textures/spheres/sphere (1).jpg")

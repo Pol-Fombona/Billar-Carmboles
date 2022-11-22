@@ -55,6 +55,7 @@ def manage_move(cue):
             if cue.moving:
                 change_objective(cue, cue.app.game.current_player.ball)    
                 cue.moving = False
+                cue.app.scene.line.moving = True
             if cue.rotate_flag:
                 rotate_cue(cue)
             if (
