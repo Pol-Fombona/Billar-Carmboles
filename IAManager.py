@@ -10,11 +10,28 @@ def make_turn(n_turns_simulated, ball_objects, game):
     # Else it will return the one with max score that is not perfect score
 
     #print("\nIA start")
-    # velocity range [+-0.5, +-2]
+
+    # Velocity range [+-0.1, +-2]
+    possible_values = [i for i in range(1, 21)]
+
+    # Intervals de probabilitat [1-5] = 0.4, [6-10] = 0.3, [11-15] = 0.2, [16-20] = 0.1
+    probabilities = [0.08, 0.08, 0.08, 0.08, 0.08, 
+                    0.06, 0.06, 0.06, 0.06, 0.06,
+                    0.04, 0.04, 0.04, 0.04, 0.04,
+                    0.02, 0.02, 0.02, 0.02, 0.02]
+
     start = time.time()
+
     # Turn data: array de shape (n_turns, 3) that contains for each turn a random 3-component array velocity 
-    turn_data = np.array([[randrange(1,20)/10*choice([1,-1]), 0, randrange(5,20)/10*choice([-1,1])] 
+    #turn_data = np.array([[randrange(1,20)/10*choice([1,-1]), 0, randrange(5,20)/10*choice([-1,1])] 
+    #                        for i in range(n_turns_simulated)])
+    turn_data = np.array([[np.random.choice(possible_values, p=probabilities) / 10 * choice([1, -1]), 
+                            0,
+                            np.random.choice(possible_values, p=probabilities) / 10 * choice([1, -1])]
                             for i in range(n_turns_simulated)])
+
+    # Order turn data in ascending mode
+    turn_data = turn_data[np.argsort(abs(turn_data).sum(axis=1))]
 
     scores = []
 

@@ -39,8 +39,8 @@ class Scene:
 
         # add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
         add_ball(Sphere(app, pos=(20, 1, 10), tex_id="sphere1",id = 1))
-        add_ball(Sphere(app, pos=(21, 1, 60), tex_id="sphere2",id = 2))
-        add_ball(Sphere(app, pos=(19, 1, 60), tex_id="sphere3",id = 3))
+        add_ball(Sphere(app, pos=(10, 1, 60), tex_id="sphere2",id = 2))
+        add_ball(Sphere(app, pos=(30, 1, 60), tex_id="sphere3",id = 3))
         '''
         add_ball(Sphere(app, pos=(23, 1, 65), tex_id="sphere4",id = 5))
         add_ball(Sphere(app, pos=(20, 1, 65), tex_id="sphere5",id = 6))

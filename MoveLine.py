@@ -35,7 +35,7 @@ def change_objective(line,ball):
     line.pos[0] += line.dist_ball
     line.pos_orig = glm.vec3(line.dist_ball,0,0)
     scale_line(line)
-    print("pos: ",line.pos)
+    #print("pos: ",line.pos)
     line.m_model = glm.scale(line.m_model,(line.perc,1,1))
 
 def scale_line(line):
