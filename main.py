@@ -8,7 +8,7 @@ from model import *
 from FreeCamera import *
 from mesh import Mesh
 from scene import Scene
-from MenuManager import pause_manager, progress_manager, format_time
+from MenuManager import pause_manager, progress_manager, format_time, game_ended
 
 from Light import Light
 from MovementManagement import checkCollisions
@@ -223,7 +223,7 @@ class GraphicsEngine(Engine):
         player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
 
         self.game = Game(player1, player2, self.scene.ball_objects)
-        self.game.mode = FreeCarambole()
+        self.game.mode = FreeCarambole(max_turn=25, max_score=10)
 
         self.sound = SoundManager(self)
         self.sound.playSong()
@@ -377,6 +377,11 @@ class GraphicsEngine(Engine):
                         self.render()
                         scored = self.game.mode.update_score(self.game.current_player)
                         self.game.changeCurrentPlayer(scored)
+
+                        if self.game.get_match_status():
+                            # Mostrar guanyador
+                            game_ended(self.game)
+                            self.quit = True
 
                 self.delta_time = self.clock.tick(self.game.game_speed)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())

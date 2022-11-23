@@ -84,10 +84,13 @@ def pause_manager(game, replay=False):
 def game_ended(game):
     # Prints summary of the game and
     # updates ranking file
+    
+    clear_terminal()
 
     print_onColored("#### Game Finished #### ")
     print("Played Time:", format_time(game.played_time))
     print("Score:", game.get_scores())
+    print_colored("Winner: " + game.winner)
     print("\n")
 
     update_ranking(game)

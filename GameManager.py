@@ -22,8 +22,9 @@ class Game():
         self.current_player = self.player1
         self.spheres = spheres
         self.played_time = 0
-        self.mode = ""
+        self.mode = None
         self.game_speed = 60 # FPS
+        self.winner = None
 
     def get_scores(self):
         # Returns players scores in str format
@@ -80,3 +81,25 @@ class Game():
 
         return z_pos
     
+
+    def get_match_status(self):
+        # Returns True if match has ended
+
+        max_turn = self.mode.max_turn 
+        max_score = self.mode.max_score
+
+        # Match ended because turn oount equals limit in mode
+        if max_turn != None:
+            if self.player1.turn_count == self.player2.turn_count == max_turn:
+                return True
+
+        if max_score != None:
+            if self.player1.score == max_score:
+                self.winner = self.player1.name
+                return True
+
+            if self.player2.score == max_score:
+                self.winner = self.player2.name
+                return True
+
+        return False

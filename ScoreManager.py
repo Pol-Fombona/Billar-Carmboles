@@ -13,8 +13,10 @@ class FreeCarambole():
     # There is no need to collide with the table and the order does not matter
     # Returns True if player scored, else False
 
-    def __init__(self):
-        ...
+    def __init__(self, max_score = None, max_turn = None):
+        self.max_score = max_score
+        self.max_turn = max_turn
+        
 
     def update_score(self, player):
 
