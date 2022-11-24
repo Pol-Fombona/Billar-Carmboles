@@ -136,13 +136,16 @@ class GraphicsEngine(Engine):
         self.pause = False
         self.quit = False
         self.game = None
+        self.save_game = False
 
 
     def check_events(self):
         if self.quit:
             self.mesh.destroy()
             pg.quit()
-            self.save_game_record()
+
+            if self.save_game == True:
+                self.save_game_record()
             sys.exit()
 
         for event in pg.event.get():
@@ -335,7 +338,6 @@ class GraphicsEngine(Engine):
         # Render the scene with all the spheres again
 
         last_timestamp = time.time()
-        record_game = False # Allow to save a record of the game 
 
         while True:
 
@@ -386,8 +388,7 @@ class GraphicsEngine(Engine):
                 self.delta_time = self.clock.tick(self.game.game_speed)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
 
-            if record_game:
-                self.record_frame_data()
+            self.record_frame_data()
 
 
 class ReplayEngine(Engine):

@@ -24,7 +24,7 @@ class Game():
         self.played_time = 0
         self.mode = None
         self.game_speed = 60 # FPS
-        self.winner = None
+        self.winner = "None"
 
     def get_scores(self):
         # Returns players scores in str format
