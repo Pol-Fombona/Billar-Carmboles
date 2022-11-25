@@ -10,6 +10,7 @@ def make_turn(n_turns_simulated, ball_objects, game):
     # Else it will return the one with max score that is not perfect score
 
     #print("\nIA start")
+    start = time.time()
 
     # Velocity range [+-0.1, +-2]
     possible_values = [i for i in range(1, 21)]
@@ -20,7 +21,12 @@ def make_turn(n_turns_simulated, ball_objects, game):
                     0.04, 0.04, 0.04, 0.04, 0.04,
                     0.02, 0.02, 0.02, 0.02, 0.02]
 
-    start = time.time()
+    # La que està comentada retorna una probabilitat descendent però no funciona tant bé
+    '''
+    temp_probabilities = sorted([random.randint(0, 2**64) for _ in range(len(possible_values))], reverse=True)
+    temp_sum = sum(temp_probabilities)
+    probabilities = [i/temp_sum for i in temp_probabilities]
+    '''
 
     # Turn data: array de shape (n_turns, 3) that contains for each turn a random 3-component array velocity 
     #turn_data = np.array([[randrange(1,20)/10*choice([1,-1]), 0, randrange(5,20)/10*choice([-1,1])] 
