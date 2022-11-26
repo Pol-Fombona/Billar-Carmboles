@@ -24,7 +24,6 @@ class Game():
         self.played_time = 0
         self.mode = None
         self.game_speed = 60 # FPS
-        self.winner = "None"
 
     def get_scores(self):
         # Returns players scores in str format
@@ -94,12 +93,7 @@ class Game():
                 return True
 
         if max_score != None:
-            if self.player1.score == max_score:
-                self.winner = self.player1.name
-                return True
-
-            if self.player2.score == max_score:
-                self.winner = self.player2.name
+            if self.player1.score == max_score or self.player2.score == max_score:
                 return True
 
         return False
