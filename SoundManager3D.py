@@ -45,7 +45,7 @@ class SoundManager:
         self.loadSounds()
         alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED)
     def update(self):
-        if not self.app.camera.bird_camera:
+        if not self.app.camera.mode == "Bird":
             self.listener.set_position(list(self.app.camera.position))
             forward = self.app.camera.forward
             up = self.app.camera.up

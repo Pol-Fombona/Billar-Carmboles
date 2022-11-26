@@ -18,7 +18,8 @@ class Camera:
         self.speed = 0.05
         self.sensivity = 0.15
 
-        self.bird_camera = True
+        self.mode = "Bird"
+        self.sphere_following_id = 0
         
         # view_matrix
         self.m_view = self.get_view_matrix()
@@ -53,6 +54,38 @@ class Camera:
         self.m_view = glm.lookAt(self.position, self.position+self.forward, self.up)
         
 
+    def set_sphere_camera(self, spheres):
+
+        self.change_following_sphere(spheres)
+        self.rotate()
+        self.update_camera_vectors()
+        self.m_view = self.get_view_matrix()
+
+    def change_following_sphere(self, spheres):
+
+        velocity = self.speed * self.app.delta_time / 2                  
+        keys = pg.key.get_pressed()
+        
+        if keys[pg.K_q]:
+            self.position += glm.vec3(0,1,0) * velocity
+
+        elif keys[pg.K_e]:
+            # Mimimum height
+            if self.position[1] > 2.5:
+                self.position -= glm.vec3(0,1,0) * velocity
+
+        elif keys[pg.K_1]:
+            self.sphere_following_id = 0
+        elif keys[pg.K_2]:
+            self.sphere_following_id = 1
+        elif keys[pg.K_3]:
+            self.sphere_following_id = 2
+
+        
+        self.position = glm.vec3(spheres[self.sphere_following_id].pos[0], self.position[1], 
+                                    spheres[self.sphere_following_id].pos[2])
+
+
     def move(self):
 
         velocity = self.speed * self.app.delta_time
@@ -78,9 +111,14 @@ class Camera:
     def get_projection_matrix(self):
         return glm.perspective(glm.radians(self.FOV), self.aspect_ratio, self.near, self.far)
 
-    def update(self):
-        if self.bird_camera:
+    def update(self, spheres):
+        if self.mode == "Bird":
             self.set_bird_camera()
+
+        elif self.mode == "Sphere":
+            self.set_sphere_camera(spheres)
+
+
         else:
             self.move()
             self.rotate()
