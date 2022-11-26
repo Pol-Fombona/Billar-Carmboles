@@ -73,8 +73,9 @@ def pause_manager(game, replay=False):
 
     clear_terminal()
 
-    if not replay and exit_game:
-        game_ended(game)
+    if exit_game:
+        if not replay:
+            game_ended(game)
 
     else:
         print_onColored("#### Game Resumed ####")
@@ -90,7 +91,16 @@ def game_ended(game):
     print_onColored("#### Game Finished #### ")
     print("Played Time:", format_time(game.played_time))
     print("Score:", game.get_scores())
-    print_colored("Winner: " + game.winner)
+
+    if game.player1.score > game.player2.score:    
+        print_colored("Winner: " + game.player1.name)
+
+    elif game.player1.score < game.player2.score:
+        print_colored("Winner: " + game.player2.name)
+
+    else:
+        print_colored("Draw")
+
     print("\n")
 
     update_ranking(game)
