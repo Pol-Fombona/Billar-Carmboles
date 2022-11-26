@@ -226,7 +226,7 @@ class GraphicsEngine(Engine):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
-        player2 = Player(name = "P2", ball = self.scene.ball_objects[1], type="IA")
+        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
 
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole(max_turn=25, max_score=10)
