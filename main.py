@@ -37,8 +37,37 @@ TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 class Engine():
     # Base game engine
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, win_size=(1280, 720)) -> None:
+
+        # Init pygame module
+        pg.init()
+
+        self.WIN_SIZE = win_size
+        
+        # Set PyGame attributes
+        self.set_pg_attributes()
+
+        # Detect and use exixting opengl context
+        self.ctx = mgl.create_context()
+        self.ctx.enable(flags=mgl.DEPTH_TEST)
+
+        self.clock = pg.time.Clock()
+
+        self.camera = Camera(self)
+        self.light = Light()
+        self.light2 = Light(position=(0, 5, 100))
+        self.mesh = Mesh(self)
+        self.scene = Scene(self)
+
+        self.delta_time = 0
+        self.pause = False
+        self.quit = False
+
+        # Bird està repetida dues vegades correctament
+        self.camera_modes = ["Bird", "Free", "Bird", "Sphere"]
+        self.camera_mode_index = 0
+
+        
 
     def set_pg_attributes(self):
 
@@ -58,8 +87,11 @@ class Engine():
         p1_score_info = "Scores: [" + self.game.player1.name + " - " + str(self.game.player1.score) + "; "
         p2_score_info = self.game.player2.name + " - " + str(self.game.player2.score) + "]"
         curent_player_info = "Current player: " + self.game.current_player.name
+        camera_info = "Camera mode: " + self.camera_modes[self.camera_mode_index]
         
-        info = time_info + " | " + curent_player_info + " | " + p1_score_info + p2_score_info + " | "
+        info = (time_info + " | " + curent_player_info + " | " + p1_score_info + p2_score_info + " | " +
+                camera_info + " | " )
+
         return info
 
 
@@ -100,41 +132,10 @@ class GraphicsEngine(Engine):
     #def __init__(self, win_size=(1600, 900)):
     def __init__(self, win_size=(1280, 720)):
 
-        # Init pygame module
-        pg.init()
-
-        self.WIN_SIZE = win_size
-        
-        # Set PyGame attributes
-        self.set_pg_attributes()
-
-        # Detect and use exixting opengl context
-        self.ctx = mgl.create_context()
-        self.ctx.enable(flags=mgl.DEPTH_TEST)
-        # self.ctx.viewport(0,0,self.WIN_SIZE[0]/2,self.WIN_SIZE[1]/2)
-        self.clock = pg.time.Clock()
-        # camera
-        '''
-        self.camera = Camera(
-            self,
-            position=(
-                TABLE_POSITION[0] + TABLE_WIDTH + 1,
-                TABLE_POSITION[1] + TABLE_HEIGHT + 1,
-                TABLE_POSITION[2] + TABLE_LENGTH,
-            ),
-            table_information=(TABLE_POSITION, TABLE_WIDTH, TABLE_HEIGHT, TABLE_LENGTH),
-        )
-        '''
         self.game_started = False
-        self.camera = Camera(self)
-        # scene
-        self.light = Light()
-        self.light2 = Light(position=(0, 5, 100))
-        self.mesh = Mesh(self)
-        self.scene = Scene(self)
-        self.delta_time = 0
-        self.pause = False
-        self.quit = False
+
+        super().__init__(win_size)
+
         self.game = None
         self.save_game = False
 
@@ -155,7 +156,9 @@ class GraphicsEngine(Engine):
                     self.pause = True
         
                 elif event.type == pg.KEYDOWN and event.key == pg.K_b:
-                    self.camera.bird_camera = not self.camera.bird_camera
+                    self.camera_mode_index = (self.camera_mode_index + 1 ) % 4
+                    self.camera.mode = self.camera_modes[self.camera_mode_index]
+                    #self.camera.bird_camera = not self.camera.bird_camera
 
                 elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
                     self.scene.ball_objects[0].velocity[0] += -0.5
@@ -223,7 +226,7 @@ class GraphicsEngine(Engine):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
-        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
+        player2 = Player(name = "P2", ball = self.scene.ball_objects[1], type="IA")
 
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole(max_turn=25, max_score=10)
@@ -273,7 +276,7 @@ class GraphicsEngine(Engine):
 
                 else:
 
-                    self.camera.update()
+                    self.camera.update(self.game.spheres)
                     self.sound.update()
 
                     match self.game.getTurnStatus() :
@@ -349,7 +352,7 @@ class GraphicsEngine(Engine):
 
             else:
 
-                self.camera.update()
+                self.camera.update(self.game.spheres)
                 self.sound.update()
 
                 turn_status = self.game.getTurnStatus()
@@ -395,35 +398,13 @@ class ReplayEngine(Engine):
     # Engine used when replaying a game
 
     def __init__(self, win_size=(1280, 720)):
+
+        self.game_started = True
         
-        # Init pygame module
-        pg.init()
-
-        self.WIN_SIZE = win_size
-        
-        # Set PyGame attributes
-        self.set_pg_attributes()
-
-        # Detect and use exixting opengl context
-        self.ctx = mgl.create_context()
-        self.ctx.enable(flags=mgl.DEPTH_TEST)
-
-        self.clock = pg.time.Clock()
-        self.camera = Camera(self)
-        self.light = Light()
-        self.light2 = Light(position=(0, 5, 100))
-        self.mesh = Mesh(self)
-        self.scene = Scene(self)
-
-        self.delta_time = 0
-
-        self.mode_bird_cam = True
-        self.pause = False
-        self.quit = False
+        super().__init__(win_size)
 
         # ReplayData
-        #self.replay_data = pd.read_pickle("GameData\\Replays\\2022-11-19_19-37-08.pkl")
-        self.replay_file = "GameData\\Replays\\2022-11-21_13-41-44.zip"
+        self.replay_file = "GameData\\Replays\\2022-11-26_12-00-01.zip"
         self.replay_data = load_replay_data(self.replay_file)
         self.replay_data_iterator = self.replay_data.iterrows()
 
@@ -452,8 +433,8 @@ class ReplayEngine(Engine):
                     self.pause = True
 
                 elif event.type == pg.KEYDOWN and event.key == pg.K_b:
-                    # Changes between bird and free cam mode
-                    self.camera.bird_camera = not self.camera.bird_camera
+                    self.camera_mode_index = (self.camera_mode_index + 1 ) % 2
+                    self.camera.mode = self.camera_modes[self.camera_mode_index]
 
     def init_game_params(self):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
@@ -501,12 +482,12 @@ class ReplayEngine(Engine):
             self.check_events()
 
             if self.pause:
-                    self.quit = pause_manager(self.game)
+                    self.quit = pause_manager(self.game, replay=True)
                     last_timestamp = self.unpause()
 
             else:
 
-                self.camera.update()
+                self.camera.update(self.game.spheres)
                 self.render()
             
                 self.delta_time = self.clock.tick(self.game.game_speed)
