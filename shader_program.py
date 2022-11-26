@@ -13,6 +13,7 @@ class ShaderProgram:
         self.programs["terra"] = self.get_program("terra")
         self.programs["sostre"] = self.get_program("sostre")
         self.programs["line"] = self.get_program("line")
+        self.programs["parets"] = self.get_program("parets")
 
 
     def get_program(self, shader_program_name):

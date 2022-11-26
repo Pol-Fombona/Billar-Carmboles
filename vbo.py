@@ -16,6 +16,7 @@ class VBO:
         self.vbos["terra"] = TerraVBO(app)
         self.vbos["sostre"] = SostreVBO(app)
         self.vbos["line"] = LineVBO(app)
+        self.vbos["parets"] = ParetsVBO(app)
 
     def destroy(self):
         [vbo.destroy() for vbo in self.vbos.values()]
@@ -1001,5 +1002,32 @@ class LineVBO(BaseVBO):
             (0,1)
         ]
         vertex_data = self.get_data(vertices, indices)
+        return vertex_data
+
+class ParetsVBO(BaseVBO):
+    def __init__(self, app):
+        super().__init__(app.ctx)
+        self.format = "2f 3f"
+        self.attrib = ["in_texcoord_0", "in_position"]
+
+    @staticmethod
+    def get_data(vertices, indices):
+        data = [vertices[ind] for triangle in indices for ind in triangle]
+        return np.array(data, dtype="f4")
+    def get_vertex_data(self):#(respecte eix y)
+        
+        vertices = [(-150,-20.5,-150),(P_X,-20.5,-150),(-150,-20.5,P_Z),(P_X,-20.5,P_Z),(-150,P_H,-150),(P_X,P_H,-150),(-150,P_H,P_Z),(P_X,P_H,P_Z),(P_F1,-20.5,-150),(P_F2,-20.5,-150),(P_F2,P_F3,-150),(P_F2,P_F4,-150),(P_F2,P_H,-150),(P_F1,P_H,-150),(P_F1,P_F4,-150),(P_F1,P_F3,-150),(P_F1,-20.5,P_Z),(P_F2,-20.5,P_Z),(P_F2,P_F3,P_Z),(P_F2,P_F4,P_Z),(P_F2,P_H,P_Z),(P_F1,P_H,P_Z),(P_F1,P_F4,P_Z),(P_F1,P_F3,P_Z)]
+        indices = [(0,6,4),(0,2,6),(3,5,7),(3,1,5),(0,8,13),(13,4,0),(8,9,10),(10,15,8),(9,1,5),(5,12,9),(14,11,12),(12,13,14),(2,16,21),(21,6,2),(16,17,18),(18,23,16),(17,3,7),(7,20,17),(22,19,20),(20,21,22)]
+
+        
+        vertex_data = self.get_data(vertices, indices)
+        
+        tex_coord = [(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(P_F1,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F1,-150),(P_F1,-150),(P_F1,-150),(P_F1,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F1,P_Z),(P_F1,P_Z),(P_F1,P_Z)]
+        
+        tex_coord_indices = [(0,6,4),(0,2,6),(3,5,7),(3,1,5),(0,8,13),(13,4,0),(8,9,10),(10,15,8),(9,1,5),(5,12,9),(14,11,12),(12,13,14),(2,16,21),(21,6,2),(16,17,18),(18,23,16),(17,3,7),(7,20,17),(22,19,20),(20,21,22)]
+        tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
+        
+        vertex_data = np.hstack([tex_coord_data,vertex_data])
+        
         return vertex_data
         

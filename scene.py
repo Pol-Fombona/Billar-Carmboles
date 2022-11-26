@@ -65,6 +65,8 @@ class Scene:
 
         self.line = Line(app, axis = glm.vec3(20, 1, 10))
 
+        add(Parets(app, pos=(0,0,0),tex_id = 10))
+
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
     def load_decision_starting(self):
@@ -91,6 +93,8 @@ class Scene:
         add(Sostre(app, pos=(0,0,0),tex_id = 9))
 
         self.line = Line(app, axis = glm.vec3(pos_sphere_1))
+
+        add(Parets(app, pos=(0,0,0),tex_id = 10))
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 

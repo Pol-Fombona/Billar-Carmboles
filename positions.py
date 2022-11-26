@@ -62,6 +62,15 @@ T_Z = 225
 S_HEIGHT = 80
 S_X = 225
 S_Z = 225
+#Parets
+P_X = 225
+P_Z = 225
+P_H = 80
+P_F1 = 225/3
+P_F2 = 550/3
+P_F3 = 50/3
+P_F4 = 100/3
+
 
 # Line
 LINE_POSITION = (TABLE_WIDTH/5, 1, TABLE_LENGTH/10)

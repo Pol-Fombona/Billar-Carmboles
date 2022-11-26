@@ -38,6 +38,9 @@ class VAO:
         self.vaos["line"] = self.get_vao(program=self.program.programs["line"],
             vbo=self.vbo.vbos["line"]
         )
+        self.vaos["parets"] = self.get_vao(program=self.program.programs["parets"],
+            vbo=self.vbo.vbos["parets"]
+        )
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)])
