@@ -148,7 +148,11 @@ class Sphere(BaseModel):
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
         self.texture.use()
         self.program["m_view"].write(self.app.camera.m_view)
+        self.program['camPos'].write(self.app.camera.position)
+
         self.program["m_model"].write(self.m_model)
+
+        self.vao.render()
 
 
     def IA_update(self):
