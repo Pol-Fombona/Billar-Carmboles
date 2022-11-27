@@ -945,7 +945,7 @@ class TerraVBO(BaseVBO):
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(-150,-150),(T_X,T_Z),(-150,T_Z),(T_X,-150)]
+        tex_coord = [(0,0), (1,0), (1,1), (0,1)]
         
         tex_coord_indices = [(0,1,3),(0,2,1)]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
@@ -974,7 +974,7 @@ class SostreVBO(BaseVBO):
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(-150,-150),(S_X,S_Z),(-150,S_Z),(S_X,-150)]
+        tex_coord = [(0,0), (1,0), (1,1), (0,1)]
         
         tex_coord_indices = [(0,1,3),(0,2,1)]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
