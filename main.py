@@ -541,9 +541,9 @@ class Menu:
         self.menu.mainloop(self.surface)
 
     def set_name(self,name):
-        self.name = name
+        self.name = name.upper()
     def set_name2(self,name):
-        self.name2 = name
+        self.name2 = name.upper()
     def select_mode(self,value,mode):
         self.mode = mode   
     def play(self):
