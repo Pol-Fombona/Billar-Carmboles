@@ -15,11 +15,11 @@ lenght_table = 83.28 # Z-edge
 PECR = True
 
 
-def checkCollisions(objects, sound, player, IA_mode = False):
+def checkCollisions(objects, sound, player, IA_mode = False, game_started = True):
     # Checks collisions between spheres and between spheres and table
     
     # Between spheres
-    checkBallsCollisions(objects, sound, player, IA_mode)
+    checkBallsCollisions(objects, sound, player, IA_mode, game_started)
 
     # Between table and sphere
     checkEdgeCollisions(objects, sound, player, IA_mode)
@@ -27,7 +27,7 @@ def checkCollisions(objects, sound, player, IA_mode = False):
     return
 
 
-def checkBallsCollisions(objects, sound, player, IA_mode):
+def checkBallsCollisions(objects, sound, player, IA_mode, game_started):
     # If the distance between the spheres is less than the sum of radius
     # there is a collision
 
@@ -51,6 +51,12 @@ def checkBallsCollisions(objects, sound, player, IA_mode):
                 addCollisionDetails(player, ball_1, ball_2)
 
                 if not IA_mode: sound.playSound([ball_1,ball_2],0)
+
+                if not game_started:
+                    print(ball_1.id, ball_2.id)
+                    if ball_1.id in [1, 2] and ball_2.id == 3:
+                        print('HEREEERERERER')
+                        return False
 
     return 
 

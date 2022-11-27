@@ -83,9 +83,12 @@ class Scene:
 
         pos_sphere_1 = FIRST_BALLS_POSITION[0]
         pos_sphere_2 = FIRST_BALLS_POSITION[1]
+        pos_sphere_3 = FIRST_BALLS_POSITION[2]
 
         add_ball(Sphere(app, pos=pos_sphere_1, tex_id="sphere1",id = 1))
         add_ball(Sphere(app, pos=pos_sphere_2, tex_id="sphere2",id = 2))
+
+        add_ball(Sphere(app, pos=pos_sphere_3, tex_id="sphere3", id = 3))
 
         self.cue = Cue(app, axis=glm.vec3(pos_sphere_1), tex_id=5)
 

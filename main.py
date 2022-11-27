@@ -224,6 +224,19 @@ class GraphicsEngine(Engine):
         pg.display.set_caption(self.get_info())
         pg.display.flip()
 
+    def render_status_played_game_starting(self):
+        # Add collision checker to the render,
+        # only when turn status is "played" because 
+        # the spheres are moving
+
+        self.ctx.clear(color=(0.08, 0.16, 0.18))
+        self.scene.render()
+        valid = checkCollisions(self.scene.ball_objects, self.sound, self.game.current_player, self.game_started)
+        pg.display.set_caption(self.get_info())
+        pg.display.flip()
+
+        return valid
+
 
     def init_game_params(self,names = [], mode = None):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
@@ -269,6 +282,7 @@ class GraphicsEngine(Engine):
             if not self.game_started:
                 last_timestamp = time.time()
                 shots_taken = 0
+                shots = {'p1':True, 'p2': True}
 
                 while True and shots_taken < 2:
 
@@ -298,7 +312,8 @@ class GraphicsEngine(Engine):
 
                             case "played":
                                 # Shot made but spheres are in movement
-                                self.render_status_played()
+                                # TODO: Aqui no detecta correctament la variable game_started, no entenc del tot perque
+                                valid = self.render_status_played_game_starting()
                             
                             case "ended":
                                 # Shot made and all spheres have stopped
@@ -306,6 +321,8 @@ class GraphicsEngine(Engine):
                                 scored = self.game.mode.update_score(self.game.current_player)
                                 self.game.changeCurrentPlayer(scored)
                                 shots_taken += 1
+                                print('VALIIIIID', valid)
+
 
 
                         self.delta_time = self.clock.tick(self.game.game_speed)

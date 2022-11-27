@@ -76,7 +76,8 @@ class Game():
     def get_sphere_position_z(self):
         z_pos = []
         for sphere in self.spheres:
-            z_pos.append(sphere.pos[2])
+            if sphere.id != 3:
+                z_pos.append(sphere.pos[2])
 
         return z_pos
     
