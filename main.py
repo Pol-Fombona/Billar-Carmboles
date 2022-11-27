@@ -20,6 +20,7 @@ from PickleManager import (save_game_record_to_pickle, clean_replay_data_file,
                         load_replay_data)
 from IAManager import make_turn
 import MovementManagement
+import pandas as pd
 
 
 
@@ -534,6 +535,7 @@ class Menu:
         self.menu.clear()
         self.menu.add.button('Play', self.play)
         self.menu.add.button('View Replay', self.view_replay)
+        self.menu.add.button('Show Ranking', self.show_ranking)
         self.menu.add.button('Options', self.select_options)
         self.menu.add.button('Quit', pg_menu.events.EXIT)
         self.menu.mainloop(self.surface)
@@ -577,6 +579,7 @@ class Menu:
         self.menu.clear()
         self.menu.add.button('Friction', self.change_friction)
         self.menu.add.button('Game Speed', self.change_speed)
+        self.menu.add.button('Show Controls', self.show_controls)
         self.menu.add.button('Back', self.on_init)
     def change_friction(self):
         self.menu.clear()
@@ -604,6 +607,23 @@ class Menu:
 
     def apply_speed(self,value,speed=1): 
         self.game_speed = speed
+
+    def show_ranking(self):
+        self.menu.clear()
+        rankings = pd.read_csv("GameData/Rankings/ranking.csv")
+        table = self.menu.add.table(table_id='my_table', font_size=20)
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(["Player","Score","Turns"],
+            cell_font=pg_menu.font.FONT_OPEN_SANS_BOLD,cell_align=pg_menu.locals.ALIGN_CENTER)
+        for index, row in rankings.iterrows():
+            table.add_row([row["Player"], row["Score"], row["Turns"]],
+                cell_font=pg_menu.font.FONT_OPEN_SANS_BOLD,cell_align=pg_menu.locals.ALIGN_CENTER)
+        self.menu.add.button('Back', self.on_init,font_size=30) 
+
+    def show_controls(self):
+        self.menu.clear()
+        self.menu.add.button('Back', self.select_options) 
 
     def start_the_game(self):
         app = GraphicsEngine(win_size=W_SIZE)
