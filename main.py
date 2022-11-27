@@ -1,4 +1,5 @@
 import pygame as pg
+import pygame_menu as pg_menu
 import moderngl as mgl
 import time
 import sys
@@ -32,7 +33,7 @@ TABLE_PROF = (
 )  # Aixo es la profunditat de la moqueta a l'interor de la taula
 # Per a tenir la moqueta de la taula a 0,0,0 aquestes son les coordenades de la taula => (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
 TABLE_POSITION = (-MARGIN_WIDTH, -TABLE_PROF, -MARGIN_WIDTH)
-
+W_SIZE = (1280,720)
 
 class Engine():
     # Base game engine
@@ -40,7 +41,7 @@ class Engine():
     def __init__(self, win_size=(1280, 720)) -> None:
 
         # Init pygame module
-        pg.init()
+        #pg.init()
 
         self.WIN_SIZE = win_size
         
@@ -222,11 +223,11 @@ class GraphicsEngine(Engine):
         pg.display.flip()
 
 
-    def init_game_params(self):
+    def init_game_params(self,names = [], mode = None):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
-        player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
-        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
+        player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
+        player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = mode)
 
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole(max_turn=25, max_score=10)
@@ -261,7 +262,7 @@ class GraphicsEngine(Engine):
         
         return
 
-    def start_game(self):
+    def start_game(self, names = [], mode = None):
         if not self.game_started:
             last_timestamp = time.time()
             shots_taken = 0
@@ -320,7 +321,7 @@ class GraphicsEngine(Engine):
             self.game_started = True
             # self.mesh.vao.destroy()
             self.scene = Scene(self)
-            self.init_game_params()
+            self.init_game_params(names, mode)
 
     
     def simulate_IA_turn(self):
@@ -397,14 +398,14 @@ class GraphicsEngine(Engine):
 class ReplayEngine(Engine):
     # Engine used when replaying a game
 
-    def __init__(self, win_size=(1280, 720)):
+    def __init__(self, win_size=(1280, 720),replay_name=""):
 
         self.game_started = True
         
         super().__init__(win_size)
 
         # ReplayData
-        self.replay_file = "GameData\\Replays\\2022-11-26_12-00-01.zip"
+        self.replay_file = "GameData\\Replays\\" + replay_name
         self.replay_data = load_replay_data(self.replay_file)
         self.replay_data_iterator = self.replay_data.iterrows()
 
@@ -436,11 +437,11 @@ class ReplayEngine(Engine):
                     self.camera_mode_index = (self.camera_mode_index + 1 ) % 2
                     self.camera.mode = self.camera_modes[self.camera_mode_index]
 
-    def init_game_params(self):
+    def init_game_params(self, names = [], mode = None):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
-        player1 = Player(name = "P1", ball = self.scene.ball_objects[0])
-        player2 = Player(name = "P2", ball = self.scene.ball_objects[1])
+        player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
+        player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = mode)
 
         self.game = Game(player1, player2, self.scene.ball_objects)
         self.game.mode = FreeCarambole()
@@ -493,12 +494,88 @@ class ReplayEngine(Engine):
                 self.delta_time = self.clock.tick(self.game.game_speed)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
                 
+class Menu:
+    def __init__(self):
+        pg.init()
+        myimage = pg_menu.baseimage.BaseImage(
+        #image_path=pg_menu.baseimage.IMAGE_EXAMPLE_GRAY_LINES,
+        image_path="MenuResources/Images/background.jpg",
+        drawing_mode=pg_menu.baseimage.IMAGE_MODE_REPEAT_XY,
+        )
+
+        my_theme = pg_menu.Theme(
+            #background_color=(176,224,230),
+            title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
+            title_font_size=60,
+            #title_font_color=(230,230,250),
+            title_offset=(30,100),
+            title_font = pg_menu.font.FONT_8BIT,
+            background_color=myimage,
+            #title_shadow=True,
+            title_background_color=(4, 47, 126),
+            widget_font=pg_menu.font.FONT_8BIT,
+            widget_font_color = (0,0,0),
+            widget_font_size = 60
+        )
+        self.surface = pg.display.set_mode(W_SIZE)
+        #self.menu = pg_menu.Menu('Three-cushion billiards', W_SIZE[0]/1.5, W_SIZE[1]/1.5,
+        #               theme=my_theme)
+        self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
+                       theme=my_theme)
+        self.mode = None
+        self.name = 'John Doe'
+        self.name2 = 'Jane Fey'
+        self.replays = [x for x in os.listdir("GameData/Replays")]
+        self.on_init()
+    
+    def on_init(self):
+        self.menu.clear()
+        self.menu.add.button('Play', self.play)
+        self.menu.add.button('View Replay', self.view_replay)
+        self.menu.add.button('Quit', pg_menu.events.EXIT)
+        self.menu.mainloop(self.surface)
+
+    def set_name(self,name):
+        self.name = name
+    def set_name2(self,name):
+        self.name2 = name
+    def select_mode(self,value,mode):
+        self.mode = mode   
+    def play(self):
+        self.mode = None
+        self.menu.clear() 
+        self.menu.add.selector('Mode ', [('PvP', None), ('vs IA', "IA")], onchange=self.select_mode)
+        self.menu.add.button('Next', self.set_params_game)
+        self.menu.add.button('Back', self.on_init)
+    def set_params_game(self):
+        self.menu.clear() 
+        if self.mode == None:
+            self.menu.add.text_input('Name Player1:', default='John Doe',onchange=self.set_name)
+            self.menu.add.text_input('Name Player2:', default='Jane Fey',onchange=self.set_name2)
+        else:
+            self.menu.add.text_input('Name Player1:', default='John Doe',onchange=self.set_name)
+            self.name2 = "IA"
+        self.menu.add.button('Play', self.start_the_game)
+        self.menu.add.button('Back', self.play)
+
+    def start_the_game(self):
+        app = GraphicsEngine(win_size=W_SIZE)
+        app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        app.start_game(names = [self.name,self.name2], mode = self.mode)
+        app.run()
+    def view_replay(self):
+        self.menu.clear()
+        for x in self.replays:
+            if x[-4:]==".zip":
+                self.menu.add.button(x[:-4], self.start_replay,x)    
+        self.menu.add.button('Back', self.on_init)
+        
+    def start_replay(self,file=""):
+        app = ReplayEngine(win_size=W_SIZE,replay_name = file)
+        app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        app.run()
 
 
 
 if __name__ == "__main__":
-
-    app = GraphicsEngine()
-    app.init_game_params()
-    app.start_game()
-    app.run()
+    Menu()
