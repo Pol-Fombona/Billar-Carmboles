@@ -19,6 +19,7 @@ from ScoreManager import *
 from PickleManager import (save_game_record_to_pickle, clean_replay_data_file, 
                         load_replay_data)
 from IAManager import make_turn
+import MovementManagement
 
 
 
@@ -526,12 +527,14 @@ class Menu:
         self.name = 'John Doe'
         self.name2 = 'Jane Fey'
         self.replays = [x for x in os.listdir("GameData/Replays")]
+        self.game_speed = 1
         self.on_init()
     
     def on_init(self):
         self.menu.clear()
         self.menu.add.button('Play', self.play)
         self.menu.add.button('View Replay', self.view_replay)
+        self.menu.add.button('Options', self.select_options)
         self.menu.add.button('Quit', pg_menu.events.EXIT)
         self.menu.mainloop(self.surface)
 
@@ -558,11 +561,6 @@ class Menu:
         self.menu.add.button('Play', self.start_the_game)
         self.menu.add.button('Back', self.play)
 
-    def start_the_game(self):
-        app = GraphicsEngine(win_size=W_SIZE)
-        app.init_game_params(names = [self.name,self.name2],mode = self.mode)
-        app.start_game(names = [self.name,self.name2], mode = self.mode)
-        app.run()
     def view_replay(self):
         self.menu.clear()
         for x in self.replays:
@@ -573,6 +571,45 @@ class Menu:
     def start_replay(self,file=""):
         app = ReplayEngine(win_size=W_SIZE,replay_name = file)
         app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        app.run()
+
+    def select_options(self):
+        self.menu.clear()
+        self.menu.add.button('Friction', self.change_friction)
+        self.menu.add.button('Game Speed', self.change_speed)
+        self.menu.add.button('Back', self.on_init)
+    def change_friction(self):
+        self.menu.clear()
+        self.menu.add.range_slider('Choose a value', 50, (0, 100), 1,
+                      rangeslider_id='range_slider',
+                      value_format=lambda x: str(int(x)), onchange=(self.apply_friction))
+        self.menu.add.button('Back', self.select_options)
+    
+    def apply_friction(self,friction = 50):
+        MovementManagement.friction = round(friction / 100 , 2)
+
+    def change_speed(self):
+        self.menu.clear()
+        self.menu.add.dropselect(
+            title='Select Game Speed',
+            items=[('x0,5', 0.5),
+            ('x1', 1),
+            ('x2',2),
+            ('x4',4)],
+            font_size=30,
+            selection_option_font_size=34,
+            onchange=(self.apply_speed)
+        )
+        self.menu.add.button('Back', self.select_options)  
+
+    def apply_speed(self,value,speed=1): 
+        self.game_speed = speed
+
+    def start_the_game(self):
+        app = GraphicsEngine(win_size=W_SIZE)
+        app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        app.start_game(names = [self.name,self.name2], mode = self.mode)
+        app.game.game_speed *= self.game_speed
         app.run()
 
 
