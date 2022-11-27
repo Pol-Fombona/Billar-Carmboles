@@ -4,8 +4,9 @@ import moderngl as mgl
 
 
 class Texture:
-    def __init__(self, ctx):
-        self.ctx = ctx
+    def __init__(self, app):
+        self.app = app
+        self.ctx = app.ctx
         self.textures = {}
         self.textures[0] = self.get_texture(path="textures/pool_table_texture.jpg")
         self.textures[1] = self.get_texture(
@@ -35,7 +36,12 @@ class Texture:
         self.textures["sphere13"] = self.get_texture(path="textures/spheres/sphere (13).jpg")
         self.textures["sphere14"] = self.get_texture(path="textures/spheres/sphere (14).jpg")
         self.textures["sphere15"] = self.get_texture(path="textures/spheres/sphere (15).jpg")
+        self.textures["depth_texture"] = self.get_depth_texture()
 
+
+    def get_depth_texture(self):
+        depth_texture = self.ctx.depth_texture(self.app.WIN_SIZE)
+        return depth_texture
 
     def get_texture(self, path):
         texture = pg.image.load(path).convert()

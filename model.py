@@ -13,6 +13,7 @@ class BaseModel:
         self.pos = pos
         self.m_model = self.get_model_matrix()
         self.tex_id = tex_id
+        self.vao_name = vao_name
         self.vao = app.mesh.vao.vaos[vao_name]
         self.program = self.vao.program
         self.camera = self.app.camera
@@ -31,6 +32,19 @@ class BaseModel:
     def render(self):
         self.update()
         self.vao.render()
+    
+    def update_shadow(self):
+        try:
+            self.shadow_program['m_model'].write(self.m_model)
+        except:
+            pass
+    
+    def render_shadow(self):
+        try:
+            self.update_shadow()
+            self.shadow_vao.render()
+        except:
+            pass
 
 
 class Legs(BaseModel):
@@ -39,6 +53,21 @@ class Legs(BaseModel):
         self.on_init()
 
     def on_init(self):
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        self.program["light.Is"].write(self.app.light.Is)
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        self.program["light2.Is"].write(self.app.light2.Is)
         # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
@@ -55,6 +84,21 @@ class Table(BaseModel):
         self.on_init()
 
     def on_init(self):
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        self.program["light.Is"].write(self.app.light.Is)
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        self.program["light2.Is"].write(self.app.light2.Is)
         # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
@@ -71,6 +115,12 @@ class TableFloor(BaseModel):
         self.on_init()
 
     def on_init(self):
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
         # light
         self.program["light.position"].write(self.app.light.position)
         self.program["light.Ia"].write(self.app.light.Ia)
@@ -107,6 +157,12 @@ class Sphere(BaseModel):
         self.on_init()
 
     def on_init(self):
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
         # light
         self.program["light.position"].write(self.app.light.position)
         self.program["light.Ia"].write(self.app.light.Ia)
@@ -281,6 +337,17 @@ class Cue(BaseModel):
         return m_model
 
     def on_init(self):
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+    
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
         self.texture.use()
@@ -333,14 +400,29 @@ class Terra(BaseModel):
         return m_model
     
     def on_init(self):
-        
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        self.program["light.Is"].write(self.app.light.Is)
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        self.program["light2.Is"].write(self.app.light2.Is)
+        # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
         self.texture.use()
-        
-        self.program['m_proj'].write(self.app.camera.m_proj)
-        self.program['m_view'].write(self.app.camera.m_view)
-        self.program['m_model'].write(self.m_model)
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
 
 class Sostre(BaseModel):
     def __init__(
@@ -379,14 +461,29 @@ class Sostre(BaseModel):
         return m_model
     
     def on_init(self):
-        
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        self.program["light.Is"].write(self.app.light.Is)
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        self.program["light2.Is"].write(self.app.light2.Is)
+        # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
         self.texture.use()
-        
-        self.program['m_proj'].write(self.app.camera.m_proj)
-        self.program['m_view'].write(self.app.camera.m_view)
-        self.program['m_model'].write(self.m_model)
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
 
 class Line(BaseModel):
     def __init__(
@@ -486,11 +583,26 @@ class Parets(BaseModel):
         return m_model
     
     def on_init(self):
-        
+        # shadow
+        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        self.shadow_program = self.shadow_vao.program
+        self.shadow_program['m_proj'].write(self.camera.m_proj)
+        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        self.shadow_program['m_model'].write(self.m_model)
+        # light
+        self.program["light.position"].write(self.app.light.position)
+        self.program["light.Ia"].write(self.app.light.Ia)
+        self.program["light.Id"].write(self.app.light.Id)
+        self.program["light.Is"].write(self.app.light.Is)
+        self.program["light2.position"].write(self.app.light2.position)
+        self.program["light2.Ia"].write(self.app.light2.Ia)
+        self.program["light2.Id"].write(self.app.light2.Id)
+        self.program["light2.Is"].write(self.app.light2.Is)
+        # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
         self.texture.use()
-        
-        self.program['m_proj'].write(self.app.camera.m_proj)
-        self.program['m_view'].write(self.app.camera.m_view)
-        self.program['m_model'].write(self.m_model)
+        # mvp
+        self.program["m_proj"].write(self.camera.m_proj)
+        self.program["m_view"].write(self.camera.m_view)
+        self.program["m_model"].write(self.m_model)
