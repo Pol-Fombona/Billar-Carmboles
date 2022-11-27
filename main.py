@@ -310,7 +310,7 @@ class GraphicsEngine(Engine):
 
                         self.delta_time = self.clock.tick(self.game.game_speed)
                         self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
-            
+                self.sound.stopSong(0)
                 z_pos = self.game.get_sphere_position_z()
                 min_z = 100
                 player1 = None
@@ -322,7 +322,7 @@ class GraphicsEngine(Engine):
                 # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
 
                 print(f'El jugador {names[index]} serà el jugador 1.')
-
+        self.sound.stopSong(0)
         self.game_started = True
         # self.mesh.vao.destroy()
         self.scene = Scene(self)
