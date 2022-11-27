@@ -146,6 +146,7 @@ class GraphicsEngine(Engine):
     def check_events(self):
         if self.quit:
             self.mesh.destroy()
+            self.sound.destroy()
             pg.quit()
 
             if self.save_game == True:
@@ -327,7 +328,7 @@ class GraphicsEngine(Engine):
 
                         self.delta_time = self.clock.tick(self.game.game_speed)
                         self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
-            
+                self.sound.stopSong(0)
                 z_pos = self.game.get_sphere_position_z()
                 min_z = 100
                 player1 = None
@@ -339,7 +340,7 @@ class GraphicsEngine(Engine):
                 # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
 
                 print(f'El jugador {names[index]} serà el jugador 1.')
-
+        self.sound.stopSong(0)
         self.game_started = True
         # self.mesh.vao.destroy()
         self.scene = Scene(self)
@@ -536,7 +537,7 @@ class Menu:
             #title_shadow=True,
             title_background_color=(4, 47, 126),
             widget_font=pg_menu.font.FONT_8BIT,
-            widget_font_color = (0,0,0),
+            widget_font_color = (139,0,0),
             widget_font_size = 60
         )
         self.surface = pg.display.set_mode(W_SIZE)
@@ -603,12 +604,12 @@ class Menu:
         self.menu.add.button('Back', self.on_init)
     def change_friction(self):
         self.menu.clear()
-        self.menu.add.range_slider('Choose a value', 50, (0, 100), 1,
+        self.menu.add.range_slider('Choose a value', 1, (0, 100), 1,
                       rangeslider_id='range_slider',
                       value_format=lambda x: str(int(x)), onchange=(self.apply_friction))
         self.menu.add.button('Back', self.select_options)
     
-    def apply_friction(self,friction = 50):
+    def apply_friction(self,friction = 1):
         MovementManagement.friction = round(friction / 100 , 2)
 
     def change_speed(self):
