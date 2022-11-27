@@ -7,14 +7,29 @@ from positions import *
 class Scene:
     def __init__(self, app):
         self.app = app
+        self.mesh = app.mesh
+        self.ctx = app.ctx
         self.table_objects = []
         self.ball_objects = []
         self.cue = None
         self.line = None
+        # depth buffer
+        self.depth_texture = self.mesh.texture.textures['depth_texture']
+        self.depth_fbo = self.ctx.framebuffer(depth_attachment=self.depth_texture)
         if self.app.game_started:
             self.load()
         else:
             self.load_decision_starting()
+
+    def render_shadow(self):
+        self.depth_fbo.clear()
+        self.depth_fbo.use()
+        for obj in self.table_objects:
+            obj.render_shadow()
+
+        for sphere in self.ball_objects:
+            sphere.render_shadow()
+        
 
     def add_object(self, obj):
         self.table_objects.append(obj)
@@ -104,7 +119,10 @@ class Scene:
 
 
     def render(self):
+        self.ctx.screen.use()
         # Render table + spheres
+
+        # self.render_shadow()
 
         for obj in self.table_objects:
             obj.render()
