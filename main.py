@@ -265,65 +265,68 @@ class GraphicsEngine(Engine):
         return
 
     def start_game(self, names = [], mode = None):
-        if not self.game_started:
-            last_timestamp = time.time()
-            shots_taken = 0
+        if self.game.player1.type != 'IA' and self.game.player2.type != 'IA':
+            if not self.game_started:
+                last_timestamp = time.time()
+                shots_taken = 0
 
-            while True and shots_taken < 2:
+                while True and shots_taken < 2:
 
-                self.check_events()
+                    self.check_events()
 
-                if self.pause:
-                    self.quit = pause_manager(self.game)
-                    last_timestamp = self.unpause()
+                    if self.pause:
+                        self.quit = pause_manager(self.game)
+                        last_timestamp = self.unpause()
 
-                else:
+                    else:
 
-                    self.camera.update(self.game.spheres)
-                    self.sound.update()
+                        self.camera.update(self.game.spheres)
+                        self.sound.update()
 
-                    match self.game.getTurnStatus() :
+                        match self.game.getTurnStatus() :
 
-                        case "initial":
-                            # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
-                            self.render_with_cue()
+                            case "initial":
+                                # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
+                                self.render_with_cue()
 
-                            # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
-                            # de la seva bola no és zero. Aixo s'haura de canviar per a 
-                            # modificar l'status de played quan s'allibera el pal, 
-                            # es a dir quan s'ha fet el tir
-                            if sum(abs(self.game.current_player.ball.velocity)) != 0:
-                                self.game.current_player.played = True
+                                # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
+                                # de la seva bola no és zero. Aixo s'haura de canviar per a 
+                                # modificar l'status de played quan s'allibera el pal, 
+                                # es a dir quan s'ha fet el tir
+                                if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                                    self.game.current_player.played = True
 
-                        case "played":
-                            # Shot made but spheres are in movement
-                            self.render_status_played()
-                        
-                        case "ended":
-                            # Shot made and all spheres have stopped
-                            self.render()
-                            scored = self.game.mode.update_score(self.game.current_player)
-                            self.game.changeCurrentPlayer(scored)
-                            shots_taken += 1
+                            case "played":
+                                # Shot made but spheres are in movement
+                                self.render_status_played()
+                            
+                            case "ended":
+                                # Shot made and all spheres have stopped
+                                self.render()
+                                scored = self.game.mode.update_score(self.game.current_player)
+                                self.game.changeCurrentPlayer(scored)
+                                shots_taken += 1
 
 
-                    self.delta_time = self.clock.tick(self.game.game_speed)
-                    self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
+                        self.delta_time = self.clock.tick(self.game.game_speed)
+                        self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
             
-            z_pos = self.game.get_sphere_position_z()
-            min_z = 100
-            player1 = None
-            for index, z in enumerate(z_pos):
-                if z < min_z:
-                    min_z = z
-                    player1 = index
+                z_pos = self.game.get_sphere_position_z()
+                min_z = 100
+                player1 = None
+                for index, z in enumerate(z_pos):
+                    if z < min_z:
+                        min_z = z
+                        player1 = index
 
-            # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
+                # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
 
-            self.game_started = True
-            # self.mesh.vao.destroy()
-            self.scene = Scene(self)
-            self.init_game_params(names, mode)
+                print(f'El jugador {names[index]} serà el jugador 1.')
+
+        self.game_started = True
+        # self.mesh.vao.destroy()
+        self.scene = Scene(self)
+        self.init_game_params(names, mode)
 
     
     def simulate_IA_turn(self):
