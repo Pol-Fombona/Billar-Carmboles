@@ -46,8 +46,8 @@ class LegsVBO(BaseVBO):
     def __init__(self, app):
         ctx = app.ctx
         super().__init__(ctx)
-        self.format = "2f 3f"
-        self.attrib = ["in_texcoord_0", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices):
@@ -105,6 +105,21 @@ class LegsVBO(BaseVBO):
             (3, 0, 1),
         ]
 
+        normals = [
+            (0, 1, 0) * 6,
+            (0, -1, 0) * 6,
+            (0, 0, -1) * 6,
+            (1, 0, 0) * 6,
+            (0, 0, 1) * 6,
+            (-1, 0, 0) * 6,
+        ]
+
+        normals = np.array(normals, dtype="f4").reshape(36, 3)
+
+        vertex_data = self.get_data(vertices, indices) 
+
+        vertex_data = np.hstack([normals, vertex_data])
+
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
         vertex_data = np.hstack([tex_coord_data, vertex_data])
@@ -115,8 +130,8 @@ class LegsVBO(BaseVBO):
 class TableVBO(BaseVBO):
     def __init__(self, app):
         super().__init__(app.ctx)
-        self.format = "2f 3f"
-        self.attrib = ["in_texcoord_0", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices):
@@ -270,7 +285,41 @@ class TableVBO(BaseVBO):
             (0, 2, 3),
         ]
 
-        vertex_data = self.get_data(vertices, indices)
+        normals = [
+            #First
+            (0, 0, -1) * 6,
+            (0, 0, 1) * 6,
+            (0, -1, 0) * 6,
+            (0, 1, 0) * 6,
+            (-1, 0, 0) * 6,
+            #Second
+            (0, 0, -1) * 6,
+            (1, 0, 0) * 6,
+            (-1, 0, 0) * 6,
+            (0, -1, 0) * 6,
+            (0, 0, 1) * 6,
+            #Third
+            (0, 0, -1) * 6,
+            (0, 0, 1) * 6,
+            (1, 0, 0) * 6,
+            (0, -1, 0) * 6,
+            (0, 1, 0) * 6,
+            #Fourth
+            (0, 0, 1) * 6,
+            (1, 0, 0) * 6,
+            (0, 0, -1) * 6,
+            (0, -1, 0) * 6,
+            (0, 1, 0) * 6,
+            #Under
+            (0, -1, 0) * 6,
+
+        ]
+
+        normals = np.array(normals, dtype="f4").reshape(126, 3)
+
+        vertex_data = self.get_data(vertices, indices) 
+
+        vertex_data = np.hstack([normals, vertex_data])
 
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
@@ -928,8 +977,8 @@ class CueVBO(BaseVBO):
 class TerraVBO(BaseVBO):
     def __init__(self, app):
         super().__init__(app.ctx)
-        self.format = "2f 3f"
-        self.attrib = ["in_texcoord_0", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices): 
@@ -938,7 +987,7 @@ class TerraVBO(BaseVBO):
 
     def get_vertex_data(self): #sobre eix y
         
-        vertices = [(-150,-20.5,-150),(T_X,-20.5,T_Z),(-150,-20.5,T_Z),(T_X,-20.5,-150)]
+        vertices = [(INICI_TERRA,T_Y,INICI_TERRA),(T_X,T_Y,T_Z),(INICI_TERRA,T_Y,T_Z),(T_X,T_Y,INICI_TERRA)]
         indices = [(0,1,3),(0,2,1)]
         
 
@@ -949,16 +998,24 @@ class TerraVBO(BaseVBO):
         
         tex_coord_indices = [(0,1,3),(0,2,1)]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
-        
-        vertex_data = np.hstack([tex_coord_data,vertex_data])
+
+        normals = [
+            (0, 0, 1) * 6
+        ]
+
+        normals = np.array(normals, dtype="f4").reshape(6, 3)
+
+        vertex_data = np.hstack([normals, vertex_data])
+
+        vertex_data = np.hstack([tex_coord_data, vertex_data])
         
         return vertex_data
 
 class SostreVBO(BaseVBO):
     def __init__(self, app):
         super().__init__(app.ctx)
-        self.format = "2f 3f"
-        self.attrib = ["in_texcoord_0", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices): 
@@ -978,8 +1035,16 @@ class SostreVBO(BaseVBO):
         
         tex_coord_indices = [(0,1,3),(0,2,1)]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
+
+        normals = [
+            (0, 0, -1) * 6,
+        ]
         
-        vertex_data = np.hstack([tex_coord_data,vertex_data])
+        normals = np.array(normals, dtype="f4").reshape(6, 3)
+
+        vertex_data = np.hstack([normals, vertex_data])
+
+        vertex_data = np.hstack([tex_coord_data, vertex_data])
         
         return vertex_data
 
@@ -1007,27 +1072,121 @@ class LineVBO(BaseVBO):
 class ParetsVBO(BaseVBO):
     def __init__(self, app):
         super().__init__(app.ctx)
-        self.format = "2f 3f"
-        self.attrib = ["in_texcoord_0", "in_position"]
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal", "in_position"]
 
     @staticmethod
     def get_data(vertices, indices):
         data = [vertices[ind] for triangle in indices for ind in triangle]
         return np.array(data, dtype="f4")
-    def get_vertex_data(self):#(respecte eix y)
-        
-        vertices = [(-150,-20.5,-150),(P_X,-20.5,-150),(-150,-20.5,P_Z),(P_X,-20.5,P_Z),(-150,P_H,-150),(P_X,P_H,-150),(-150,P_H,P_Z),(P_X,P_H,P_Z),(P_F1,-20.5,-150),(P_F2,-20.5,-150),(P_F2,P_F3,-150),(P_F2,P_F4,-150),(P_F2,P_H,-150),(P_F1,P_H,-150),(P_F1,P_F4,-150),(P_F1,P_F3,-150),(P_F1,-20.5,P_Z),(P_F2,-20.5,P_Z),(P_F2,P_F3,P_Z),(P_F2,P_F4,P_Z),(P_F2,P_H,P_Z),(P_F1,P_H,P_Z),(P_F1,P_F4,P_Z),(P_F1,P_F3,P_Z)]
-        indices = [(0,6,4),(0,2,6),(3,5,7),(3,1,5),(0,8,13),(13,4,0),(8,9,10),(10,15,8),(9,1,5),(5,12,9),(14,11,12),(12,13,14),(2,16,21),(21,6,2),(16,17,18),(18,23,16),(17,3,7),(7,20,17),(22,19,20),(20,21,22)]
 
+    def get_vertex_data(self):#(respecte eix y)
+
+        vertices = [
+            (INICI_TERRA, T_Y, INICI_TERRA),
+            (P_X, T_Y, INICI_TERRA),
+            (P_X, S_HEIGHT, INICI_TERRA),
+            (INICI_TERRA, S_HEIGHT, INICI_TERRA),
+            (INICI_TERRA, T_Y, P_Z),
+            (P_X, T_Y, P_Z),
+            (P_X, S_HEIGHT, P_Z),
+            (INICI_TERRA, S_HEIGHT, P_Z)
+        ]
+
+        indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+            (4, 5, 6),
+            (4, 6, 7),
+            (0, 4, 7),
+            (0, 7, 3),
+            (1, 5, 6),
+            (1, 6, 2),
+        ]
+        
+        # vertices = [
+        #     (-150,-20.5,-150),
+        #     (P_X,-20.5,-150),
+        #     (-150,-20.5,P_Z),
+        #     (P_X,-20.5,P_Z),
+        #     (-150,P_H,-150),
+        #     (P_X,P_H,-150),
+        #     (-150,P_H,P_Z),
+        #     (P_X,P_H,P_Z),
+        #     (P_F1,-20.5,-150),
+        #     (P_F2,-20.5,-150),
+        #     (P_F2,P_F3,-150),
+        #     (P_F2,P_F4,-150),
+        #     (P_F2,P_H,-150),
+        #     (P_F1,P_H,-150),
+        #     (P_F1,P_F4,-150),
+        #     (P_F1,P_F3,-150),
+        #     (P_F1,-20.5,P_Z),
+        #     (P_F2,-20.5,P_Z),
+        #     (P_F2,P_F3,P_Z),
+        #     (P_F2,P_F4,P_Z),
+        #     (P_F2,P_H,P_Z),
+        #     (P_F1,P_H,P_Z),
+        #     (P_F1,P_F4,P_Z),
+        #     (P_F1,P_F3,P_Z)
+        #     ]
+    
+        # indices = [
+        #     (0,6,4),
+        #     (0,2,6),
+        #     (3,5,7),
+        #     (3,1,5),
+        #     (0,8,13),
+        #     (13,4,0),
+        #     (8,9,10),
+        #     (10,15,8),
+        #     (9,1,5),
+        #     (5,12,9),
+        #     (14,11,12),
+        #     (12,13,14),
+        #     (2,16,21),
+        #     (21,6,2),
+        #     (16,17,18),
+        #     (18,23,16),
+        #     (17,3,7),
+        #     (7,20,17),
+        #     (22,19,20),
+        #     (20,21,22)
+        #     ]
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(P_F1,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F1,-150),(P_F1,-150),(P_F1,-150),(P_F1,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F1,P_Z),(P_F1,P_Z),(P_F1,P_Z)]
+        # tex_coord = [(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(P_F1,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F1,-150),(P_F1,-150),(P_F1,-150),(P_F1,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F1,P_Z),(P_F1,P_Z),(P_F1,P_Z)]
         
-        tex_coord_indices = [(0,6,4),(0,2,6),(3,5,7),(3,1,5),(0,8,13),(13,4,0),(8,9,10),(10,15,8),(9,1,5),(5,12,9),(14,11,12),(12,13,14),(2,16,21),(21,6,2),(16,17,18),(18,23,16),(17,3,7),(7,20,17),(22,19,20),(20,21,22)]
+        # tex_coord_indices = [(0,6,4),(0,2,6),(3,5,7),(3,1,5),(0,8,13),(13,4,0),(8,9,10),(10,15,8),(9,1,5),(5,12,9),(14,11,12),(12,13,14),(2,16,21),(21,6,2),(16,17,18),(18,23,16),(17,3,7),(7,20,17),(22,19,20),(20,21,22)]
+        
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        tex_coord_indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 1, 2),
+            (0, 2, 3),
+        ]
+
+        normals = [
+            (0, 0, 1) * 6,
+            (0, 0, -1) * 6,
+            (1, 0, 0) * 6,
+            (-1, 0, 0) * 6,
+
+        ]
+        
+        normals = np.array(normals, dtype="f4").reshape(24, 3)
+
+        vertex_data = np.hstack([normals, vertex_data])
+
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
-        
-        vertex_data = np.hstack([tex_coord_data,vertex_data])
+
+        vertex_data = np.hstack([tex_coord_data, vertex_data])
         
         return vertex_data
         

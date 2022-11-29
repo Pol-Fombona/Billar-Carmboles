@@ -10,7 +10,7 @@ class Texture:
         self.textures = {}
         self.textures[0] = self.get_texture(path="textures/pool_table_texture.jpg")
         self.textures[1] = self.get_texture(
-            path="textures/wooden-textured-background.jpg"
+            path="textures/wooden-textured-background-reduced.jpg"
         )
         self.textures[2] = self.get_texture(path="textures/test_mantel.png")
         self.textures[5] = self.get_texture(path="textures/cue.jpg")
