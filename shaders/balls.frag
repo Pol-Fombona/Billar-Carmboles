@@ -21,7 +21,7 @@ uniform vec3 camPos;
 vec3 getLight(vec3 color){
     vec3 Normal = normalize(normal);
     // ambient
-    vec3 ambient = light.Ia;
+    vec3 ambient = light.Ia * 1.2;
     vec3 ambient2 = light2.Ia;
     //diffuse
     vec3 lightDir = normalize(light.position - fragPos);

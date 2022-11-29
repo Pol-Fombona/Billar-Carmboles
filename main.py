@@ -8,6 +8,7 @@ import pandas as pd
 from model import *
 from FreeCamera import *
 from mesh import Mesh
+from positions import *
 from scene import Scene
 from MenuManager import pause_manager, progress_manager, format_time, game_ended
 
@@ -57,8 +58,9 @@ class Engine():
         self.clock = pg.time.Clock()
 
         self.camera = Camera(self)
-        self.light = Light()
-        self.light2 = Light(position=(0, 5, 100))
+        self.light = Light(position=LIGHT1_POSITION, Ia = 0.2, Id = 0, Is = 0)
+        self.light2 = Light(position=LIGHT2_POSITION, Ia = 0)
+        self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
         self.mesh = Mesh(self)
         self.scene = Scene(self)
 
