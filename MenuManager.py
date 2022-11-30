@@ -257,7 +257,7 @@ def modify_friction():
     clear_terminal()
     
     print_onColored("#### Modify Friction ####")
-    print_colored("\nCurrent friction: " + str(int(MovementManagement.friction*100)))
+    print_colored("\nCurrent friction: " + str(int(MovementManagement.friction*2000)))
     print("Friction accepts values in range [0,100] where 0 is no friction!")
 
     while True:
@@ -267,7 +267,7 @@ def modify_friction():
             friction = int(friction)
             
             if 0 <= friction <= 100:
-                MovementManagement.friction = round(friction / 100 , 2)
+                MovementManagement.friction = round(friction / 2000 , 2)
                 print("Friction correctly updated")
                 break
 
