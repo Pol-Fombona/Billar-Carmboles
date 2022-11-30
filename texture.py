@@ -8,11 +8,11 @@ class Texture:
         self.app = app
         self.ctx = app.ctx
         self.textures = {}
-        self.textures[0] = self.get_texture(path="textures/pool_table_texture.jpg")
-        self.textures[1] = self.get_texture(
-            path="textures/wooden-textured-background-reduced.jpg"
-        )
-        self.textures[2] = self.get_texture(path="textures/test_mantel.png")
+        #self.textures[0] = self.get_texture(path="textures/pool_table_texture.jpg")
+        #self.textures[1] = self.get_texture(
+        #    path="textures/wooden-textured-background-reduced.jpg"
+        #)
+        #self.textures[2] = self.get_texture(path="textures/test_mantel.png")
         self.textures[5] = self.get_texture(path="textures/cue.jpg")
         self.textures[6] = self.get_texture(path="textures/pool_table2.jpg")
         self.textures[7] = self.get_texture(path="textures/brixton_finish.jpg")
@@ -24,6 +24,7 @@ class Texture:
         self.textures["sphere1"] = self.get_texture(path="textures/spheres/sphere (1).jpg")
         self.textures["sphere2"] = self.get_texture(path="textures/spheres/sphere (2).jpg")
         self.textures["sphere3"] = self.get_texture(path="textures/spheres/sphere (3).jpg")
+        '''
         self.textures["sphere4"] = self.get_texture(path="textures/spheres/sphere (4).jpg")
         self.textures["sphere5"] = self.get_texture(path="textures/spheres/sphere (5).jpg")
         self.textures["sphere6"] = self.get_texture(path="textures/spheres/sphere (6).jpg")
@@ -36,6 +37,7 @@ class Texture:
         self.textures["sphere13"] = self.get_texture(path="textures/spheres/sphere (13).jpg")
         self.textures["sphere14"] = self.get_texture(path="textures/spheres/sphere (14).jpg")
         self.textures["sphere15"] = self.get_texture(path="textures/spheres/sphere (15).jpg")
+        '''
         self.textures["depth_texture"] = self.get_depth_texture()
 
 
