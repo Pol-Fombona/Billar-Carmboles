@@ -1,5 +1,6 @@
 import glm
 import pygame as pg
+import numpy as np
 
 class Camera:
     def __init__(self, app, position=(0,0,4), yaw=-90, pitch=0):
@@ -20,6 +21,7 @@ class Camera:
 
         self.mode = "Bird"
         self.sphere_following_id = 0
+        self.move_swiftly = False
         
         # view_matrix
         self.m_view = self.get_view_matrix()
@@ -76,13 +78,31 @@ class Camera:
 
         elif keys[pg.K_1]:
             self.sphere_following_id = 0
+            self.move_swiftly = True
         elif keys[pg.K_2]:
             self.sphere_following_id = 1
+            self.move_swiftly = True
         elif keys[pg.K_3]:
             self.sphere_following_id = 2
+            self.move_swiftly = True
 
-        
-        self.position = glm.vec3(spheres[self.sphere_following_id].pos[0], self.position[1], 
+
+        if self.move_swiftly:
+            # Calculates difference between sphere pos and camera pos
+            # to move more swiftly
+            cam_pos_array = np.array((self.position[0], self.position[1], self.position[2]))
+            difference = (cam_pos_array - np.array(spheres[self.sphere_following_id].pos))
+            difference[1] = 0
+            difference = np.around(difference / 20, 3) 
+
+            if np.abs(sum(difference)) == 0:
+                self.move_swiftly = False
+
+        if self.move_swiftly:
+            self.position = glm.vec3(list(cam_pos_array - difference))
+
+        else:
+            self.position = glm.vec3(spheres[self.sphere_following_id].pos[0], self.position[1], 
                                     spheres[self.sphere_following_id].pos[2])
 
 
