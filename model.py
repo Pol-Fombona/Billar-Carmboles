@@ -148,68 +148,6 @@ class Sphere(BaseModel):
     def IA_update(self):
         IA_movement(self)
 
-
-class SubdivisionSphere(BaseModel):
-    def __init__(
-        self, app, pos=(0, 0, 0), radi=1, vao_name="subdivision_balls", tex_id=4,id = 0
-    ):
-
-        # Position intial, useful when resseting position
-        self.initial_position = pos
-        self.pos = pos
-        self.id = id
-        super().__init__(app, vao_name, tex_id, pos)
-
-        self.translation = glm.mat4()
-        self.rotation = glm.mat4()
-
-        self.radi = radi
-        # self.color = color
-
-        ## velocity and friction
-        self.velocity = np.array((0, 0, 0), dtype=float)
-        # self.velocityX = 0
-        # self.velocityZ = 0
-
-        # self.rot = glm.vec3([glm.radians(a) for a in rot])
-        # self.scale = scale
-        self.on_init()
-    def on_init(self):
-        # Light
-        self.program["light.position"].write(self.app.light.position)
-        self.program["light.Ia"].write(self.app.light.Ia)
-        self.program["light.Id"].write(self.app.light.Id)
-        self.program["light.Is"].write(self.app.light.Is)
-
-        self.program["m_proj"].write(self.app.camera.m_proj)
-        self.program["m_view"].write(self.app.camera.m_view)
-        self.program["m_model"].write(self.m_model)
-
-    def update(self):
-        self.program["m_proj"].write(self.app.camera.m_proj)
-        self.program["m_view"].write(self.app.camera.m_view)
-
-        self.translation, new_rotation = movement(self)
-
-        if new_rotation != None:
-            self.rotation = new_rotation * self.rotation
-
-        m_model = self.translation * self.rotation
-        self.m_model = m_model
-        self.program["m_model"].write(m_model)
-        self.program["camPos"].write(self.app.camera.position)
-
-    def replay_render(self):
-        self.replay_update()
-        self.vao.render()
-
-    def replay_update(self):
-        # self.shader_program['m_proj'].write(self.app.camera.m_proj)
-        self.program["m_proj"].write(self.app.camera.m_proj)
-        self.program["m_view"].write(self.app.camera.m_view)
-        self.program["m_model"].write(self.m_model)
-        self.program["camPos"].write(self.app.camera.position)
-
 class Cue(BaseModel):
     def __init__(
         self,
