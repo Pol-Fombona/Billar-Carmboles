@@ -5,6 +5,7 @@ import datetime
 from termcolor import colored
 from tabulate import tabulate
 import pandas as pd
+from PickleManager import save_game_data_to_pickle
 
 
 def progress_manager(played_time, last_timestamp, actual_timestamp):
@@ -50,25 +51,29 @@ def pause_manager(game, replay=False):
         try:
             choice = int(choice)
             
-            match choice:
-                case 1:
-                    pause = False
+            if choice == 1:
+                pause = False
 
-                case 2:
-                    extended_options(game)
-                    show_options()
+            elif choice == 2:
+                extended_options(game)
+                show_options()
 
-                case 3:
-                    show_controls()
-                    show_options()
+            elif choice == 3:
+                show_controls()
+                show_options()
 
-                case 4:
-                    exit_game = True
+            elif choice == 4:
+                save_game(game)
+                show_options()
 
-                case _:
-                    print_onColored("Invalid choice input", "on_red")
+            elif choice == 5:
+                exit_game = True
 
-        except:
+            else:
+                print_onColored("Invalid choice input", "on_red")
+
+        except Exception as e:
+            print(e)
             print_onColored("Invalid choice input", "on_red")
 
     clear_terminal()
@@ -139,28 +144,26 @@ def extended_options(game):
         try:
             choice = int(choice)
 
-            match choice:
+            if choice == 1:
+                show_ranking()
+                show_extended_options()
 
-                case 1:
-                    show_ranking()
-                    show_extended_options()
+            elif choice == 2:
+                modify_friction()
+                show_extended_options()
 
-                case 2:
-                    modify_friction()
-                    show_extended_options()
+            elif choice == 3:
+                modify_game_speed(game)
+                show_extended_options()
+            
+            elif choice == 4:
+                back = True
 
-                case 3:
-                    modify_game_speed(game)
-                    show_extended_options()
-
-                case 4:
-                    back = True
-
-                case _:
-                    print_onColored("Invalid choice input", "on_red")
+            else:
+                print_onColored("Invalid choice input", "on_red")
         
         except:
-            print_onColored("Invalid choice input", "on_red")
+            print_onColored("Invalaaaaaaaaaid choice input", "on_red")
 
     clear_terminal()
     
@@ -279,6 +282,50 @@ def modify_friction():
     return
 
 
+def save_game(game):
+
+    if game.getTurnStatus() != "initial":
+        clear_terminal()
+        print_colored("Saving data is only available during turn start\n", "red")
+        return
+
+    # Game data to save
+    status_data = [game.current_player.name, game.played_time, game.mode,
+                    game.game_speed]
+    status_columns = ["CurrentPlayer", "PlayedTime", "Mode", "GameSpeed"]
+
+    # Player data to save
+    p1 = game.player1
+    p1_data = [p1.name, p1.ball.id, p1.score, p1.turn_count, p1.type]
+    p1_columns = ["P1Name", "P1BallID", "P1Score", "P1Turn", "P1Type"]
+    
+    p2 = game.player2
+    p2_data = [p2.name, p2.ball.id, p2.score,
+                p2.turn_count, p2.type]
+    p2_columns = ["P2Name", "P2BallID", "P2Score", "P2Turn", "P2Type"]
+
+    # Sphere position data
+    sphere_data = [game.spheres[i].pos for i in range(3)]
+    sphere_columns = ["Sphere1Pos", "Sphere2Pos", "Sphere3Pos"]
+
+    game_data = status_data + p1_data + p2_data + sphere_data
+    game_columns = status_columns + p1_columns + p2_columns + sphere_columns
+
+    game_df = pd.DataFrame([game_data], columns = game_columns)
+
+    status = save_game_data_to_pickle(game_df)
+
+    if status:
+        clear_terminal()
+        print_colored("Game saved successfully\n")
+
+    else:
+        clear_terminal()
+        print_colored("Save data file could not be created\n", "red")
+    
+    return
+
+
 def clear_terminal():
     # Clears terminal (linux & windows)
 
@@ -305,7 +352,8 @@ def show_options():
     print("     1) Resume game")
     print("     2) More Options")
     print("     3) Show Controls")
-    print("     4) Exit Game")
+    print("     4) Save Game")
+    print("     5) Exit Game")
 
 
 def show_extended_options():

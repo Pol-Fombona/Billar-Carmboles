@@ -3,10 +3,11 @@ from pathlib import Path
 from datetime import datetime
 import zipfile as zp
 import os
+import pickle
 
 
 def save_game_record_to_pickle(df):
-    # Saves game data as pickle format with zip compression
+    # Saves game record data as pickle format with zip compression
 
     try:
         filename = "GameData/Replays/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")# + ".pkl"
@@ -25,6 +26,22 @@ def save_game_record_to_pickle(df):
         print("Error while saving game replay")
 
     return
+
+
+def save_game_data_to_pickle(game_df):
+    
+    try:
+        filename = "GameData/SavedGames/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".pkl"
+        game_df.to_pickle(filename)
+        return True
+
+    except Exception as e: 
+        print(e)
+        return False
+    #except:
+    #    return False
+
+
 
 def clean_replay_data_file(file):
     # Removes "pkl" file unzipped
