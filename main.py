@@ -256,8 +256,44 @@ class GraphicsEngine(Engine):
         # Game history 
         # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 
         #   p1.score, p2.score)
-        self.game_record = [] 
+        self.game_record = []
 
+    def init_saved_game_params(self, save_data_path=None):
+        # Load parameters and status from save data file
+
+        save_data_path = "GameData/SavedGames/2022-12-01_12-09-18.pkl"
+        save_data_df = pd.read_pickle(save_data_path) 
+        
+        # Game data
+        self.game.played_time = int(save_data_df.iloc[0]["PlayedTime"])
+        self.game.mode = save_data_df.iloc[0]["Mode"]
+        self.game.game_speed = save_data_df.iloc[0]["GameSpeed"]
+
+        # P1 Data
+        self.game.player1.name = save_data_df.iloc[0]["P1Name"]
+        self.game.player1.ball_id = save_data_df.iloc[0]["P1BallID"]
+        self.game.player1.score = save_data_df.iloc[0]["P1Score"]
+        self.game.player1.turn_count = save_data_df.iloc[0]["P1Turn"]
+        self.game.player1.type = save_data_df.iloc[0]["P1Type"]
+
+        # P2 Data
+        self.game.player2.name = save_data_df.iloc[0]["P2Name"]
+        self.game.player2.ball_id = save_data_df.iloc[0]["P2BallID"]
+        self.game.player2.score = save_data_df.iloc[0]["P2Score"]
+        self.game.player2.turn_count = save_data_df.iloc[0]["P2Turn"]
+        self.game.player2.type = save_data_df.iloc[0]["P2Type"]
+
+        if self.game.player1.name == save_data_df.iloc[0]["CurrentPlayer"]:
+            self.game.current_player = self.game.player1
+        else:
+            self.game.current_player = self.game.player2
+
+        # Sphere Data
+        self.game.spheres[0].pos = save_data_df.iloc[0]["Sphere1Pos"]
+        self.game.spheres[1].pos = save_data_df.iloc[0]["Sphere2Pos"]
+        self.game.spheres[2].pos = save_data_df.iloc[0]["Sphere3Pos"]
+
+        return
     
     def record_frame_data(self):
         # Save current frame data
@@ -651,8 +687,10 @@ class Menu:
     def start_the_game(self):
         app = GraphicsEngine(win_size=W_SIZE)
         app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        #app.game_started = True
         app.start_game(names = [self.name,self.name2], mode = self.mode)
         app.game.game_speed *= self.game_speed
+        #app.init_saved_game_params()
         app.run()
 
 
