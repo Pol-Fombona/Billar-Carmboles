@@ -59,5 +59,60 @@ class FreeCarambole():
             return 0
 
 
+class ThreeWayCarambole():
+    # To get a score, the player needs to collide with two different balls 
+    # and three times with the table edge, does not matter it is the same edge
+    # Returns True if player scored, else False
+
+    def __init__(self, max_score = None, max_turn = None):
+        self.max_score = max_score
+        self.max_turn = max_turn
 
             
+    def update_score(self, player):
+
+        sphere_collisioned = set()
+        edge_collisions = 0
+
+        for coll_type, detail in player.collision_record:
+            if coll_type == "Sphere":
+                sphere_collisioned.add(detail)
+
+            elif coll_type == "Edge":
+                edge_collisions += 1 
+                
+        # Empty list for next turn
+        player.collision_record.clear()
+        if edge_collisions >= 3 and len(sphere_collisioned) >= 2:
+            player.score += 1
+            return True
+
+        return False
+
+    def update_score_IA_simulation(self, player):
+        # Return 1 if scored, 0.5 if colision with one other sphere
+        # O if no colision
+        
+        sphere_collisioned = set()
+        edge_collisions = 0
+
+        for coll_type, detail in player.collision_record:
+            if coll_type == "Sphere":
+                sphere_collisioned.add(detail)
+
+            elif coll_type == "Edge":
+                edge_collisions += 1
+                
+        # Empty list for next turn
+        player.collision_record.clear()
+
+        total_collisions = len(sphere_collisioned) + min(edge_collisions, 3)
+
+        if total_collisions >= 5:
+            return 1
+            
+        elif total_collisions == 0:
+            return 0
+
+        else:
+            return 1 - (1/total_collisions)
