@@ -15,7 +15,7 @@ class Player():
 
 class Game():
 
-    def __init__(self, player1, player2, spheres):
+    def __init__(self, player1, player2, spheres, difficulty = "Normal"):
 
         self.player1 = player1
         self.player2 = player2
@@ -24,6 +24,7 @@ class Game():
         self.played_time = 0
         self.mode = None
         self.game_speed = 60 # FPS
+        self.difficulty = difficulty # Easy, Normal, Hard
 
     def get_scores(self):
         # Returns players scores in str format

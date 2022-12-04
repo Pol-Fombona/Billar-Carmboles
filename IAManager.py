@@ -4,6 +4,9 @@ from random import choice, randrange
 from MovementManagement import checkCollisions
 import time
 
+# Probability to return best move (based on game difficulty)
+return_best_move_probabilities = {"Easy":[0.5, 0.5], "Normal":[0.7, 0.3], "Hard":[0.9, 0.1]}
+
 def make_turn(n_turns_simulated, ball_objects, game):
     # Loop to simulate n turns
     # If one turn gets a perfect score, return the velocity data of that simulation
@@ -53,33 +56,27 @@ def make_turn(n_turns_simulated, ball_objects, game):
         
         scores.append(score)
 
-        # Deshabilitat
-        # Aqui si un torn simulat retorna puntuació
-        # Parem les simulacions i retorna la jugada bona
-        # Amb probabilitat "x"
-        '''
-        if score == 1:
-            # Probability to choose correct movement:
-            p = np.random.choice([1,0], p=[0.9,0.1])
-            if p == 1:
-                print("Score fet")
-                print("Time:", str(round(time.time()-start,3)))
-                return data
-    
-        else:
-            scores.append(score)
-        '''
-
     #print("Simulation time:", str(round(time.time()-start,3)))
 
-    if 1 in scores:
-        return turn_data[scores.index(1)]
+    p_value = np.random.choice([1, -1], p=return_best_move_probabilities[game.difficulty])
 
+    if 1 in scores:
+        if p_value == 1:
+            # Returns best movement with perfect score
+            return turn_data[scores.index(1)]
+
+        else:
+            scores = [x if x != 1 else 0 for x in scores]
+
+    # Returns best movement that is not a perfect score
+    return turn_data[scores.index(max(scores))]
+    '''
     elif 0.5 in scores:
         return turn_data[scores.index(0.5)]
 
     else:
         return turn_data[randrange(0,len(scores))]
+    '''
 
 
 def simulate_turn(data, game):
