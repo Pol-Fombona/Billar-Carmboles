@@ -25,6 +25,8 @@ class Game():
         self.mode = None
         self.game_speed = 60 # FPS
         self.difficulty = difficulty # Easy, Normal, Hard
+        self.spheres_turn_initial_position = [None, None, None] # Initial pos for "undo turn"
+        self.undo_turn = False # True if turn undone is in process
 
     def get_scores(self):
         # Returns players scores in str format
@@ -61,8 +63,12 @@ class Game():
         #                 still in movement
         #   - "ended"   = turn has ended
         #   - "IA"      = IA turn simulation in progress
+        #   - "undo"    = Undo turn in process
 
-        if self.current_player.type == "IA" and not self.current_player.played:
+        if self.undo_turn:
+            return "undo"
+
+        elif self.current_player.type == "IA" and not self.current_player.played:
             return "IA"
 
         elif not self.current_player.played:

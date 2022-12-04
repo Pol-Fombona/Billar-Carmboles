@@ -399,6 +399,37 @@ class GraphicsEngine(Engine):
 
         return
 
+    def procces_undo_turn(self):
+        # Updates swiftly the position of the spheres
+        # to the original turn position
+
+        undo_completed = True
+
+        for i in range(3):
+
+            actual_pos = self.game.spheres[i].pos
+            original_pos = self.game.spheres_turn_initial_position[i]
+
+            # If actual pos is not the original
+            if actual_pos != original_pos: 
+
+                difference = (np.array(original_pos) - np.array(actual_pos))
+                difference = np.around(difference / 20, 3)
+        
+                # If the difference between actual and pos is too small
+                # Skip and say it is equal
+                if sum(difference) == 0:
+                    continue
+
+                # Update sphere pos
+                self.game.spheres[i].pos = tuple(np.array(actual_pos) + difference)
+                undo_completed = False
+
+        if undo_completed:
+            self.game.undo_turn = False
+
+        return 
+
     def run(self):
         # Render the scene with all the spheres again
 
@@ -423,22 +454,19 @@ class GraphicsEngine(Engine):
                     self.simulate_IA_turn()
 
                 else:
-                    if turn_status == "initial":
+                    if turn_status == "played":
+                        # Shot made but spheres are in movement
+                        self.render_status_played()
+
+                    elif turn_status == "initial":
                         # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
                         self.render_with_cue()
 
-                        # Temporal per fer proves, per mirar si ha jugat comprovo si la velocitat
-                        # de la seva bola no és zero. Aixo s'haura de canviar per a 
-                        # modificar l'status de played quan s'allibera el pal, 
-                        # es a dir quan s'ha fet el tir
+                        # If there is movement, player has made a shot
                         if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                            self.game.spheres_turn_initial_position = [self.game.spheres[i].pos for i in range(3)]
                             self.game.current_player.played = True
-
-
-                    elif turn_status == "played":
-                        # Shot made but spheres are in movement
-                        self.render_status_played()
-                    
+                     
                     elif turn_status == "ended":
                         # Shot made and all spheres have stopped
                         self.render()
@@ -449,6 +477,11 @@ class GraphicsEngine(Engine):
                             # Mostrar guanyador
                             game_ended(self.game)
                             self.quit = True
+
+                    elif turn_status == "undo":
+                        # Process undo of a turn
+                        self.render()
+                        self.procces_undo_turn()
 
                 self.delta_time = self.clock.tick(self.game.game_speed)
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())

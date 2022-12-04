@@ -63,10 +63,14 @@ def pause_manager(game, replay=False):
                 show_options()
 
             elif choice == 4:
+                undo_turn(game)
+                show_options()
+            
+            elif choice == 5:
                 save_game(game)
                 show_options()
 
-            elif choice == 5:
+            elif choice == 6:
                 exit_game = True
 
             else:
@@ -326,6 +330,35 @@ def save_game(game):
     return
 
 
+def undo_turn(game):
+    # Undo sphere movement in turn
+    
+    clear_terminal()
+
+    if game.getTurnStatus() != "played":
+        
+        print_colored("Undo turn only available when player has made a move",
+                         "red")
+        return None
+
+    
+    for i in range(3):
+
+        # Return sphere to initial position and velocity to zero
+        #game.spheres[i].pos = game.spheres_turn_initial_position[i]
+        game.spheres[i].velocity *= 0
+
+        # Deletes collision record for this turn
+    game.current_player.collision_record.clear()
+
+        # Updates current player status
+    game.current_player.played = False
+    
+    game.undo_turn = True
+    print_colored("Undo Turn in process", "green")
+    return
+
+
 def clear_terminal():
     # Clears terminal (linux & windows)
 
@@ -352,8 +385,9 @@ def show_options():
     print("     1) Resume game")
     print("     2) More Options")
     print("     3) Show Controls")
-    print("     4) Save Game")
-    print("     5) Exit Game")
+    print("     4) Undo Turn")
+    print("     5) Save Game")
+    print("     6) Exit Game")
 
 
 def show_extended_options():
