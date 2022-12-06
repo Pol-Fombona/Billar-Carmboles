@@ -22,6 +22,7 @@ from PickleManager import (save_game_record_to_pickle, clean_replay_data_file,
 from IAManager import make_turn
 import MovementManagement
 import pandas as pd
+import json
 
 
 
@@ -71,6 +72,8 @@ class Engine():
         # Bird està repetida dues vegades correctament
         self.camera_modes = ["Bird", "Free", "Bird", "Sphere"]
         self.camera_mode_index = 0
+
+        self.game_data = {}
 
         
 
@@ -147,6 +150,16 @@ class GraphicsEngine(Engine):
 
     def check_events(self):
         if self.quit:
+            try:
+                with open('data.json', 'r') as j:
+                    listObj = json.loads(j.read())
+            except: 
+                listObj = []
+            listObj.append(self.game_data)
+            with open('data.json', 'w') as json_file:
+                json.dump(listObj, json_file, indent=4)
+                
+                
             self.mesh.destroy()
             self.sound.destroy()
             pg.quit()
@@ -457,10 +470,13 @@ class GraphicsEngine(Engine):
                     if turn_status == "played":
                         # Shot made but spheres are in movement
                         self.render_status_played()
+                        self.save_game_data(turn_status)
 
                     elif turn_status == "initial":
                         # Aqui és quan s'ha de mostrar el pal perquè el jugador encara no ha tirat
                         self.render_with_cue()
+                        self.save_game_data(turn_status)
+                        self.frame_count = 0
 
                         # If there is movement, player has made a shot
                         if sum(abs(self.game.current_player.ball.velocity)) != 0:
@@ -471,6 +487,7 @@ class GraphicsEngine(Engine):
                         # Shot made and all spheres have stopped
                         self.render()
                         scored = self.game.mode.update_score(self.game.current_player)
+                        self.save_game_data(turn_status, scored)
                         self.game.changeCurrentPlayer(scored)
 
                         if self.game.get_match_status():
@@ -487,6 +504,37 @@ class GraphicsEngine(Engine):
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
 
             self.record_frame_data()
+
+    def save_game_data(self, turn_status, scored=False):
+        current_player = self.game.current_player
+        if turn_status == 'initial':
+            if current_player.name not in self.game_data.keys():
+                self.game_data[current_player.name] = {}
+            if current_player.turn_count not in self.game_data[current_player.name].keys():
+                self.game_data[current_player.name][current_player.turn_count] = {}
+            potencia =  self.scene.cue.axis - self.scene.cue.pos
+            self.game_data[current_player.name][current_player.turn_count]['initial'] = {
+                'sphere_position': [self.game.spheres[i].pos for i in range(3)],
+                'tir': {
+                    'angle': self.scene.cue.angle,
+                    'potencia': [potencia[0], potencia[1], potencia[2]],
+                    'sphere': self.game.current_player.ball.pos
+                }
+            }
+        elif turn_status == 'played':
+            if 'played' not in self.game_data[current_player.name][current_player.turn_count].keys():
+                self.game_data[current_player.name][current_player.turn_count]['played'] = {}
+            self.game_data[current_player.name][current_player.turn_count]['played']['frame_'+str(self.frame_count)] = {
+                'sphere_position': [self.game.spheres[i].pos for i in range(3)]
+            }
+
+            self.frame_count += 1
+        elif turn_status == 'ended':
+            self.game_data[current_player.name][current_player.turn_count]['ended'] = {
+                'sphere_position': [self.game.spheres[i].pos for i in range(3)],
+                'scored': scored
+            }
+
 
 
 class ReplayEngine(Engine):
