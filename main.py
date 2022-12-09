@@ -465,6 +465,7 @@ class GraphicsEngine(Engine):
 
                 if turn_status == "IA":
                     self.simulate_IA_turn()
+                    self.save_game_data(turn_status)
 
                 else:
                     if turn_status == "played":
@@ -507,33 +508,39 @@ class GraphicsEngine(Engine):
 
     def save_game_data(self, turn_status, scored=False):
         current_player = self.game.current_player
-        if turn_status == 'initial':
+        if turn_status == 'IA':
             if current_player.name not in self.game_data.keys():
                 self.game_data[current_player.name] = {}
             if current_player.turn_count not in self.game_data[current_player.name].keys():
                 self.game_data[current_player.name][current_player.turn_count] = {}
-            potencia =  self.scene.cue.axis - self.scene.cue.pos
-            self.game_data[current_player.name][current_player.turn_count]['initial'] = {
-                'sphere_position': [self.game.spheres[i].pos for i in range(3)],
-                'tir': {
-                    'angle': self.scene.cue.angle,
-                    'potencia': [potencia[0], potencia[1], potencia[2]],
-                    'sphere': self.game.current_player.ball.pos
+        else:
+            if turn_status == 'initial':
+                if current_player.name not in self.game_data.keys():
+                    self.game_data[current_player.name] = {}
+                if current_player.turn_count not in self.game_data[current_player.name].keys():
+                    self.game_data[current_player.name][current_player.turn_count] = {}
+                potencia =  self.scene.cue.axis - self.scene.cue.pos
+                self.game_data[current_player.name][current_player.turn_count]['initial'] = {
+                    'sphere_position': [self.game.spheres[i].pos for i in range(3)],
+                    'tir': {
+                        'angle': self.scene.cue.angle,
+                        'potencia': [potencia[0], potencia[1], potencia[2]],
+                        'sphere': self.game.current_player.ball.pos
+                    }
                 }
-            }
-        elif turn_status == 'played':
-            if 'played' not in self.game_data[current_player.name][current_player.turn_count].keys():
-                self.game_data[current_player.name][current_player.turn_count]['played'] = {}
-            self.game_data[current_player.name][current_player.turn_count]['played']['frame_'+str(self.frame_count)] = {
-                'sphere_position': [self.game.spheres[i].pos for i in range(3)]
-            }
+            elif turn_status == 'played':
+                if 'played' not in self.game_data[current_player.name][current_player.turn_count].keys():
+                    self.game_data[current_player.name][current_player.turn_count]['played'] = {}
+                self.game_data[current_player.name][current_player.turn_count]['played']['frame_'+str(self.frame_count)] = {
+                    'sphere_position': [self.game.spheres[i].pos for i in range(3)]
+                }
 
-            self.frame_count += 1
-        elif turn_status == 'ended':
-            self.game_data[current_player.name][current_player.turn_count]['ended'] = {
-                'sphere_position': [self.game.spheres[i].pos for i in range(3)],
-                'scored': scored
-            }
+                self.frame_count += 1
+            elif turn_status == 'ended':
+                self.game_data[current_player.name][current_player.turn_count]['ended'] = {
+                    'sphere_position': [self.game.spheres[i].pos for i in range(3)],
+                    'scored': scored
+                }
 
 
 
