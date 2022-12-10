@@ -34,6 +34,7 @@ class BaseModel:
         self.program["light2.Ia"].write(self.app.light2.Ia)
         self.program["light2.Id"].write(self.app.light2.Id)
         self.program["light2.Is"].write(self.app.light2.Is)
+        self.program["light3.position"].write(self.app.light3.position)
         self.program["light3.Ia"].write(self.app.light3.Ia)
         self.program["light3.Id"].write(self.app.light3.Id)
         self.program["light3.Is"].write(self.app.light3.Is)
