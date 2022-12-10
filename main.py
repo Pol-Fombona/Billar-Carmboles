@@ -74,6 +74,7 @@ class Engine():
         self.camera_mode_index = 0
 
         self.game_data = {}
+        self.save_data = False
 
         
 
@@ -150,14 +151,15 @@ class GraphicsEngine(Engine):
 
     def check_events(self):
         if self.quit:
-            try:
-                with open('data.json', 'r') as j:
-                    listObj = json.loads(j.read())
-            except: 
-                listObj = []
-            listObj.append(self.game_data)
-            with open('data.json', 'w') as json_file:
-                json.dump(listObj, json_file, indent=4)
+            if self.save_data:
+                try:
+                    with open('data.json', 'r') as j:
+                        listObj = json.loads(j.read())
+                except: 
+                    listObj = []
+                listObj.append(self.game_data)
+                with open('data.json', 'w') as json_file:
+                    json.dump(listObj, json_file, indent=4)
                 
                 
             self.mesh.destroy()
