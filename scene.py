@@ -53,9 +53,12 @@ class Scene:
         #add_ball(SubdivisionSphere(app, pos=(20, 1, 10), tex_id=3,id = 1))
 
         # add_ball(Sphere(app, pos=(20,1,60), tex_id=3))
-        add_ball(Sphere(app, pos=(10, 1, 10), tex_id="sphere2",id = 2))
-        add_ball(Sphere(app, pos=(30, 1, 10), tex_id="sphere1",id = 1))
-        add_ball(Sphere(app, pos=(20, 1, 60), tex_id="sphere3",id = 3))
+        first_sphere_position = (30, 1, 10)
+        second_sphere_position = (10, 1, 10)
+        third_sphere_position = (20, 1, 60)
+        add_ball(Sphere(app, pos=first_sphere_position, tex_id="sphere1",id = 1))
+        add_ball(Sphere(app, pos=second_sphere_position, tex_id="sphere2",id = 2))
+        add_ball(Sphere(app, pos=third_sphere_position, tex_id="sphere3",id = 3))
         '''
         add_ball(Sphere(app, pos=(23, 1, 65), tex_id="sphere4",id = 5))
         add_ball(Sphere(app, pos=(20, 1, 65), tex_id="sphere5",id = 6))
@@ -73,12 +76,12 @@ class Scene:
         add_ball(Sphere(app, pos=(20, 1, 80), tex_id="sphere15",id = 16))
         '''
 
-        self.cue = Cue(app, axis=glm.vec3((20, 1, 10)), tex_id=5)
+        self.cue = Cue(app, axis=glm.vec3(first_sphere_position), tex_id=5)
 
         add(Terra(app, pos=(0,0,0),tex_id = 8))
         add(Sostre(app, pos=(0,0,0),tex_id = 9))
 
-        self.line = Line(app, axis = glm.vec3(20, 1, 10))
+        self.line = Line(app, axis = glm.vec3(first_sphere_position))
 
         add(Parets(app, pos=(0,0,0),tex_id = 10))
 
