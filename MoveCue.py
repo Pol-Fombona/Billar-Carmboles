@@ -32,8 +32,9 @@ def reset_displace_cue(cue):
 
 def cue_hit_ball(cue,ball):
     vel = cue.axis - cue.pos
-    ball.velocity[0] = vel[0]*ball.radi*0.15
-    ball.velocity[2] = vel[2]*ball.radi*0.15
+    #ball.velocity[0] = vel[0]*ball.radi*0.15
+    #ball.velocity[2] = vel[2]*ball.radi*0.15
+    ball.update_velocity_values(vel*ball.radi*0.15)
     #ball.velocityX = vel[0]*ball.radi*0.15
     #ball.velocityZ = vel[2]*ball.radi*0.15
 

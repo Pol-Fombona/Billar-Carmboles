@@ -1,6 +1,7 @@
 import itertools
 import glm
 import numpy as np
+import math
 
 friction = 0.01
 edge_collision_loss = 0.99
@@ -34,19 +35,22 @@ def checkBallsCollisions(objects, sound, player, IA_mode, game_started):
     for ball_1, ball_2 in itertools.combinations(objects, 2):
         # Iterates over every pair of spheres
 
-        v1 = ball_1.velocity 
-        v2 = ball_2.velocity
-        
-        if np.sum(abs(v1)) != 0 or np.sum(abs(v2)) != 0:
+        if ball_1.abs_velocity > 0 or ball_2.abs_velocity > 0:
             # If atleast one of the two spheres in the pair is moving
 
-            x1 = np.array(ball_1.pos)
-            x2 = np.array(ball_2.pos)
-            dist = np.linalg.norm(x1 - x2)
+            
+            #x1 = np.array(ball_1.pos)
+            #x2 = np.array(ball_2.pos)
+            #dist = np.linalg.norm(x1 - x2)
+            dist = math.dist(ball_1.pos, ball_2.pos)
 
+            #if (dist <= (radius * 2)):
             if (dist <= (radius * 2)):
 
-                ballCollision(ball_1, ball_2, v1, v2, x1, x2)
+                x1 = np.array(ball_1.pos)
+                x2 = np.array(ball_2.pos)
+
+                ballCollision(ball_1, ball_2, x1, x2)
                 correctOverlap(ball_1, ball_2, dist, x1, x2)
                 addCollisionDetails(player, ball_1, ball_2)
 
@@ -91,10 +95,13 @@ def correctOverlap(ball_1, ball_2, dist, x1, x2):
     return
 
 
-def ballCollision(ball_1, ball_2, v1, v2, x1, x2):
+def ballCollision(ball_1, ball_2, x1, x2):
     # Returns velocity after colision
 
-    if np.sum(abs(v1)) != 0 and np.sum(abs(v2)) != 0:
+    v1 = ball_1.velocity 
+    v2 = ball_2.velocity
+
+    if ball_1.abs_velocity > 0 and ball_2.abs_velocity > 0:
         # If the two spheres are moving
         v1f = getImpactVelocityTwoMovingObjects(v1, v2, 1, 1, x1, x2)
         v2f = getImpactVelocityTwoMovingObjects(v2, v1, 1, 1, x2, x1)
@@ -106,8 +113,18 @@ def ballCollision(ball_1, ball_2, v1, v2, x1, x2):
     if (PECR == True):
        v1f, v2f = addPECR(v1, v1f, v2, v2f)
 
+    '''
     ball_1.velocity = v1f * ball_collision_loss
     ball_2.velocity = v2f * ball_collision_loss  
+
+    # Abs velocity
+    ball_1.abs_velocity = sum(abs(ball_1.velocity))
+    ball_2.abs_velocity = sum(abs(ball_2.velocity))
+    '''
+    ball_1.update_velocity_values(v1f * ball_collision_loss)
+    ball_2.update_velocity_values(v2f * ball_collision_loss)
+
+
 
     return 
 
@@ -162,8 +179,8 @@ def checkEdgeCollisions(objects, sound, player, IA_mode):
     # and a sphere
 
     for sphere in objects:
-
-        if sum(abs(sphere.velocity)) > 0:
+        if sphere.abs_velocity > 0:
+            
             overlap_x, overlap_z = 0, 0
             collision_info = None # Info to get score
 
@@ -196,6 +213,7 @@ def checkEdgeCollisions(objects, sound, player, IA_mode):
 
             # Corrects overlap with table edge
             sphere.pos = (sphere.pos[0] - overlap_x, sphere.pos[1], sphere.pos[2] - overlap_z)
+            sphere.abs_velocity = sum(abs(sphere.velocity))
 
             # Add collision info if the sphere "belongs" to the current player
             if (sphere.id == player.ball_id and collision_info != None):
@@ -207,20 +225,24 @@ def checkEdgeCollisions(objects, sound, player, IA_mode):
 def movement(ball):
     # Controls the movement of the balls adding friction and rotation
 
-    if abs(ball.velocity[0]) < 0.001:
-        ball.velocity[0] = 0
-
-        if abs(ball.velocity[2]) < 0.01:
-            ball.velocity[2] = 0
-
-
-    elif abs(ball.velocity[2]) < 0.001:
-        ball.velocity[2] = 0
-
-        if abs(ball.velocity[0]) < 0.01:
+    if ball.abs_velocity > 0:
+        
+        if abs(ball.velocity[0]) < 0.001:
             ball.velocity[0] = 0
 
-    ball.velocity *= 1 - friction
+            if abs(ball.velocity[2]) < 0.01:
+                ball.velocity[2] = 0
+
+
+        elif abs(ball.velocity[2]) < 0.001:
+            ball.velocity[2] = 0
+
+            if abs(ball.velocity[0]) < 0.01:
+                ball.velocity[0] = 0
+
+    ball.update_velocity_values(ball.velocity * (1-friction))
+    #ball.velocity *= 1 - friction
+    #ball.abs_velocity = sum(abs(ball.velocity))
     ball.pos = tuple(ball.pos + ball.velocity)
 
     translation = glm.translate(glm.mat4(), ball.pos)
@@ -234,22 +256,24 @@ def movement(ball):
 def IA_movement(ball):
     # Controls the movement of the balls adding friction and rotation
     # Optimized for IA turn simulation (removed sphere rotation and m_model)
-
-    if abs(ball.velocity[0]) < 0.001:
-        ball.velocity[0] = 0
-
-        if abs(ball.velocity[2]) < 0.01:
-            ball.velocity[2] = 0
-
-
-    elif abs(ball.velocity[2]) < 0.001:
-        ball.velocity[2] = 0
-
-        if abs(ball.velocity[0]) < 0.01:
+    if ball.abs_velocity > 0:
+        if abs(ball.velocity[0]) < 0.001:
             ball.velocity[0] = 0
 
-    ball.velocity *= 1 - friction
-    ball.pos = tuple(ball.pos + ball.velocity)
+            if abs(ball.velocity[2]) < 0.01:
+                ball.velocity[2] = 0
+
+
+        elif abs(ball.velocity[2]) < 0.001:
+            ball.velocity[2] = 0
+
+            if abs(ball.velocity[0]) < 0.01:
+                ball.velocity[0] = 0
+
+        ball.update_velocity_values(ball.velocity * (1-friction))
+        #ball.velocity *= 1 - friction
+        #ball.abs_velocity = sum(abs(ball.velocity))
+        ball.pos = tuple(ball.pos + ball.velocity)
 
     return
 

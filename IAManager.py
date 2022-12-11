@@ -44,15 +44,14 @@ def make_turn(n_turns_simulated, ball_objects, game):
 
     scores = []
 
-    original_data = [(np.copy(sphere.m_model), sphere.pos) for sphere in ball_objects]
+    original_data = [sphere.pos for sphere in ball_objects]
 
     for data in turn_data:
         score = simulate_turn(data, game)
 
         # Restore orignal data to sphere
         for i in range(len(ball_objects)):
-            #ball_objects[i].m_model = original_data[i][0]
-            ball_objects[i].pos = original_data[i][1]
+            ball_objects[i].pos = original_data[i]
         
         scores.append(score)
 
@@ -61,6 +60,7 @@ def make_turn(n_turns_simulated, ball_objects, game):
     p_value = np.random.choice([1, -1], p=return_best_move_probabilities[game.difficulty])
 
     if 1 in scores:
+        #print("score")
         if p_value == 1:
             # Returns best movement with perfect score
             return turn_data[scores.index(1)]
@@ -82,7 +82,9 @@ def make_turn(n_turns_simulated, ball_objects, game):
 def simulate_turn(data, game):
     # Simulate turns and returns the score
 
-    game.current_player.ball.velocity = data.copy()
+    game.current_player.ball.update_velocity_values(data.copy())
+    #game.current_player.ball.velocity = data.copy()
+    #game.current_player.ball.abs_velocity = sum(abs(data))
 
     # Loop until all sphere are still
     while True:
@@ -103,12 +105,6 @@ def simulate_turn(data, game):
 def get_current_movement_data(ball_objects):
     # Returns True if there is a sphere in movement
 
-    movement = sum([sum(abs(sphere.velocity)) for sphere in ball_objects])
-
-    if movement == 0:
-        return False
-
-    else:
-        return True
+    return False if sum([sphere.abs_velocity for sphere in ball_objects]) == 0 else True
 
 

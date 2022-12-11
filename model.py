@@ -110,6 +110,7 @@ class Sphere(BaseModel):
 
         self.radi = radi
         self.velocity = np.array((0, 0, 0), dtype=float)
+        self.abs_velocity = 0
 
         self.slices = slices
         self.stacks = stacks
@@ -148,6 +149,11 @@ class Sphere(BaseModel):
 
     def IA_update(self):
         IA_movement(self)
+
+    def update_velocity_values(self, new_vel):
+        # Updata both velocity values (normal and absolute)
+        self.velocity = np.array(new_vel)
+        self.abs_velocity = sum(abs(new_vel))
 
 class Cue(BaseModel):
     def __init__(

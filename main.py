@@ -408,7 +408,9 @@ class GraphicsEngine(Engine):
         #self.render()
         pg.display.set_caption("Processing IA turn...")
         turn_data = make_turn(50, self.scene.ball_objects, self.game)
-        self.game.current_player.ball.velocity = turn_data
+        self.game.current_player.ball.update_velocity_values(turn_data)
+        #self.game.current_player.ball.velocity = turn_data
+        #self.game.current_player.ball.abs_velocity = sum(abs(turn_data))
         self.game.current_player.played = True
         pg.event.clear()
 
