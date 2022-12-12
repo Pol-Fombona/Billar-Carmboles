@@ -857,7 +857,7 @@ class Menu:
         self.menu.clear()
         self.menu.add.button('Resume', self.resume_the_game)
         self.menu.add.button('Options', self.select_options_pause)
-        #self.menu.add.button('Quit', pg_menu.events.EXIT)
+        self.menu.add.button('Save Game', self.saveGame)
         self.menu.add.button('Quit', self.quit_pause)
         self.menu.mainloop(self.surface)
 
@@ -874,35 +874,27 @@ class Menu:
             pg_menu.events.EXIT
             sys.exit()    
         self.menu.clear()
-        self.menu.add.selector(title="Save Game",
-                               items=[("Yes",True),
-                               ("No",False)],
-                                font_size=50,
-                                selection_color = (139,0,0),
-                                onreturn=self.saveGame)
-
-    def saveGame(self,value,save_bool):
-        if save_bool:
-            self.menu.clear()
-            self.menu.add.button('save1', self.select_save_space,1)
-            self.menu.add.button('save2', self.select_save_space,2)
-            self.menu.add.button('save3', self.select_save_space,3)
-        else:
-            self.menu.clear()
-            self.menu.add.selector(title="Save Replay",
+        self.menu.add.selector(title="Save Replay",
                                items=[("Yes",True),
                                ("No",False)],
                                 font_size=50,
                                 selection_color = (139,0,0),
                                 onreturn=self.save_rep)
+        
 
+    def saveGame(self):
+        self.menu.clear()
+        self.menu.add.button('save1', self.select_save_space,1)
+        self.menu.add.button('save2', self.select_save_space,2)
+        self.menu.add.button('save3', self.select_save_space,3)
+        self.menu.add.button('Back', self.pause_menu)
+   
     def select_save_space(self,pos):
+        self.menu.clear()
         save_game(game=self.game_engine.app.game,type=3,name_f="save"+str(pos))
-        if self.game_engine.app != None:
-            self.game_engine.app.mesh.destroy()
-        pg_menu.events.EXIT
-        sys.exit()    
-
+        self.menu.add.label("Saved")
+        self.menu.add.button('Back', self.saveGame)
+  
     def save_rep(self,value,save_bool):
         if save_bool:
             self.game_engine.app.save_game_record()  
