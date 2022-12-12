@@ -28,28 +28,16 @@ def save_game_record_to_pickle(df):
     return
 
 
-"""
-def save_game_data_to_pickle(game_df):
-    
-    try:
-        filename = "GameData/SavedGames/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".pkl"
-        game_df.to_pickle(filename)
-        return True
 
-    except Exception as e: 
-        print(e)
-        return False
-    #except:
-    #    return False
-"""
-def save_game_data_to_pickle(game_df, type):
+def save_game_data_to_pickle(game_df, type, name_f):
     
     try:
         if type == 1:
             filename = "GameData/SavedGames/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".pkl"
-        else:
+        elif type == 2:
             filename = "MenuResources/temp/temp.pkl"
-            print(game_df)
+        elif type == 3:
+            filename = "GameData/Savedatas/"+name_f+".pkl"
         game_df.to_pickle(filename)
         return True
 

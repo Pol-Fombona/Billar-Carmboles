@@ -287,7 +287,7 @@ class GraphicsEngine(Engine):
         self.game.mode = FreeCarambole(max_turn=25, max_score=10)
 
         self.sound = SoundManager(self)
-        self.sound.playSong()
+        self.sound.playSong(rolloff=1)
 
         # Game history 
         # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 
@@ -298,7 +298,7 @@ class GraphicsEngine(Engine):
     def init_saved_game_params(self, save_data_path=None, type=1):
         # Load parameters and status from save data file
 
-        save_data_path = "GameData/SavedGames/2022-12-01_12-09-18.pkl"
+        #save_data_path = "GameData/SavedGames/2022-12-01_12-09-18.pkl"
         if type == 2:
             save_data_path = "MenuResources/temp/temp.pkl"
         save_data_df = pd.read_pickle(save_data_path) 
@@ -332,6 +332,9 @@ class GraphicsEngine(Engine):
         self.game.spheres[0].pos = save_data_df.iloc[0]["Sphere1Pos"]
         self.game.spheres[1].pos = save_data_df.iloc[0]["Sphere2Pos"]
         self.game.spheres[2].pos = save_data_df.iloc[0]["Sphere3Pos"]
+
+        MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
+        MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
 
         return
     
@@ -680,36 +683,26 @@ class Menu:
     def __init__(self, Game):
         pg.init()
         self.myimage = pg_menu.baseimage.BaseImage(
-        #image_path=pg_menu.baseimage.IMAGE_EXAMPLE_GRAY_LINES,
         image_path="MenuResources/Images/background.jpg",
         drawing_mode=pg_menu.baseimage.IMAGE_MODE_REPEAT_XY,
         )
 
         self.my_theme = pg_menu.Theme(
-            #background_color=(176,224,230),
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
             title_font_size=60,
-            #title_font_color=(230,230,250),
             title_offset=(30,100),
             title_font = pg_menu.font.FONT_8BIT,
             background_color=self.myimage,
-            #title_shadow=True,
             title_background_color=(4, 47, 126),
             widget_font=pg_menu.font.FONT_8BIT,
             widget_font_color = (139,0,0),
-            widget_font_size = 60
+            widget_font_size = 50
         )
-        #self.surface = pg.display.set_mode(W_SIZE)
-        #self.menu = pg_menu.Menu('Three-cushion billiards', W_SIZE[0]/1.5, W_SIZE[1]/1.5,
-        #               theme=my_theme)
-        #self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
-        #               theme=my_theme)
         self.mode = None
         self.name = 'John Doe'
         self.name2 = 'Jane Fey'
         self.replays = [x for x in os.listdir("GameData/Replays")]
         self.game_speed = 1
-        #self.on_init()
         self.game_engine = Game
         self.start=False
     
@@ -723,6 +716,7 @@ class Menu:
     def on_init(self):
         self.menu.clear()
         self.menu.add.button('Play', self.play)
+        self.menu.add.button('Load Game', self.load_game)
         self.menu.add.button('View Replay', self.view_replay)
         self.menu.add.button('Show Ranking', self.show_ranking)
         self.menu.add.button('Options', self.select_options)
@@ -752,6 +746,21 @@ class Menu:
             self.name2 = "IA"
         self.menu.add.button('Play', self.start_the_game)
         self.menu.add.button('Back', self.play)
+
+    def load_game(self):
+        self.menu.clear() 
+        savedatas = [x for x in os.listdir("GameData/Savedatas")]
+        if len(savedatas)>0:
+            for x in savedatas:
+                if x[-4:]==".pkl":
+                    self.menu.add.button(x[:5], self.load_save,x)    
+        self.menu.add.button('Back', self.on_init)
+
+    def load_save(self,path):
+        self.game_engine.app = GraphicsEngine(win_size=W_SIZE, game_engine = self.game_engine)
+        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        self.game_engine.app.init_saved_game_params(save_data_path="GameData/Savedatas/"+path)
+        self.game_engine.app.run()   
 
     def view_replay(self):
         self.menu.clear()
@@ -865,12 +874,34 @@ class Menu:
             pg_menu.events.EXIT
             sys.exit()    
         self.menu.clear()
-        self.menu.add.selector(title="Save Replay",
+        self.menu.add.selector(title="Save Game",
+                               items=[("Yes",True),
+                               ("No",False)],
+                                font_size=50,
+                                selection_color = (139,0,0),
+                                onreturn=self.saveGame)
+
+    def saveGame(self,value,save_bool):
+        if save_bool:
+            self.menu.clear()
+            self.menu.add.button('save1', self.select_save_space,1)
+            self.menu.add.button('save2', self.select_save_space,2)
+            self.menu.add.button('save3', self.select_save_space,3)
+        else:
+            self.menu.clear()
+            self.menu.add.selector(title="Save Replay",
                                items=[("Yes",True),
                                ("No",False)],
                                 font_size=50,
                                 selection_color = (139,0,0),
                                 onreturn=self.save_rep)
+
+    def select_save_space(self,pos):
+        save_game(game=self.game_engine.app.game,type=3,name_f="save"+str(pos))
+        if self.game_engine.app != None:
+            self.game_engine.app.mesh.destroy()
+        pg_menu.events.EXIT
+        sys.exit()    
 
     def save_rep(self,value,save_bool):
         if save_bool:
@@ -878,7 +909,7 @@ class Menu:
         if self.game_engine.app != None:
             self.game_engine.app.mesh.destroy()
         pg_menu.events.EXIT
-        sys.exit() 
+        sys.exit()
 
     def select_options_pause(self):
         self.menu.clear()

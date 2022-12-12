@@ -286,7 +286,7 @@ def modify_friction():
     return
 
 
-def save_game(game, type = 1):
+def save_game(game, type = 1,name_f="save1"):
 
     if game.getTurnStatus() != "initial":
         clear_terminal()
@@ -317,7 +317,7 @@ def save_game(game, type = 1):
 
     game_df = pd.DataFrame([game_data], columns = game_columns)
 
-    status = save_game_data_to_pickle(game_df,type)
+    status = save_game_data_to_pickle(game_df,type,name_f)
 
     if status:
         clear_terminal()
