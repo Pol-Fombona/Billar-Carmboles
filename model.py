@@ -19,6 +19,13 @@ class BaseModel:
         self.camera = self.app.camera
 
     def on_init(self):
+        self.program['m_view_light'].write(self.app.light.m_view_light)
+        # resolution
+        self.program['u_resolution'].write(glm.vec2(self.app.WIN_SIZE))
+        # depth texture
+        self.depth_texture = self.app.mesh.texture.textures['depth_texture']
+        self.program['shadowMap'] = 1
+        self.depth_texture.use(location=1)
         # shadow
         self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
         self.shadow_program = self.shadow_vao.program
@@ -30,14 +37,14 @@ class BaseModel:
         self.program["light.Ia"].write(self.app.light.Ia)
         self.program["light.Id"].write(self.app.light.Id)
         self.program["light.Is"].write(self.app.light.Is)
-        self.program["light2.position"].write(self.app.light2.position)
-        self.program["light2.Ia"].write(self.app.light2.Ia)
-        self.program["light2.Id"].write(self.app.light2.Id)
-        self.program["light2.Is"].write(self.app.light2.Is)
-        self.program["light3.position"].write(self.app.light3.position)
-        self.program["light3.Ia"].write(self.app.light3.Ia)
-        self.program["light3.Id"].write(self.app.light3.Id)
-        self.program["light3.Is"].write(self.app.light3.Is)
+        # self.program["light2.position"].write(self.app.light2.position)
+        # self.program["light2.Ia"].write(self.app.light2.Ia)
+        # self.program["light2.Id"].write(self.app.light2.Id)
+        # self.program["light2.Is"].write(self.app.light2.Is)
+        # self.program["light3.position"].write(self.app.light3.position)
+        # self.program["light3.Ia"].write(self.app.light3.Ia)
+        # self.program["light3.Id"].write(self.app.light3.Id)
+        # self.program["light3.Is"].write(self.app.light3.Is)
         # texture
         self.texture = self.app.mesh.texture.textures[self.tex_id]
         self.program["u_texture_0"] = 0
@@ -64,18 +71,11 @@ class BaseModel:
         self.vao.render()
     
     def update_shadow(self):
-        try:
-            self.shadow_program['m_model'].write(self.m_model)
-        except:
-            pass
+        self.shadow_program['m_model'].write(self.m_model)
     
     def render_shadow(self):
-        try:
-            self.update_shadow()
-            self.shadow_vao.render()
-        except:
-            pass
-
+        self.update_shadow()
+        self.shadow_vao.render()
 
 class Legs(BaseModel):
     def __init__(self, app, vao_name="legs", tex_id=1, pos=(0, 0, 0)):
