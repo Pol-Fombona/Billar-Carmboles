@@ -19,17 +19,7 @@ class Scene:
         if self.app.game_started:
             self.load()
         else:
-            self.load_decision_starting()
-
-    def render_shadow(self):
-        self.depth_fbo.clear()
-        self.depth_fbo.use()
-        for obj in self.table_objects:
-            obj.render_shadow()
-
-        for sphere in self.ball_objects:
-            sphere.render_shadow()
-        
+            self.load_decision_starting() 
 
     def add_object(self, obj):
         self.table_objects.append(obj)
@@ -113,40 +103,10 @@ class Scene:
         add(Terra(app, pos=(0,0,0),tex_id = 8))
         add(Sostre(app, pos=(0,0,0),tex_id = 9))
 
-        self.line = Line(app, axis = glm.vec3(pos_sphere_1))
+        # self.line = Line(app, axis = glm.vec3(pos_sphere_1))
+        # Per a que no doni error
+        self.line = Cue(app, axis=glm.vec3(pos_sphere_1), tex_id=5)
 
         add(Parets(app, pos=(0,0,0),tex_id = 10))
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
-
-
-
-    def render(self):
-        self.ctx.screen.use()
-        # Render table + spheres
-
-        # self.render_shadow()
-
-        for obj in self.table_objects:
-            obj.render()
-
-        for sphere in self.ball_objects:
-            sphere.render()
-
-
-    def render_with_cue(self):
-        # Render table + spheres + cue
-
-        for obj in self.all_objects:
-            obj.render()
-
-
-    def replay_render(self):
-        # Render table + special render spheres
-
-        for obj in self.table_objects:
-            obj.render()
-
-        for sphere in self.ball_objects:
-            sphere.replay_render()
-        

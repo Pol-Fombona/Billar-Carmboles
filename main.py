@@ -10,6 +10,7 @@ from FreeCamera import *
 from mesh import Mesh
 from positions import *
 from scene import Scene
+from scene_renderer import SceneRenderer
 from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game
 
 from Light import Light
@@ -66,6 +67,7 @@ class Engine():
         self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
         self.mesh = Mesh(self)
         self.scene = Scene(self)
+        self.scene_renderer = SceneRenderer(self)
 
         self.delta_time = 0
         self.pause = False
@@ -110,7 +112,7 @@ class Engine():
         # Default render
 
         self.ctx.clear(color=(0.08, 0.16, 0.18))
-        self.scene.render()
+        self.scene_renderer.render()
         pg.display.set_caption(self.get_info())
         pg.display.flip()
 
@@ -119,7 +121,7 @@ class Engine():
         # render with cue
 
         self.ctx.clear(color=(0.08, 0.16, 0.18))
-        self.scene.render_with_cue()
+        self.scene_renderer.render_with_cue()
         pg.display.set_caption(self.get_info())
         pg.display.flip()
 
@@ -159,11 +161,12 @@ class GraphicsEngine(Engine):
         self.ctx.enable(flags=mgl.DEPTH_TEST)
 
         self.camera = Camera(self)
-        self.light = Light(position=LIGHT1_POSITION, Ia = 0.2, Id = 0, Is = 0)
+        self.light = Light(position=LIGHT1_POSITION, Ia = 0.2)
         self.light2 = Light(position=LIGHT2_POSITION, Ia = 0)
         self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
         self.mesh = Mesh(self)
         self.scene = Scene(self)
+        self.scene_renderer = SceneRenderer(self)
         self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode,type=2)
         self.game.game_speed *= self.game_engine.menu.game_speed
         self.init_saved_game_params(type=2)
@@ -258,7 +261,7 @@ class GraphicsEngine(Engine):
         # the spheres are moving
 
         self.ctx.clear(color=(0.08, 0.16, 0.18))
-        self.scene.render()
+        self.scene_renderer.render()
         checkCollisions(self.scene.ball_objects, self.sound, self.game.current_player)
         pg.display.set_caption(self.get_info())
         pg.display.flip()
@@ -269,7 +272,7 @@ class GraphicsEngine(Engine):
         # the spheres are moving
 
         self.ctx.clear(color=(0.08, 0.16, 0.18))
-        self.scene.render()
+        self.scene_renderer.render()
         valid = checkCollisions(self.scene.ball_objects, self.sound, self.game.current_player, self.game_started)
         pg.display.set_caption(self.get_info())
         pg.display.flip()
@@ -426,6 +429,7 @@ class GraphicsEngine(Engine):
         self.game_started = True
         # self.mesh.vao.destroy()
         self.scene = Scene(self)
+        self.scene_renderer = SceneRenderer(self)
         self.init_game_params(names, mode)
 
     

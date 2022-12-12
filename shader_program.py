@@ -3,17 +3,17 @@ class ShaderProgram:
         self.ctx = ctx
         self.programs = {}
         self.programs["default"] = self.get_program("default")
-        self.programs["legs"] = self.get_program("legs")
-        self.programs["table"] = self.get_program("table")
-        self.programs["table_floor"] = self.get_program("table_floor")
-        self.programs["axis"] = self.get_program("axis")
-        self.programs["balls"] = self.get_program("balls")
-        self.programs["subdivision_balls"] = self.get_program("subdivision_balls")
-        self.programs["cue"] = self.get_program("cue")
-        self.programs["terra"] = self.get_program("terra")
-        self.programs["sostre"] = self.get_program("sostre")
-        self.programs["line"] = self.get_program("line")
-        self.programs["parets"] = self.get_program("parets")
+        self.programs["legs"] = self.get_program("default")
+        self.programs["table"] = self.get_program("default")
+        self.programs["table_floor"] = self.get_program("default")
+        self.programs["axis"] = self.get_program("default")
+        self.programs["balls"] = self.get_program("default")
+        self.programs["subdivision_balls"] = self.get_program("default")
+        self.programs["cue"] = self.get_program("default")
+        self.programs["terra"] = self.get_program("default")
+        self.programs["sostre"] = self.get_program("default")
+        self.programs["line"] = self.get_program("default")
+        self.programs["parets"] = self.get_program("default")
         self.programs["shadow_map"] = self.get_program("shadow_map")
 
 

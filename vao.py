@@ -60,6 +60,9 @@ class VAO:
         self.vaos["line"] = self.get_vao(program=self.program.programs["line"],
             vbo=self.vbo.vbos["line"]
         )
+        self.vaos["shadow_line"] = self.get_vao(program=self.program.programs["shadow_map"],
+            vbo=self.vbo.vbos["line"]
+        )
         self.vaos["parets"] = self.get_vao(program=self.program.programs["parets"],
             vbo=self.vbo.vbos["parets"]
         )
