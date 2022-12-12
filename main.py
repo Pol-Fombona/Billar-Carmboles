@@ -10,10 +10,12 @@ from FreeCamera import *
 from mesh import Mesh
 from positions import *
 from scene import Scene
-from MenuManager import pause_manager, progress_manager, format_time, game_ended
+from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game
 
 from Light import Light
 from MovementManagement import checkCollisions
+import MoveCue
+import MoveLine
 from GameManager import *
 from SoundManager3D import *
 from ScoreManager import *
@@ -139,15 +141,34 @@ class Engine():
 
 class GraphicsEngine(Engine):
     #def __init__(self, win_size=(1600, 900)):
-    def __init__(self, win_size=(1280, 720)):
+    def __init__(self, win_size=(1280, 720),game_engine = None):
 
         self.game_started = False
 
         super().__init__(win_size)
-
+        self.game_engine = game_engine
         self.game = None
         self.save_game = False
 
+    def reload_params(self):
+        # Set PyGame attributes
+        self.set_pg_attributes()
+
+        # Detect and use exixting opengl context
+        self.ctx = mgl.create_context()
+        self.ctx.enable(flags=mgl.DEPTH_TEST)
+
+        self.camera = Camera(self)
+        self.light = Light(position=LIGHT1_POSITION, Ia = 0.2, Id = 0, Is = 0)
+        self.light2 = Light(position=LIGHT2_POSITION, Ia = 0)
+        self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
+        self.mesh = Mesh(self)
+        self.scene = Scene(self)
+        self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode,type=2)
+        self.game.game_speed *= self.game_engine.menu.game_speed
+        self.init_saved_game_params(type=2)
+        MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
+        MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
 
     def check_events(self):
         if self.quit:
@@ -256,7 +277,7 @@ class GraphicsEngine(Engine):
         return valid
 
 
-    def init_game_params(self,names = [], mode = None):
+    def init_game_params(self,names = [], mode = None, type = 1):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
@@ -271,18 +292,22 @@ class GraphicsEngine(Engine):
         # Game history 
         # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 
         #   p1.score, p2.score)
-        self.game_record = []
+        if type != 2:
+            self.game_record = []
 
-    def init_saved_game_params(self, save_data_path=None):
+    def init_saved_game_params(self, save_data_path=None, type=1):
         # Load parameters and status from save data file
 
         save_data_path = "GameData/SavedGames/2022-12-01_12-09-18.pkl"
+        if type == 2:
+            save_data_path = "MenuResources/temp/temp.pkl"
         save_data_df = pd.read_pickle(save_data_path) 
         
         # Game data
         self.game.played_time = int(save_data_df.iloc[0]["PlayedTime"])
         self.game.mode = save_data_df.iloc[0]["Mode"]
-        self.game.game_speed = save_data_df.iloc[0]["GameSpeed"]
+        if type != 2:
+            self.game.game_speed = save_data_df.iloc[0]["GameSpeed"]
 
         # P1 Data
         self.game.player1.name = save_data_df.iloc[0]["P1Name"]
@@ -342,8 +367,9 @@ class GraphicsEngine(Engine):
 
                     self.check_events()
 
-                    if self.pause:
-                        self.quit = pause_manager(self.game)
+                    if self.pause and self.game.getTurnStatus()=="initial":
+                        #self.quit = pause_manager(self.game)
+                        self.game_engine.menu.display_menu_pause(start=True)
                         last_timestamp = self.unpause()
 
                     else:
@@ -456,8 +482,9 @@ class GraphicsEngine(Engine):
 
             self.check_events()
 
-            if self.pause:
-                self.quit = pause_manager(self.game)
+            if self.pause and self.game.getTurnStatus()=="initial":
+                #self.quit = pause_manager(self.game)
+                self.game_engine.menu.display_menu_pause()
                 last_timestamp = self.unpause()
 
             else:
@@ -551,11 +578,12 @@ class GraphicsEngine(Engine):
 class ReplayEngine(Engine):
     # Engine used when replaying a game
 
-    def __init__(self, win_size=(1280, 720),replay_name=""):
+    def __init__(self, win_size=(1280, 720),replay_name="", game_engine = None):
 
         self.game_started = True
         
         super().__init__(win_size)
+        self.game_engine = game_engine
 
         # ReplayData
         self.replay_file = "GameData\\Replays\\" + replay_name
@@ -635,8 +663,9 @@ class ReplayEngine(Engine):
 
             self.check_events()
 
-            if self.pause:
-                    self.quit = pause_manager(self.game, replay=True)
+            if self.pause and self.game.getTurnStatus()=="initial":
+                    #self.quit = pause_manager(self.game)
+                    self.game_engine.menu.display_menu_pause()
                     last_timestamp = self.unpause()
 
             else:
@@ -648,40 +677,49 @@ class ReplayEngine(Engine):
                 self.game.played_time, last_timestamp = progress_manager(self.game.played_time, last_timestamp, time.time())
                 
 class Menu:
-    def __init__(self):
+    def __init__(self, Game):
         pg.init()
-        myimage = pg_menu.baseimage.BaseImage(
+        self.myimage = pg_menu.baseimage.BaseImage(
         #image_path=pg_menu.baseimage.IMAGE_EXAMPLE_GRAY_LINES,
         image_path="MenuResources/Images/background.jpg",
         drawing_mode=pg_menu.baseimage.IMAGE_MODE_REPEAT_XY,
         )
 
-        my_theme = pg_menu.Theme(
+        self.my_theme = pg_menu.Theme(
             #background_color=(176,224,230),
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
             title_font_size=60,
             #title_font_color=(230,230,250),
             title_offset=(30,100),
             title_font = pg_menu.font.FONT_8BIT,
-            background_color=myimage,
+            background_color=self.myimage,
             #title_shadow=True,
             title_background_color=(4, 47, 126),
             widget_font=pg_menu.font.FONT_8BIT,
             widget_font_color = (139,0,0),
             widget_font_size = 60
         )
-        self.surface = pg.display.set_mode(W_SIZE)
+        #self.surface = pg.display.set_mode(W_SIZE)
         #self.menu = pg_menu.Menu('Three-cushion billiards', W_SIZE[0]/1.5, W_SIZE[1]/1.5,
         #               theme=my_theme)
-        self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
-                       theme=my_theme)
+        #self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
+        #               theme=my_theme)
         self.mode = None
         self.name = 'John Doe'
         self.name2 = 'Jane Fey'
         self.replays = [x for x in os.listdir("GameData/Replays")]
         self.game_speed = 1
-        self.on_init()
+        #self.on_init()
+        self.game_engine = Game
+        self.start=False
     
+    def display_menu(self):
+        self.surface = pg.display.set_mode(W_SIZE)
+        self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
+                       theme=self.my_theme)
+        self.on_init()               
+
+         
     def on_init(self):
         self.menu.clear()
         self.menu.add.button('Play', self.play)
@@ -690,6 +728,7 @@ class Menu:
         self.menu.add.button('Options', self.select_options)
         self.menu.add.button('Quit', pg_menu.events.EXIT)
         self.menu.mainloop(self.surface)
+       
 
     def set_name(self,name):
         self.name = name.upper()
@@ -722,7 +761,7 @@ class Menu:
         self.menu.add.button('Back', self.on_init)
         
     def start_replay(self,file=""):
-        app = ReplayEngine(win_size=W_SIZE,replay_name = file)
+        app = ReplayEngine(win_size=W_SIZE,replay_name = file, game_engine = self.game_engine)
         app.init_game_params(names = [self.name,self.name2],mode = self.mode)
         app.run()
 
@@ -777,15 +816,108 @@ class Menu:
         self.menu.add.button('Back', self.select_options) 
 
     def start_the_game(self):
-        app = GraphicsEngine(win_size=W_SIZE)
-        app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        self.game_engine.app = GraphicsEngine(win_size=W_SIZE, game_engine = self.game_engine)
+        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode)
         #app.game_started = True
-        app.start_game(names = [self.name,self.name2], mode = self.mode)
-        app.game.game_speed *= self.game_speed
+        self.game_engine.app.start_game(names = [self.name,self.name2], mode = self.mode)
+        self.game_engine.app.game.game_speed *= self.game_speed
         #app.init_saved_game_params()
-        app.run()
+        self.game_engine.app.run()
 
+    def display_menu_pause(self,start=False):
+        self.start = start
+        save_game(self.game_engine.app.game,2)
+        self.game_engine.app.sound.stopSong()
+        self.my_theme = pg_menu.Theme(
+            title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
+            title_font_size=60,
+            title_offset=(350,100),
+            title_font = pg_menu.font.FONT_8BIT,
+            background_color=self.myimage,
+            title_background_color=(4, 47, 126),
+            widget_font=pg_menu.font.FONT_8BIT,
+            widget_font_color = (139,0,0),
+            widget_font_size = 60
+        )
+        self.surface = pg.display.set_mode(W_SIZE)
+        self.menu = pg_menu.Menu('Pause Menu', W_SIZE[0], W_SIZE[1],
+                       theme=self.my_theme)
+        self.pause_menu() 
+
+    def pause_menu(self):
+        self.menu.clear()
+        self.menu.add.button('Resume', self.resume_the_game)
+        self.menu.add.button('Options', self.select_options_pause)
+        #self.menu.add.button('Quit', pg_menu.events.EXIT)
+        self.menu.add.button('Quit', self.quit_pause)
+        self.menu.mainloop(self.surface)
+
+    def resume_the_game(self):
+        self.start = False
+        self.game_engine.app.pause = False
+        self.game_engine.app.reload_params()
+        self.game_engine.app.run()
+
+    def quit_pause(self):
+        if self.start:
+            if self.game_engine.app != None:
+                self.game_engine.app.mesh.destroy()
+            pg_menu.events.EXIT
+            sys.exit()    
+        self.menu.clear()
+        self.menu.add.selector(title="Save Replay",
+                               items=[("Yes",True),
+                               ("No",False)],
+                                font_size=50,
+                                selection_color = (139,0,0),
+                                onreturn=self.save_rep)
+
+    def save_rep(self,value,save_bool):
+        if save_bool:
+            self.game_engine.app.save_game_record()  
+        if self.game_engine.app != None:
+            self.game_engine.app.mesh.destroy()
+        pg_menu.events.EXIT
+        sys.exit() 
+
+    def select_options_pause(self):
+        self.menu.clear()
+        self.menu.add.button('Friction', self.change_friction_pause)
+        self.menu.add.button('Game Speed', self.change_speed_pause)
+        self.menu.add.button('Show Controls', self.show_controls_pause)
+        self.menu.add.button('Back', self.pause_menu)
+    
+    def change_friction_pause(self):
+        self.menu.clear()
+        self.menu.add.range_slider('Choose a value', 1, (0, 100), 1,
+                      rangeslider_id='range_slider',
+                      value_format=lambda x: str(int(x)), onchange=(self.apply_friction))
+        self.menu.add.button('Back', self.select_options_pause)
+    
+    def change_speed_pause(self):
+        self.menu.clear()
+        self.menu.add.dropselect(
+            title='Select Game Speed',
+            items=[('x0,5', 0.5),
+            ('x1', 1),
+            ('x2',2),
+            ('x4',4)],
+            font_size=30,
+            selection_option_font_size=34,
+            onchange=(self.apply_speed)
+        )
+        self.menu.add.button('Back', self.select_options_pause) 
+    def show_controls_pause(self):
+        self.menu.clear()
+        self.menu.add.button('Back', self.select_options_pause) 
+
+class Game_Engine:
+    def __init__(self):
+        self.menu = Menu(self)
+        self.app = None
+        self.menu.display_menu()
 
 
 if __name__ == "__main__":
-    Menu()
+    #Menu()
+    Game_Engine()
