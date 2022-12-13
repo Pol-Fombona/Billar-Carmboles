@@ -301,8 +301,9 @@ class GraphicsEngine(Engine):
 
         #save_data_path = "GameData/SavedGames/2022-12-01_12-09-18.pkl"
         if type == 2:
-            save_data_path = "MenuResources/temp/temp.pkl"
-        save_data_df = pd.read_pickle(save_data_path) 
+            save_data_df = self.game_engine.menu.game_df
+        else:
+            save_data_df = pd.read_pickle(save_data_path) 
         
         # Game data
         self.game.played_time = int(save_data_df.iloc[0]["PlayedTime"])
@@ -333,6 +334,11 @@ class GraphicsEngine(Engine):
         self.game.spheres[0].pos = save_data_df.iloc[0]["Sphere1Pos"]
         self.game.spheres[1].pos = save_data_df.iloc[0]["Sphere2Pos"]
         self.game.spheres[2].pos = save_data_df.iloc[0]["Sphere3Pos"]
+
+        # Sphere Velocity
+        self.game.spheres[0].velocity = save_data_df.iloc[0]["Sphere1Vel"]
+        self.game.spheres[1].velocity = save_data_df.iloc[0]["Sphere2Vel"]
+        self.game.spheres[2].velocity = save_data_df.iloc[0]["Sphere3Vel"]
 
         MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
         MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
@@ -371,7 +377,8 @@ class GraphicsEngine(Engine):
 
                     self.check_events()
 
-                    if self.pause and self.game.getTurnStatus()=="initial":
+                    #if self.pause and self.game.getTurnStatus()=="initial":
+                    if self.pause and self.game.current_player.type != "IA":
                         #self.quit = pause_manager(self.game)
                         self.game_engine.menu.display_menu_pause(start=True)
                         last_timestamp = self.unpause()
@@ -486,7 +493,7 @@ class GraphicsEngine(Engine):
 
             self.check_events()
 
-            if self.pause and self.game.getTurnStatus()=="initial":
+            if self.pause and self.game.current_player.type != "IA":
                 #self.quit = pause_manager(self.game)
                 self.game_engine.menu.display_menu_pause()
                 last_timestamp = self.unpause()
@@ -667,7 +674,7 @@ class ReplayEngine(Engine):
 
             self.check_events()
 
-            if self.pause and self.game.getTurnStatus()=="initial":
+            if self.pause and self.game.current_player.type != "IA":
                     #self.quit = pause_manager(self.game)
                     self.game_engine.menu.display_menu_pause()
                     last_timestamp = self.unpause()
@@ -707,6 +714,7 @@ class Menu:
         self.game_engine = Game
         self.start=False
         self.difficulty = "Normal"
+        self.game_df = None
 
     def display_menu(self):
         self.surface = pg.display.set_mode(W_SIZE)
@@ -842,7 +850,8 @@ class Menu:
 
     def display_menu_pause(self,start=False):
         self.start = start
-        save_game(self.game_engine.app.game,2)
+        #save_game(self.game_engine.app.game,2)
+        self.save_temporal_data()
         self.game_engine.app.sound.stopSong()
         self.my_theme = pg_menu.Theme(
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
@@ -940,6 +949,36 @@ class Menu:
     def show_controls_pause(self):
         self.menu.clear()
         self.menu.add.button('Back', self.select_options_pause) 
+
+    def save_temporal_data(self):
+        game = self.game_engine.app.game
+        # Game data to save
+        status_data = [game.current_player.name, game.played_time, game.mode,
+                        game.game_speed]
+        status_columns = ["CurrentPlayer", "PlayedTime", "Mode", "GameSpeed"]
+
+        # Player data to save
+        p1 = game.player1
+        p1_data = [p1.name, p1.ball.id, p1.score, p1.turn_count, p1.type]
+        p1_columns = ["P1Name", "P1BallID", "P1Score", "P1Turn", "P1Type"]
+        
+        p2 = game.player2
+        p2_data = [p2.name, p2.ball.id, p2.score,
+                    p2.turn_count, p2.type]
+        p2_columns = ["P2Name", "P2BallID", "P2Score", "P2Turn", "P2Type"]
+
+        # Sphere position data
+        sphere_data = [game.spheres[i].pos for i in range(3)]
+        sphere_columns = ["Sphere1Pos", "Sphere2Pos", "Sphere3Pos"]
+
+        # Sphere velocity data
+        sphere_data_vel = [game.spheres[i].velocity for i in range(3)]
+        sphere_columns_vel = ["Sphere1Vel", "Sphere2Vel", "Sphere3Vel"]
+
+        game_data = status_data + p1_data + p2_data + sphere_data + sphere_data_vel
+        game_columns = status_columns + p1_columns + p2_columns + sphere_columns + sphere_columns_vel
+
+        self.game_df = pd.DataFrame([game_data], columns = game_columns)
 
 class Game_Engine:
     def __init__(self):
