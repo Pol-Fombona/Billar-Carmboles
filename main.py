@@ -164,7 +164,8 @@ class GraphicsEngine(Engine):
         self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
         self.mesh = Mesh(self)
         self.scene = Scene(self)
-        self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode,type=2)
+        self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode,type=2,
+        difficulty=self.game_engine.menu.difficulty)
         self.game.game_speed *= self.game_engine.menu.game_speed
         self.init_saved_game_params(type=2)
         MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
@@ -277,13 +278,13 @@ class GraphicsEngine(Engine):
         return valid
 
 
-    def init_game_params(self,names = [], mode = None, type = 1):
+    def init_game_params(self,names = [], mode = None, type = 1, difficulty = "Normal"):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
         player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = mode)
 
-        self.game = Game(player1, player2, self.scene.ball_objects)
+        self.game = Game(player1, player2, self.scene.ball_objects, difficulty=difficulty)
         self.game.mode = FreeCarambole(max_turn=25, max_score=10)
 
         self.sound = SoundManager(self)
@@ -705,7 +706,8 @@ class Menu:
         self.game_speed = 1
         self.game_engine = Game
         self.start=False
-    
+        self.difficulty = "Normal"
+
     def display_menu(self):
         self.surface = pg.display.set_mode(W_SIZE)
         self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
@@ -744,8 +746,13 @@ class Menu:
         else:
             self.menu.add.text_input('Name Player1:', default='John Doe',onchange=self.set_name)
             self.name2 = "IA"
+            self.menu.add.selector('Difficulty ', [('Normal', "Normal"),
+            ("Hard", "Hard"),('Easy', "Easy")], onchange=self.select_difficulty)
         self.menu.add.button('Play', self.start_the_game)
         self.menu.add.button('Back', self.play)
+    
+    def select_difficulty(self,value,difficulty):
+        self.difficulty = difficulty
 
     def load_game(self):
         self.menu.clear() 
@@ -826,7 +833,7 @@ class Menu:
 
     def start_the_game(self):
         self.game_engine.app = GraphicsEngine(win_size=W_SIZE, game_engine = self.game_engine)
-        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode,difficulty = self.difficulty)
         #app.game_started = True
         self.game_engine.app.start_game(names = [self.name,self.name2], mode = self.mode)
         self.game_engine.app.game.game_speed *= self.game_speed
