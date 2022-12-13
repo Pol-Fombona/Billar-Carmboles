@@ -10,7 +10,7 @@ from FreeCamera import *
 from mesh import Mesh
 from positions import *
 from scene import Scene
-from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game
+from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game, undo_turn
 
 from Light import Light
 from MovementManagement import checkCollisions
@@ -337,6 +337,12 @@ class GraphicsEngine(Engine):
 
         if type == 2:
             # Sphere Velocity
+            self.game.current_player.played = save_data_df.iloc[0]["Played"]
+            self.game.undo_turn = save_data_df.iloc[0]["Undo"]
+            self.game.current_player.collision_record = save_data_df.iloc[0]["ColRec"]
+            self.game.spheres_turn_initial_position[0] = save_data_df.iloc[0]["Sphere1PosInit"]
+            self.game.spheres_turn_initial_position[1] = save_data_df.iloc[0]["Sphere2PosInit"]
+            self.game.spheres_turn_initial_position[2] = save_data_df.iloc[0]["Sphere3PosInit"]
             self.game.spheres[0].velocity = save_data_df.iloc[0]["Sphere1Vel"]
             self.game.spheres[1].velocity = save_data_df.iloc[0]["Sphere2Vel"]
             self.game.spheres[2].velocity = save_data_df.iloc[0]["Sphere3Vel"]
@@ -400,6 +406,7 @@ class GraphicsEngine(Engine):
                                 # modificar l'status de played quan s'allibera el pal, 
                                 # es a dir quan s'ha fet el tir
                                 if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                                    self.game.spheres_turn_initial_position = [self.game.spheres[i].pos for i in range(3)]
                                     self.game.current_player.played = True
 
                             case "played":
@@ -482,6 +489,8 @@ class GraphicsEngine(Engine):
 
         if undo_completed:
             self.game.undo_turn = False
+            MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
+            MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
 
         return 
 
@@ -924,6 +933,7 @@ class Menu:
         self.menu.clear()
         self.menu.add.button('Friction', self.change_friction_pause)
         self.menu.add.button('Game Speed', self.change_speed_pause)
+        self.menu.add.button('Undo Turn', self.undo_move)
         self.menu.add.button('Show Controls', self.show_controls_pause)
         self.menu.add.button('Back', self.pause_menu)
     
@@ -947,6 +957,11 @@ class Menu:
             onchange=(self.apply_speed)
         )
         self.menu.add.button('Back', self.select_options_pause) 
+
+    def undo_move(self):
+        undo_turn(self.game_engine.app.game)
+        self.save_temporal_data()
+
     def show_controls_pause(self):
         self.menu.clear()
         self.menu.add.button('Back', self.select_options_pause) 
@@ -955,8 +970,10 @@ class Menu:
         game = self.game_engine.app.game
         # Game data to save
         status_data = [game.current_player.name, game.played_time, game.mode,
-                        game.game_speed]
-        status_columns = ["CurrentPlayer", "PlayedTime", "Mode", "GameSpeed"]
+                        game.game_speed, game.current_player.played, game.undo_turn, 
+                        game.current_player.collision_record]
+        status_columns = ["CurrentPlayer", "PlayedTime", "Mode", "GameSpeed", 
+                          "Played", "Undo", "ColRec"]
 
         # Player data to save
         p1 = game.player1
@@ -972,12 +989,15 @@ class Menu:
         sphere_data = [game.spheres[i].pos for i in range(3)]
         sphere_columns = ["Sphere1Pos", "Sphere2Pos", "Sphere3Pos"]
 
+        sphere_initial_data = [game.spheres_turn_initial_position[i] for i in range(3)]
+        sphere_initial_columns = ["Sphere1PosInit", "Sphere2PosInit", "Sphere3PosInit"]
+
         # Sphere velocity data
         sphere_data_vel = [game.spheres[i].velocity for i in range(3)]
         sphere_columns_vel = ["Sphere1Vel", "Sphere2Vel", "Sphere3Vel"]
 
-        game_data = status_data + p1_data + p2_data + sphere_data + sphere_data_vel
-        game_columns = status_columns + p1_columns + p2_columns + sphere_columns + sphere_columns_vel
+        game_data = status_data + p1_data + p2_data + sphere_data + sphere_data_vel + sphere_initial_data
+        game_columns = status_columns + p1_columns + p2_columns + sphere_columns + sphere_columns_vel + sphere_initial_columns
 
         self.game_df = pd.DataFrame([game_data], columns = game_columns)
 
