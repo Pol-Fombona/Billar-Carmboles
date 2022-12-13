@@ -335,10 +335,11 @@ class GraphicsEngine(Engine):
         self.game.spheres[1].pos = save_data_df.iloc[0]["Sphere2Pos"]
         self.game.spheres[2].pos = save_data_df.iloc[0]["Sphere3Pos"]
 
-        # Sphere Velocity
-        self.game.spheres[0].velocity = save_data_df.iloc[0]["Sphere1Vel"]
-        self.game.spheres[1].velocity = save_data_df.iloc[0]["Sphere2Vel"]
-        self.game.spheres[2].velocity = save_data_df.iloc[0]["Sphere3Vel"]
+        if type == 2:
+            # Sphere Velocity
+            self.game.spheres[0].velocity = save_data_df.iloc[0]["Sphere1Vel"]
+            self.game.spheres[1].velocity = save_data_df.iloc[0]["Sphere2Vel"]
+            self.game.spheres[2].velocity = save_data_df.iloc[0]["Sphere3Vel"]
 
         MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
         MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
