@@ -149,6 +149,7 @@ class GraphicsEngine(Engine):
         self.game_engine = game_engine
         self.game = None
         self.save_game = False
+        self.shots_taken = 0
 
     def reload_params(self):
         # Set PyGame attributes
@@ -168,8 +169,9 @@ class GraphicsEngine(Engine):
         difficulty=self.game_engine.menu.difficulty)
         self.game.game_speed *= self.game_engine.menu.game_speed
         self.init_saved_game_params(type=2)
-        MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
-        MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
+        #MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
+        #MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
+        self.scene.cue.moving = True
 
     def check_events(self):
         if self.quit:
@@ -373,14 +375,14 @@ class GraphicsEngine(Engine):
         
         return
 
-    def start_game(self, names = [], mode = None):
+    def start_game(self, names = [], mode = None, difficulty = "Normal"):
         if self.game.player1.type != 'IA' and self.game.player2.type != 'IA':
             if not self.game_started:
                 last_timestamp = time.time()
-                shots_taken = 0
+                self.shots_taken = 0
                 shots = {'p1':True, 'p2': True}
 
-                while True and shots_taken < 2:
+                while True and self.shots_taken < 2:
 
                     self.check_events()
 
@@ -419,7 +421,7 @@ class GraphicsEngine(Engine):
                                 self.render()
                                 scored = self.game.mode.update_score(self.game.current_player)
                                 self.game.changeCurrentPlayer(scored)
-                                shots_taken += 1
+                                self.shots_taken += 1
                                 print('VALIIIIID', valid)
 
 
@@ -442,7 +444,8 @@ class GraphicsEngine(Engine):
         self.game_started = True
         # self.mesh.vao.destroy()
         self.scene = Scene(self)
-        self.init_game_params(names, mode)
+        self.init_game_params(names, mode, difficulty)
+        self.run()
 
     
     def simulate_IA_turn(self):
@@ -888,10 +891,13 @@ class Menu:
         self.menu.mainloop(self.surface)
 
     def resume_the_game(self):
-        self.start = False
+        #self.start = False
         self.game_engine.app.pause = False
         self.game_engine.app.reload_params()
-        self.game_engine.app.run()
+        if self.start:
+            self.game_engine.app.start_game(names = [self.name,self.name2],mode = self.mode,difficulty = self.difficulty) 
+        else:   
+            self.game_engine.app.run()
 
     def quit_pause(self):
         if self.start:
