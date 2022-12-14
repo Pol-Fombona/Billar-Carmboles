@@ -10,7 +10,7 @@ from FreeCamera import *
 from mesh import Mesh
 from positions import *
 from scene import Scene
-from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game
+from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game, undo_turn
 
 from Light import Light
 from MovementManagement import checkCollisions
@@ -150,6 +150,7 @@ class GraphicsEngine(Engine):
         self.game_engine = game_engine
         self.game = None
         self.save_game = False
+        self.shots_taken = 0
 
     def reload_params(self):
         # Set PyGame attributes
@@ -165,11 +166,13 @@ class GraphicsEngine(Engine):
         self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
         self.mesh = Mesh(self)
         self.scene = Scene(self)
-        self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode,type=2)
+        self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode,type=2,
+        difficulty=self.game_engine.menu.difficulty)
         self.game.game_speed *= self.game_engine.menu.game_speed
         self.init_saved_game_params(type=2)
-        MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
-        MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
+        #MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
+        #MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
+        self.scene.cue.moving = True
 
     def game_save_frames_data_to_json(self):
         # Save frame data to json for metrics
@@ -291,13 +294,13 @@ class GraphicsEngine(Engine):
         return valid
 
 
-    def init_game_params(self,names = [], mode = None, type = 1):
+    def init_game_params(self,names = [], mode = None, type = 1, difficulty = "Normal"):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
         
         player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
         player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = mode)
 
-        self.game = Game(player1, player2, self.scene.ball_objects)
+        self.game = Game(player1, player2, self.scene.ball_objects, difficulty=difficulty)
         self.game.mode = FreeCarambole(max_turn=25, max_score=10)
 
         self.sound = SoundManager(self)
@@ -314,8 +317,9 @@ class GraphicsEngine(Engine):
 
         #save_data_path = "GameData/SavedGames/2022-12-01_12-09-18.pkl"
         if type == 2:
-            save_data_path = "MenuResources/temp/temp.pkl"
-        save_data_df = pd.read_pickle(save_data_path) 
+            save_data_df = self.game_engine.menu.game_df
+        else:
+            save_data_df = pd.read_pickle(save_data_path) 
         
         # Game data
         self.game.played_time = int(save_data_df.iloc[0]["PlayedTime"])
@@ -347,6 +351,18 @@ class GraphicsEngine(Engine):
         self.game.spheres[1].pos = save_data_df.iloc[0]["Sphere2Pos"]
         self.game.spheres[2].pos = save_data_df.iloc[0]["Sphere3Pos"]
 
+        if type == 2:
+            # Sphere Velocity
+            self.game.current_player.played = save_data_df.iloc[0]["Played"]
+            self.game.undo_turn = save_data_df.iloc[0]["Undo"]
+            self.game.current_player.collision_record = save_data_df.iloc[0]["ColRec"]
+            self.game.spheres_turn_initial_position[0] = save_data_df.iloc[0]["Sphere1PosInit"]
+            self.game.spheres_turn_initial_position[1] = save_data_df.iloc[0]["Sphere2PosInit"]
+            self.game.spheres_turn_initial_position[2] = save_data_df.iloc[0]["Sphere3PosInit"]
+            self.game.spheres[0].velocity = save_data_df.iloc[0]["Sphere1Vel"]
+            self.game.spheres[1].velocity = save_data_df.iloc[0]["Sphere2Vel"]
+            self.game.spheres[2].velocity = save_data_df.iloc[0]["Sphere3Vel"]
+
         MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
         MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
 
@@ -373,18 +389,19 @@ class GraphicsEngine(Engine):
         
         return
 
-    def start_game(self, names = [], mode = None):
+    def start_game(self, names = [], mode = None, difficulty = "Normal"):
         if self.game.player1.type != 'IA' and self.game.player2.type != 'IA':
             if not self.game_started:
                 last_timestamp = time.time()
-                shots_taken = 0
+                self.shots_taken = 0
                 shots = {'p1':True, 'p2': True}
 
-                while True and shots_taken < 2:
+                while True and self.shots_taken < 2:
 
                     self.check_events()
 
-                    if self.pause and self.game.getTurnStatus()=="initial":
+                    #if self.pause and self.game.getTurnStatus()=="initial":
+                    if self.pause and self.game.current_player.type != "IA":
                         #self.quit = pause_manager(self.game)
                         self.game_engine.menu.display_menu_pause(start=True)
                         last_timestamp = self.unpause()
@@ -405,6 +422,7 @@ class GraphicsEngine(Engine):
                                 # modificar l'status de played quan s'allibera el pal, 
                                 # es a dir quan s'ha fet el tir
                                 if sum(abs(self.game.current_player.ball.velocity)) != 0:
+                                    self.game.spheres_turn_initial_position = [self.game.spheres[i].pos for i in range(3)]
                                     self.game.current_player.played = True
 
                             case "played":
@@ -417,7 +435,7 @@ class GraphicsEngine(Engine):
                                 self.render()
                                 scored = self.game.mode.update_score(self.game.current_player)
                                 self.game.changeCurrentPlayer(scored)
-                                shots_taken += 1
+                                self.shots_taken += 1
                                 print('VALIIIIID', valid)
 
 
@@ -440,7 +458,8 @@ class GraphicsEngine(Engine):
         self.game_started = True
         # self.mesh.vao.destroy()
         self.scene = Scene(self)
-        self.init_game_params(names, mode)
+        self.init_game_params(names, mode, difficulty)
+        self.run()
 
     
     def simulate_IA_turn(self):
@@ -482,6 +501,8 @@ class GraphicsEngine(Engine):
 
         if undo_completed:
             self.game.undo_turn = False
+            MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
+            MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
 
         return 
 
@@ -494,7 +515,7 @@ class GraphicsEngine(Engine):
 
             self.check_events()
 
-            if self.pause and self.game.getTurnStatus()=="initial":
+            if self.pause and self.game.current_player.type != "IA":
                 #self.quit = pause_manager(self.game)
                 self.game_engine.menu.display_menu_pause()
                 last_timestamp = self.unpause()
@@ -685,7 +706,7 @@ class ReplayEngine(Engine):
 
             self.check_events()
 
-            if self.pause and self.game.getTurnStatus()=="initial":
+            if self.pause and self.game.current_player.type != "IA":
                     #self.quit = pause_manager(self.game)
                     self.game_engine.menu.display_menu_pause()
                     last_timestamp = self.unpause()
@@ -724,7 +745,9 @@ class Menu:
         self.game_speed = 1
         self.game_engine = Game
         self.start=False
-    
+        self.difficulty = "Normal"
+        self.game_df = None
+
     def display_menu(self):
         self.surface = pg.display.set_mode(W_SIZE)
         self.menu = pg_menu.Menu('Three cushion billiards', W_SIZE[0], W_SIZE[1],
@@ -763,8 +786,13 @@ class Menu:
         else:
             self.menu.add.text_input('Name Player1:', default='John Doe',onchange=self.set_name)
             self.name2 = "IA"
+            self.menu.add.selector('Difficulty ', [('Normal', "Normal"),
+            ("Hard", "Hard"),('Easy', "Easy")], onchange=self.select_difficulty)
         self.menu.add.button('Play', self.start_the_game)
         self.menu.add.button('Back', self.play)
+    
+    def select_difficulty(self,value,difficulty):
+        self.difficulty = difficulty
 
     def load_game(self):
         self.menu.clear() 
@@ -845,7 +873,7 @@ class Menu:
 
     def start_the_game(self):
         self.game_engine.app = GraphicsEngine(win_size=W_SIZE, game_engine = self.game_engine)
-        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode,difficulty = self.difficulty)
         #app.game_started = True
         self.game_engine.app.start_game(names = [self.name,self.name2], mode = self.mode)
         self.game_engine.app.game.game_speed *= self.game_speed
@@ -854,7 +882,8 @@ class Menu:
 
     def display_menu_pause(self,start=False):
         self.start = start
-        save_game(self.game_engine.app.game,2)
+        #save_game(self.game_engine.app.game,2)
+        self.save_temporal_data()
         self.game_engine.app.sound.stopSong()
         self.my_theme = pg_menu.Theme(
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
@@ -881,10 +910,13 @@ class Menu:
         self.menu.mainloop(self.surface)
 
     def resume_the_game(self):
-        self.start = False
+        #self.start = False
         self.game_engine.app.pause = False
         self.game_engine.app.reload_params()
-        self.game_engine.app.run()
+        if self.start:
+            self.game_engine.app.start_game(names = [self.name,self.name2],mode = self.mode,difficulty = self.difficulty) 
+        else:   
+            self.game_engine.app.run()
 
     def quit_pause(self):
         if self.start:
@@ -928,6 +960,7 @@ class Menu:
         self.menu.clear()
         self.menu.add.button('Friction', self.change_friction_pause)
         self.menu.add.button('Game Speed', self.change_speed_pause)
+        self.menu.add.button('Undo Turn', self.undo_move)
         self.menu.add.button('Show Controls', self.show_controls_pause)
         self.menu.add.button('Back', self.pause_menu)
     
@@ -951,9 +984,49 @@ class Menu:
             onchange=(self.apply_speed)
         )
         self.menu.add.button('Back', self.select_options_pause) 
+
+    def undo_move(self):
+        undo_turn(self.game_engine.app.game)
+        self.save_temporal_data()
+
     def show_controls_pause(self):
         self.menu.clear()
         self.menu.add.button('Back', self.select_options_pause) 
+
+    def save_temporal_data(self):
+        game = self.game_engine.app.game
+        # Game data to save
+        status_data = [game.current_player.name, game.played_time, game.mode,
+                        game.game_speed, game.current_player.played, game.undo_turn, 
+                        game.current_player.collision_record]
+        status_columns = ["CurrentPlayer", "PlayedTime", "Mode", "GameSpeed", 
+                          "Played", "Undo", "ColRec"]
+
+        # Player data to save
+        p1 = game.player1
+        p1_data = [p1.name, p1.ball.id, p1.score, p1.turn_count, p1.type]
+        p1_columns = ["P1Name", "P1BallID", "P1Score", "P1Turn", "P1Type"]
+        
+        p2 = game.player2
+        p2_data = [p2.name, p2.ball.id, p2.score,
+                    p2.turn_count, p2.type]
+        p2_columns = ["P2Name", "P2BallID", "P2Score", "P2Turn", "P2Type"]
+
+        # Sphere position data
+        sphere_data = [game.spheres[i].pos for i in range(3)]
+        sphere_columns = ["Sphere1Pos", "Sphere2Pos", "Sphere3Pos"]
+
+        sphere_initial_data = [game.spheres_turn_initial_position[i] for i in range(3)]
+        sphere_initial_columns = ["Sphere1PosInit", "Sphere2PosInit", "Sphere3PosInit"]
+
+        # Sphere velocity data
+        sphere_data_vel = [game.spheres[i].velocity for i in range(3)]
+        sphere_columns_vel = ["Sphere1Vel", "Sphere2Vel", "Sphere3Vel"]
+
+        game_data = status_data + p1_data + p2_data + sphere_data + sphere_data_vel + sphere_initial_data
+        game_columns = status_columns + p1_columns + p2_columns + sphere_columns + sphere_columns_vel + sphere_initial_columns
+
+        self.game_df = pd.DataFrame([game_data], columns = game_columns)
 
 class Game_Engine:
     def __init__(self):
