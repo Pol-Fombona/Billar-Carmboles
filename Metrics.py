@@ -114,6 +114,7 @@ def create_heamaps(data):
     turn_heatmaps = []
     for file in os.listdir(path_temp):
         turn_heatmaps.append(imageio.v2.imread(path_temp + file))
+
     imageio.mimsave(path_temp + "Evolution.gif", turn_heatmaps, duration = 0.5)
 
     # Create heatmap from entire match
@@ -206,7 +207,6 @@ def movement_graph(movement, players, ax):
     x_axis = np.arange(len(labels))
     x_ticks = [i for i in range(0,int(max(movement)) + 200, 100)]
 
-    #fig = plt.figure(figsize = (10, 5))
     bars = ax.barh(x_axis - 0.1, movement[:3], height=0.2, color ='green', label = players[0],)
     bars2 = ax.barh(x_axis + 0.1, movement[3:], height=0.2, color ='orange', label = players[1],)
 
