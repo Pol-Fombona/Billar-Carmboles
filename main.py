@@ -22,6 +22,7 @@ from ScoreManager import *
 from PickleManager import (save_game_record_to_pickle, clean_replay_data_file, 
                         load_replay_data)
 from IAManager import make_turn
+from Metrics import create_graphs
 import MovementManagement
 import pandas as pd
 import json
@@ -75,7 +76,7 @@ class Engine():
         self.camera_modes = ["Bird", "Free", "Bird", "Sphere"]
         self.camera_mode_index = 0
 
-        self.game_data = {}
+        self.game_data = [0]
         self.save_data = False
 
         
@@ -170,19 +171,32 @@ class GraphicsEngine(Engine):
         MoveCue.change_objective(self.scene.cue,self.game.current_player.ball)
         MoveLine.change_objective(self.scene.line,self.game.current_player.ball)
 
+    def game_save_frames_data_to_json(self):
+        # Save frame data to json for metrics
+
+        if self.save_data:
+            columns = ["PlayerName", "TurnStatus", "TurnCount", "Pos1", "Pos2", "Pos3"]
+            self.game_data = self.game_data[1:]
+            df = pd.DataFrame(self.game_data, columns=columns)
+            #df.to_pickle("test.pkl")
+            create_graphs(df) # Create  metrics graphs
+            '''
+            try:
+                with open('data.json', 'r') as j:
+                    listObj = json.loads(j.read())
+            except: 
+                listObj = []
+            listObj.append(self.game_data)
+            
+            with open('data.json', 'w') as json_file:
+                json.dump(listObj, json_file, indent=4)
+            '''
+
+
     def check_events(self):
-        if self.quit:
-            if self.save_data:
-                try:
-                    with open('data.json', 'r') as j:
-                        listObj = json.loads(j.read())
-                except: 
-                    listObj = []
-                listObj.append(self.game_data)
-                with open('data.json', 'w') as json_file:
-                    json.dump(listObj, json_file, indent=4)
-                
-                
+        if self.quit:    
+            
+            self.game_save_frames_data_to_json()
             self.mesh.destroy()
             self.sound.destroy()
             pg.quit()
@@ -432,14 +446,9 @@ class GraphicsEngine(Engine):
     def simulate_IA_turn(self):
         # Simulates turn made by IA
 
-        #self.camera.bird_camera = True # Bird camera is defaulted when IA plays
-        #self.camera.update()
-        #self.render()
         pg.display.set_caption("Processing IA turn...")
-        turn_data = make_turn(50, self.scene.ball_objects, self.game)
+        turn_data = make_turn(self.scene.ball_objects, self.game)
         self.game.current_player.ball.update_velocity_values(turn_data)
-        #self.game.current_player.ball.velocity = turn_data
-        #self.game.current_player.ball.abs_velocity = sum(abs(turn_data))
         self.game.current_player.played = True
         pg.event.clear()
 
@@ -540,7 +549,7 @@ class GraphicsEngine(Engine):
 
             self.record_frame_data()
 
-    def save_game_data(self, turn_status, scored=False):
+    def save_game_data2(self, turn_status, scored=False):
         current_player = self.game.current_player
         if turn_status == 'IA':
             if current_player.name not in self.game_data.keys():
@@ -576,6 +585,16 @@ class GraphicsEngine(Engine):
                     'scored': scored
                 }
 
+
+    def save_game_data(self, turn_status, score = None):
+
+        data = [self.game.current_player.name, turn_status, self.game.current_player.turn_count,
+                self.game.spheres[0].pos, self.game.spheres[1].pos, self.game.spheres[2].pos]
+
+        if data != self.game_data[-1]:
+            self.game_data.append(data)
+            
+        return
 
 
 class ReplayEngine(Engine):
@@ -873,6 +892,8 @@ class Menu:
                 self.game_engine.app.mesh.destroy()
             pg_menu.events.EXIT
             sys.exit()    
+
+        self.game_engine.app.game_save_frames_data_to_json()
         self.menu.clear()
         self.menu.add.selector(title="Save Replay",
                                items=[("Yes",True),
