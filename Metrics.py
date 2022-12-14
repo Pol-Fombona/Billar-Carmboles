@@ -87,7 +87,7 @@ def plot_heatmap(positions, title = None):
     if title != None:
         ax.set(title=title)
 
-    plt.savefig("C:/Users/Admin/Desktop/4t/EGRA/Billar/Billar-Carmboles/GameData/Metrics/" + "Heatmap " + title + ".png",
+    plt.savefig("GameData/Metrics/" + "Heatmap " + title + ".png",
                     transparent = False, bbox_inches='tight')
 
     plt.close()
@@ -110,10 +110,11 @@ def create_heamaps(data):
         plot_heatmap(positions=positions_list, title="Turn " + str(turn))
 
     # Create gif from heatmaps
-    path_temp = "C:/Users/Admin/Desktop/4t/EGRA/Billar/Billar-Carmboles/GameData/Metrics/"
+    path_temp = "GameData/Metrics/"
     turn_heatmaps = []
     for file in os.listdir(path_temp):
-        turn_heatmaps.append(imageio.v2.imread(path_temp + file))
+        if "Turn" in file:
+            turn_heatmaps.append(imageio.v2.imread(path_temp + file))
 
     imageio.mimsave(path_temp + "Evolution.gif", turn_heatmaps, duration = 0.5)
 
@@ -170,7 +171,7 @@ def create_total_movement_graph(data):
     boxplot_graph(spheres_movement_by_turn, players[0], ax1)
     boxplot_graph(spheres_movement_by_turn, players[1], ax2)
 
-    plt.savefig("C:/Users/Admin/Desktop/4t/EGRA/Billar/Billar-Carmboles/GameData/Metrics/" + "sphere_data.png")
+    plt.savefig("GameData/Metrics/" + "sphere_data.png")
 
 
 def boxplot_graph(data, player, ax):
