@@ -424,7 +424,6 @@ class GraphicsEngine(Engine):
                                 scored = self.game.mode.update_score(self.game.current_player)
                                 self.game.changeCurrentPlayer(scored)
                                 self.shots_taken += 1
-                                print('VALIIIIID', valid)
 
 
 
