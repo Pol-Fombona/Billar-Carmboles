@@ -6,8 +6,9 @@ import time
 
 # Probability to return best move (based on game difficulty)
 return_best_move_probabilities = {"Easy":[0.5, 0.5], "Normal":[0.7, 0.3], "Hard":[0.9, 0.1]}
+total_simulated_turns = {"Easy": 50, "Normal":125, "Hard":200}
 
-def make_turn(n_turns_simulated, ball_objects, game):
+def make_turn(ball_objects, game):
     # Loop to simulate n turns
     # If one turn gets a perfect score, return the velocity data of that simulation
     # Else it will return the one with max score that is not perfect score
@@ -15,6 +16,7 @@ def make_turn(n_turns_simulated, ball_objects, game):
     #print("\nIA start")
     start = time.time()
 
+    n_turns_simulated = total_simulated_turns[game.difficulty]
     # Velocity range [+-0.1, +-2]
     possible_values = [i for i in range(1, 21)]
 
@@ -24,16 +26,7 @@ def make_turn(n_turns_simulated, ball_objects, game):
                     0.04, 0.04, 0.04, 0.04, 0.04,
                     0.02, 0.02, 0.02, 0.02, 0.02]
 
-    # La que està comentada retorna una probabilitat descendent però no funciona tant bé
-    '''
-    temp_probabilities = sorted([random.randint(0, 2**64) for _ in range(len(possible_values))], reverse=True)
-    temp_sum = sum(temp_probabilities)
-    probabilities = [i/temp_sum for i in temp_probabilities]
-    '''
-
     # Turn data: array de shape (n_turns, 3) that contains for each turn a random 3-component array velocity 
-    #turn_data = np.array([[randrange(1,20)/10*choice([1,-1]), 0, randrange(5,20)/10*choice([-1,1])] 
-    #                        for i in range(n_turns_simulated)])
     turn_data = np.array([[np.random.choice(possible_values, p=probabilities) / 10 * choice([1, -1]), 
                             0,
                             np.random.choice(possible_values, p=probabilities) / 10 * choice([1, -1])]
@@ -70,21 +63,12 @@ def make_turn(n_turns_simulated, ball_objects, game):
 
     # Returns best movement that is not a perfect score
     return turn_data[scores.index(max(scores))]
-    '''
-    elif 0.5 in scores:
-        return turn_data[scores.index(0.5)]
-
-    else:
-        return turn_data[randrange(0,len(scores))]
-    '''
 
 
 def simulate_turn(data, game):
     # Simulate turns and returns the score
 
     game.current_player.ball.update_velocity_values(data.copy())
-    #game.current_player.ball.velocity = data.copy()
-    #game.current_player.ball.abs_velocity = sum(abs(data))
 
     # Loop until all sphere are still
     while True:
