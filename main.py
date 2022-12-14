@@ -181,19 +181,7 @@ class GraphicsEngine(Engine):
             columns = ["PlayerName", "TurnStatus", "TurnCount", "Pos1", "Pos2", "Pos3"]
             self.game_data = self.game_data[1:]
             df = pd.DataFrame(self.game_data, columns=columns)
-            #df.to_pickle("test.pkl")
             create_graphs(df) # Create  metrics graphs
-            '''
-            try:
-                with open('data.json', 'r') as j:
-                    listObj = json.loads(j.read())
-            except: 
-                listObj = []
-            listObj.append(self.game_data)
-            
-            with open('data.json', 'w') as json_file:
-                json.dump(listObj, json_file, indent=4)
-            '''
 
 
     def check_events(self):
