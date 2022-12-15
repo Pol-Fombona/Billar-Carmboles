@@ -60,15 +60,19 @@ T_Z = 225
 S_HEIGHT = 80
 S_X = 225
 S_Z = 225
-#Parets
-P_X = 225
-P_Z = 225
-P_H = 80
-P_F1 = 225/3
-P_F2 = 550/3
-P_F3 = 50/3
-P_F4 = 100/3
 
+#Walls
+W_0_X = -150
+W_0_Y = -20.5
+W_0_Z = -150
+
+W_X = T_X - INICI_TERRA
+W_Y = S_HEIGHT - T_Y
+W_Z = T_Z - INICI_TERRA
+
+W_WIN_X = W_X/3
+W_WIN_Y = W_Y*0.8
+W_WIN_Z = W_Z/3
 
 
 

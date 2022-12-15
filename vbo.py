@@ -767,7 +767,7 @@ class LineVBO(BaseVBO):
         vertex_data = self.get_data(vertices, indices)
         return vertex_data
 
-class ParetsVBO(BaseVBO):
+class ParetsVBO(BaseVBO): 
     def __init__(self, app):
         super().__init__(app.ctx)
         self.format = "2f 3f 3f"
@@ -778,107 +778,134 @@ class ParetsVBO(BaseVBO):
         data = [vertices[ind] for triangle in indices for ind in triangle]
         return np.array(data, dtype="f4")
 
-    def get_vertex_data(self):#(respecte eix y)
-
+    def get_vertex_data(self):
         vertices = [
-            (INICI_TERRA, T_Y, INICI_TERRA),
-            (P_X, T_Y, INICI_TERRA),
-            (P_X, S_HEIGHT, INICI_TERRA),
-            (INICI_TERRA, S_HEIGHT, INICI_TERRA),
-            (INICI_TERRA, T_Y, P_Z),
-            (P_X, T_Y, P_Z),
-            (P_X, S_HEIGHT, P_Z),
-            (INICI_TERRA, S_HEIGHT, P_Z)
+            # First Wall
+            (W_0_X, W_0_Y, W_0_Z),
+            (W_0_X + W_WIN_X, W_0_Y, W_0_Z),
+            (W_0_X + W_WIN_X, W_0_Y + W_Y, W_0_Z),
+            (W_0_X, W_0_Y + W_Y, W_0_Z),
+            (W_0_X + W_WIN_X*2, W_0_Y, W_0_Z),
+            (W_0_X + W_WIN_X*2, W_0_Y + W_Y, W_0_Z),
+            (W_0_X + W_X, W_0_Y, W_0_Z),
+            (W_0_X + W_X, W_0_Y + W_Y, W_0_Z),
+            (W_0_X + W_WIN_X, W_0_Y + W_WIN_Y, W_0_Z),
+            (W_0_X + W_WIN_X*2, W_0_Y + W_WIN_Y, W_0_Z),
+            # Second Wall
+            (W_0_X, W_0_Y, W_0_Z + W_Z),
+            (W_0_X + W_WIN_X, W_0_Y, W_0_Z + W_Z),
+            (W_0_X + W_WIN_X, W_0_Y + W_Y, W_0_Z + W_Z),
+            (W_0_X, W_0_Y + W_Y, W_0_Z + W_Z),
+            (W_0_X + W_WIN_X*2, W_0_Y, W_0_Z + W_Z),
+            (W_0_X + W_WIN_X*2, W_0_Y + W_Y, W_0_Z + W_Z),
+            (W_0_X + W_X, W_0_Y, W_0_Z + W_Z),
+            (W_0_X + W_X, W_0_Y + W_Y, W_0_Z + W_Z),
+            (W_0_X + W_WIN_X, W_0_Y + W_WIN_Y, W_0_Z + W_Z),
+            (W_0_X + W_WIN_X*2, W_0_Y + W_WIN_Y, W_0_Z + W_Z),
+            #Third Wall
+            (W_0_X, W_0_Y, W_0_Z),
+            (W_0_X, W_0_Y, W_0_Z + W_WIN_Z),
+            (W_0_X, W_0_Y + W_Y, W_0_Z + W_WIN_Z),
+            (W_0_X, W_0_Y + W_Y, W_0_Z),
+            (W_0_X, W_0_Y, W_0_Z + W_WIN_Z*2),
+            (W_0_X, W_0_Y + W_Y, W_0_Z + W_WIN_Z*2),
+            (W_0_X, W_0_Y, W_0_Z + W_Z),
+            (W_0_X, W_0_Y + W_Y, W_0_Z + W_Z),
+            (W_0_X, W_0_Y + W_WIN_Y, W_0_Z + W_WIN_Z),
+            (W_0_X, W_0_Y + W_WIN_Y, W_0_Z + W_WIN_Z*2),
+            #Fourt Wall
+            (W_0_X + W_X, W_0_Y, W_0_Z),
+            (W_0_X + W_X, W_0_Y, W_0_Z + W_WIN_Z),
+            (W_0_X + W_X, W_0_Y + W_Y, W_0_Z + W_WIN_Z),
+            (W_0_X + W_X, W_0_Y + W_Y, W_0_Z),
+            (W_0_X + W_X, W_0_Y, W_0_Z + W_WIN_Z*2),
+            (W_0_X + W_X, W_0_Y + W_Y, W_0_Z + W_WIN_Z*2),
+            (W_0_X + W_X, W_0_Y, W_0_Z + W_Z),
+            (W_0_X + W_X, W_0_Y + W_Y, W_0_Z + W_Z),
+            (W_0_X + W_X, W_0_Y + W_WIN_Y, W_0_Z + W_WIN_Z),
+            (W_0_X + W_X, W_0_Y + W_WIN_Y, W_0_Z + W_WIN_Z*2),    
         ]
 
         indices = [
             (0, 1, 2),
             (0, 2, 3),
-            (4, 5, 6),
+            (1, 4, 9),
+            (1, 9, 8),
             (4, 6, 7),
-            (0, 4, 7),
-            (0, 7, 3),
-            (1, 5, 6),
-            (1, 6, 2),
+            (4, 7, 5),
+
+            # Second Wall
+            (10, 11, 12),
+            (10, 12, 13),
+            (11, 14, 19),
+            (11, 19, 18),
+            (14, 16, 17),
+            (14, 17, 15),
+
+            # Third Wall
+            (20, 21, 22),
+            (20, 22, 23),
+            (21, 24, 29),
+            (21, 29, 28),
+            (24, 26, 27),
+            (24, 27, 25),
+
+            #Fourth Wall
+            (30, 31, 32),
+            (30, 32, 33),
+            (31, 34, 39),
+            (31, 39, 38),
+            (34, 36, 37),
+            (34, 37, 35),
         ]
         
-        # vertices = [
-        #     (-150,-20.5,-150),
-        #     (P_X,-20.5,-150),
-        #     (-150,-20.5,P_Z),
-        #     (P_X,-20.5,P_Z),
-        #     (-150,P_H,-150),
-        #     (P_X,P_H,-150),
-        #     (-150,P_H,P_Z),
-        #     (P_X,P_H,P_Z),
-        #     (P_F1,-20.5,-150),
-        #     (P_F2,-20.5,-150),
-        #     (P_F2,P_F3,-150),
-        #     (P_F2,P_F4,-150),
-        #     (P_F2,P_H,-150),
-        #     (P_F1,P_H,-150),
-        #     (P_F1,P_F4,-150),
-        #     (P_F1,P_F3,-150),
-        #     (P_F1,-20.5,P_Z),
-        #     (P_F2,-20.5,P_Z),
-        #     (P_F2,P_F3,P_Z),
-        #     (P_F2,P_F4,P_Z),
-        #     (P_F2,P_H,P_Z),
-        #     (P_F1,P_H,P_Z),
-        #     (P_F1,P_F4,P_Z),
-        #     (P_F1,P_F3,P_Z)
-        #     ]
-    
-        # indices = [
-        #     (0,6,4),
-        #     (0,2,6),
-        #     (3,5,7),
-        #     (3,1,5),
-        #     (0,8,13),
-        #     (13,4,0),
-        #     (8,9,10),
-        #     (10,15,8),
-        #     (9,1,5),
-        #     (5,12,9),
-        #     (14,11,12),
-        #     (12,13,14),
-        #     (2,16,21),
-        #     (21,6,2),
-        #     (16,17,18),
-        #     (18,23,16),
-        #     (17,3,7),
-        #     (7,20,17),
-        #     (22,19,20),
-        #     (20,21,22)
-        #     ]
-        
         vertex_data = self.get_data(vertices, indices)
-        
-        # tex_coord = [(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(-150,-150),(P_X,-150),(-150,P_Z),(P_X,P_Z),(P_F1,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F2,-150),(P_F1,-150),(P_F1,-150),(P_F1,-150),(P_F1,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F2,P_Z),(P_F1,P_Z),(P_F1,P_Z),(P_F1,P_Z)]
-        
-        # tex_coord_indices = [(0,6,4),(0,2,6),(3,5,7),(3,1,5),(0,8,13),(13,4,0),(8,9,10),(10,15,8),(9,1,5),(5,12,9),(14,11,12),(12,13,14),(2,16,21),(21,6,2),(16,17,18),(18,23,16),(17,3,7),(7,20,17),(22,19,20),(20,21,22)]
-        
-        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
+
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
         tex_coord_indices = [
             (0, 1, 2),
             (0, 2, 3),
+            (0, 4, 5),
+            (0, 5, 6),
             (0, 1, 2),
             (0, 2, 3),
             (0, 1, 2),
             (0, 2, 3),
+            (0, 4, 5),
+            (0, 5, 6),
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 4, 5),
+            (0, 5, 6),
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 1, 2),
+            (0, 2, 3),
+            (0, 4, 5),
+            (0, 5, 6),
             (0, 1, 2),
             (0, 2, 3),
         ]
 
         normals = [
             (0, 0, 1) * 6,
+            (0, 0, 1) * 6,
+            (0, 0, 1) * 6,
+            (0, 0, -1) * 6,
+            (0, 0, -1) * 6,
             (0, 0, -1) * 6,
             (1, 0, 0) * 6,
+            (1, 0, 0) * 6,
+            (1, 0, 0) * 6,
+            (-1, 0, 0) * 6,
+            (-1, 0, 0) * 6,
             (-1, 0, 0) * 6,
 
         ]
         
-        normals = np.array(normals, dtype="f4").reshape(24, 3)
+        normals = np.array(normals, dtype="f4").reshape(72, 3)
 
         vertex_data = np.hstack([normals, vertex_data])
 
