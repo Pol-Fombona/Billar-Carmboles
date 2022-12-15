@@ -10,7 +10,7 @@ from FreeCamera import *
 from mesh import Mesh
 from positions import *
 from scene import Scene
-from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game, undo_turn
+from MenuManager import pause_manager, progress_manager, format_time, game_ended, save_game, undo_turn, update_ranking
 
 from Light import Light
 from MovementManagement import checkCollisions
@@ -25,6 +25,7 @@ from IAManager import make_turn
 from Metrics import create_graphs
 import MovementManagement
 import pandas as pd
+import datetime
 import json
 
 
@@ -742,14 +743,14 @@ class Menu:
 
         self.my_theme = pg_menu.Theme(
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
-            title_font_size=60,
-            title_offset=(30,100),
-            title_font = pg_menu.font.FONT_8BIT,
+            title_font_size=80,
+            title_offset=(340,50),
+            title_font = pg_menu.font.FONT_FRANCHISE,
             background_color=self.myimage,
             title_background_color=(4, 47, 126),
-            widget_font=pg_menu.font.FONT_8BIT,
+            widget_font=pg_menu.font.FONT_FRANCHISE,
             widget_font_color = (139,0,0),
-            widget_font_size = 50
+            widget_font_size = 70
         )
         self.mode = 'PvP'
         self.name = 'John Doe'
@@ -887,7 +888,7 @@ class Menu:
             ('x1', 1),
             ('x2',2),
             ('x4',4)],
-            font_size=30,
+            font_size=70,
             selection_option_font_size=34,
             onchange=(self.apply_speed)
         )
@@ -931,14 +932,14 @@ class Menu:
         self.game_engine.app.sound.stopSong()
         self.my_theme = pg_menu.Theme(
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
-            title_font_size=60,
-            title_offset=(350,100),
-            title_font = pg_menu.font.FONT_8BIT,
+            title_font_size=100,
+            title_offset=(470,50),
+            title_font = pg_menu.font.FONT_FRANCHISE,
             background_color=self.myimage,
             title_background_color=(4, 47, 126),
-            widget_font=pg_menu.font.FONT_8BIT,
+            widget_font=pg_menu.font.FONT_FRANCHISE,
             widget_font_color = (139,0,0),
-            widget_font_size = 60
+            widget_font_size = 80
         )
         self.surface = pg.display.set_mode(W_SIZE)
         self.menu = pg_menu.Menu('Pause Menu', W_SIZE[0], W_SIZE[1],
@@ -950,7 +951,7 @@ class Menu:
         self.menu.add.button('Resume', self.resume_the_game)
         self.menu.add.button('Options', self.select_options_pause)
         self.menu.add.button('Save Game', self.saveGame)
-        self.menu.add.button('Quit', self.quit_pause)
+        self.menu.add.button('Quit', self.show_summary)
         self.menu.mainloop(self.surface)
 
     def resume_the_game(self):
@@ -961,6 +962,26 @@ class Menu:
             self.game_engine.app.start_game(names = [self.name,self.name2],mode = self.mode,difficulty = self.difficulty) 
         else:   
             self.game_engine.app.run()
+
+    def show_summary(self):
+        self.menu.clear()
+        time = datetime.timedelta(seconds=self.game_engine.app.game.played_time)
+        self.menu.add.label("Game Finished")
+        self.menu.add.label("Played Time:" + str(time))
+        scores = self.game_engine.app.game.get_scores()
+        self.menu.add.label("Score:"+ scores[1:-1])
+
+        if self.game_engine.app.game.player1.score > self.game_engine.app.game.player2.score:    
+            self.menu.add.label("Winner: " + self.game_engine.app.game.player1.name)
+
+        elif self.game_engine.app.game.player1.score < self.game_engine.app.game.player2.score:
+            self.menu.add.label("Winner: " + self.game_engine.app.game.player2.name)
+
+        else:
+            self.menu.add.label("Draw")
+
+        update_ranking(self.game_engine.app.game)
+        self.menu.add.button('Next', self.quit_pause)
 
     def quit_pause(self):
         if self.start:
@@ -974,13 +995,13 @@ class Menu:
         self.menu.add.selector(title="Save Replay",
                                items=[("No",False),
                                ("Yes",True)],
-                                font_size=50,
+                                font_size=80,
                                 selection_color = (139,0,0),
                                 onchange=self.save_rep)
         self.menu.add.selector(title="Save Graphics",
                                items=[("No",False),
                                ("Yes",True)],
-                                font_size=50,
+                                font_size=80,
                                 selection_color = (139,0,0),
                                 onchange=self.save_graphics)
         self.menu.add.button('Quit', self.exit_pause)
@@ -1051,7 +1072,7 @@ class Menu:
             ('x1', 1),
             ('x2',2),
             ('x4',4)],
-            font_size=30,
+            font_size=80,
             selection_option_font_size=34,
             onchange=(self.apply_speed)
         )
@@ -1072,17 +1093,17 @@ class Menu:
         #self.game_engine.app.sound.stopSong()
         self.my_theme = pg_menu.Theme(
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
-            title_font_size=60,
-            title_offset=(350,100),
-            title_font = pg_menu.font.FONT_8BIT,
+            title_font_size=100,
+            title_offset=(460,100),
+            title_font = pg_menu.font.FONT_FRANCHISE,
             background_color=self.myimage,
             title_background_color=(4, 47, 126),
-            widget_font=pg_menu.font.FONT_8BIT,
+            widget_font=pg_menu.font.FONT_FRANCHISE,
             widget_font_color = (139,0,0),
-            widget_font_size = 60
+            widget_font_size = 80
         )
         self.surface = pg.display.set_mode(W_SIZE)
-        self.menu = pg_menu.Menu('Pause Menu', W_SIZE[0], W_SIZE[1],
+        self.menu = pg_menu.Menu('Replay Menu', W_SIZE[0], W_SIZE[1],
                        theme=self.my_theme)
         self.replay_menu() 
     
@@ -1106,7 +1127,7 @@ class Menu:
             ('x1', 1),
             ('x2',2),
             ('x4',4)],
-            font_size=30,
+            font_size=80,
             selection_option_font_size=34,
             onchange=(self.apply_speed)
         )
