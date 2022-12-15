@@ -740,6 +740,8 @@ class Menu:
         self.typeGame = "FreeCarambole"
         self.max_score = 10
         self.max_turn = 25
+        self.bool_replay = False
+        self.bool_graphics = False
 
     def display_menu(self):
         self.surface = pg.display.set_mode(W_SIZE)
@@ -940,11 +942,30 @@ class Menu:
         #self.game_engine.app.game_save_frames_data_to_json()
         self.menu.clear()
         self.menu.add.selector(title="Save Replay",
-                               items=[("Yes",True),
-                               ("No",False)],
+                               items=[("No",False),
+                               ("Yes",True)],
                                 font_size=50,
                                 selection_color = (139,0,0),
-                                onreturn=self.save_rep)
+                                onchange=self.save_rep)
+        self.menu.add.selector(title="Save Graphics",
+                               items=[("No",False),
+                               ("Yes",True)],
+                                font_size=50,
+                                selection_color = (139,0,0),
+                                onchange=self.save_graphics)
+        self.menu.add.button('Quit', self.exit_pause)
+
+    def exit_pause(self):
+        if self.bool_replay:
+            self.game_engine.app.save_game_record()    
+        if self.bool_graphics:
+            self.menu.clear()
+            self.menu.add.label("Processing Graphics...")
+            self.game_engine.app.game_save_frames_data_to_json()      
+        if self.game_engine.app != None:
+            self.game_engine.app.mesh.destroy()
+        pg_menu.events.EXIT
+        sys.exit()
         
 
     def saveGame(self):
@@ -962,28 +983,26 @@ class Menu:
   
     def save_rep(self,value,save_bool):
         if save_bool:
-            self.game_engine.app.save_game_record()  
-        self.menu.clear()
-        self.menu.add.selector(title="Save Graphics",
-                               items=[("Yes",True),
-                               ("No",False)],
-                                font_size=50,
-                                selection_color = (139,0,0),
-                                onreturn=self.save_graphics)
+            self.bool_replay = True
+        else:
+            self.bool_replay = False
+        
     
     def save_graphics(self,value,save_bool):
         if save_bool:
-            self.game_engine.app.game_save_frames_data_to_json()   
-        if self.game_engine.app != None:
-            self.game_engine.app.mesh.destroy()
-        pg_menu.events.EXIT
-        sys.exit()
+            self.bool_graphics = True
+        else:
+            self.bool_graphics = False
+              
+
 
     def select_options_pause(self):
         self.menu.clear()
         self.menu.add.button('Friction', self.change_friction_pause)
         self.menu.add.button('Game Speed', self.change_speed_pause)
-        self.menu.add.button('Undo Turn', self.undo_move)
+        if self.game_engine.app.game.getTurnStatus() != "initial":
+            print(self.game_engine.app.game.getTurnStatus())
+            self.menu.add.button('Undo Turn', self.undo_move)
         self.menu.add.button('Show Controls', self.show_controls_pause)
         self.menu.add.button('Back', self.pause_menu)
     
