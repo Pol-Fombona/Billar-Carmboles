@@ -234,9 +234,15 @@ def get_sphere_total_movement(data):
 def create_graphs(data):
     # Creates and saves graphs
 
-    # Remove old files
-    for file in os.listdir("Gamedata/Metrics"):
-        os.remove("Gamedata/Metrics/"+file)
+    # Creates path if not exists
+    newpath = "Gamedata/Metrics"
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+
+    else:
+        # Remove old files
+        for file in os.listdir("Gamedata/Metrics"):
+            os.remove("Gamedata/Metrics/"+file)
 
     create_heamaps(data)
     create_total_movement_graph(data)   
