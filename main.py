@@ -281,9 +281,15 @@ class GraphicsEngine(Engine):
 
     def init_game_params(self,names = [], mode = None, type = 1, difficulty = "Normal"):
         # Aqui és on preguntarem nom dels jugador i mode que volen jugar
-        
-        player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
-        player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = mode)
+        if mode == "IA vs IA":
+            player1 = Player(name = names[0], ball = self.scene.ball_objects[0], type = "IA")
+            player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = "IA")
+        elif mode == "PvP":
+            player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
+            player2 = Player(name = names[1], ball = self.scene.ball_objects[1])    
+        elif mode == "Player vs IA":
+            player1 = Player(name = names[0], ball = self.scene.ball_objects[0])
+            player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = "IA")  
 
         self.game = Game(player1, player2, self.scene.ball_objects, difficulty=difficulty)
         if self.game_engine.menu.typeGame == "FreeCarambole":
@@ -745,7 +751,7 @@ class Menu:
             widget_font_color = (139,0,0),
             widget_font_size = 50
         )
-        self.mode = None
+        self.mode = 'PvP'
         self.name = 'John Doe'
         self.name2 = 'Jane Fey'
         self.replays = [x for x in os.listdir("GameData/Replays")]
@@ -787,20 +793,25 @@ class Menu:
     def select_typeGame(self,value,typeGame):
         self.typeGame = typeGame      
     def play(self):
-        self.mode = None
         self.menu.clear() 
         self.menu.add.selector('Game Type ', [('Free', 'FreeCarambole'), ('ThreeWay', 'ThreeWayCarambole')], onchange=self.select_typeGame)
-        self.menu.add.selector('Mode ', [('PvP', None), ('vs IA', "IA")], onchange=self.select_mode)
+        self.menu.add.selector('Mode ', [('PvP', 'PvP'), ('Player vs IA', 'Player vs IA'),
+        ('IA vs IA', 'IA vs IA')], onchange=self.select_mode)
         self.menu.add.button('Next', self.set_params_game)
         self.menu.add.button('Back', self.on_init)
     def set_params_game(self):
         self.menu.clear() 
-        if self.mode == None:
+        if self.mode == "PvP":
             self.menu.add.text_input('Name Player1:', default='John Doe',onchange=self.set_name)
             self.menu.add.text_input('Name Player2:', default='Jane Fey',onchange=self.set_name2)
-        else:
+        elif self.mode == "Player vs IA":
             self.menu.add.text_input('Name Player1:', default='John Doe',onchange=self.set_name)
             self.name2 = "IA"
+            self.menu.add.selector('Difficulty ', [('Normal', "Normal"),
+            ("Hard", "Hard"),('Easy', "Easy")], onchange=self.select_difficulty)
+        else:
+            self.name = "IA"
+            self.name2 = "IA 2"
             self.menu.add.selector('Difficulty ', [('Normal', "Normal"),
             ("Hard", "Hard"),('Easy', "Easy")], onchange=self.select_difficulty)
         self.menu.add.button('Additional Options', self.set_add_options)
@@ -906,8 +917,10 @@ class Menu:
         self.game_engine.app = GraphicsEngine(win_size=W_SIZE, game_engine = self.game_engine)
         self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode,difficulty = self.difficulty)
         #app.game_started = True
-        self.game_engine.app.start_game(names = [self.name,self.name2], mode = self.mode)
         self.game_engine.app.game.game_speed *= self.game_speed
+        if self.mode == "PvP":
+            self.game_engine.app.start_game(names = [self.name,self.name2], mode = self.mode)
+        #self.game_engine.app.game.game_speed *= self.game_speed
         #app.init_saved_game_params()
         self.game_engine.app.run()
 
