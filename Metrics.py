@@ -82,6 +82,7 @@ def plot_heatmap(positions, title = None):
     ax.set(xticklabels=[], yticklabels=[])
     ax.set(xlabel="Table Width", ylabel="Table Height")
     ax.invert_xaxis()
+    ax.grid(None)
     
     if title != None:
         ax.set(title=title)
@@ -99,11 +100,10 @@ def get_distance(a, b):
 
 
 def create_heamaps(data):
-
-    plt.ioff()
-
     # Create turn heatmaps individually for every turn
+
     turns = list(data["TurnCount"].unique())
+
     for turn in turns:
         positions_list = get_position_list(data[data["TurnCount"] == turn], cols=["Pos1", "Pos2", "Pos3"])
         plot_heatmap(positions=positions_list, title="Turn " + str(turn).zfill(4))
@@ -111,15 +111,17 @@ def create_heamaps(data):
     # Create gif from heatmaps
     path_temp = "GameData/Metrics/"
     turn_heatmaps = []
+    
     for file in os.listdir(path_temp):
         if "Turn" in file:
             turn_heatmaps.append(imageio.v2.imread(path_temp + file))
-
+    
     imageio.mimsave(path_temp + "Evolution.gif", turn_heatmaps, duration = 0.5)
 
     # Create heatmap from entire match
     positions_list = get_position_list(data, cols=["Pos1", "Pos2", "Pos3"])
     plot_heatmap(positions=positions_list, title="Entire Match")
+
 
 def create_total_movement_graph(data):
     # Creates a graph with total movement of spheres by player
@@ -139,7 +141,7 @@ def create_total_movement_graph(data):
         for sphere in sphere_cols:
             spheres_movement_by_turn[player][sphere] = []
 
-    
+
     for player in players:
 
         player_data = data[data["PlayerName"] == player]
@@ -167,13 +169,24 @@ def create_total_movement_graph(data):
     ax3 = fig.add_subplot(gs[1, :])
     
     movement_graph(spheres_movement, players, ax3)
-    boxplot_graph(spheres_movement_by_turn, players[0], ax1)
-    boxplot_graph(spheres_movement_by_turn, players[1], ax2)
+
+    # Get top y axis
+    y_tick_top = 1
+    for player in players:
+        p_data = [spheres_movement_by_turn[player][sphere] for sphere in sphere_cols]
+        
+        for sphere_data in p_data:
+            y_tick_top = max(y_tick_top, sum(sphere_data) / len(sphere_data))
+
+    y_tick_top = int(y_tick_top * 2)
+
+    boxplot_graph(spheres_movement_by_turn, players[0], ax1, y_tick_top)
+    boxplot_graph(spheres_movement_by_turn, players[1], ax2, y_tick_top)
 
     plt.savefig("GameData/Metrics/" + "sphere_data.png")
 
 
-def boxplot_graph(data, player, ax):
+def boxplot_graph(data, player, ax, y_tick_top):
     # Create boxplot graph
 
     # Boxplot explication https://stackoverflow.com/questions/38794406/why-is-matplotlibs-notched-boxplot-folding-back-on-itself
@@ -190,6 +203,7 @@ def boxplot_graph(data, player, ax):
     ax.grid(linestyle = '--', linewidth = 0.5, axis = 'y')
     ax.set(title = "Distance Taveled By Turn of '" + player + "'")
     ax.set(ylabel="Distance traveled (cm)")
+    ax.set_ylim(0, y_tick_top)
 
     colors = ['#ffff00', '#ffffff',
           '#ff0000']
@@ -243,6 +257,9 @@ def create_graphs(data):
         for file in os.listdir("Gamedata/Metrics"):
             os.remove("Gamedata/Metrics/"+file)
 
+    plt.ioff()
+    # plt.style.use("dark_background")
+    plt.style.use("Solarize_Light2")
     create_heamaps(data)
     create_total_movement_graph(data)   
 
