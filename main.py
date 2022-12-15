@@ -937,7 +937,7 @@ class Menu:
             pg_menu.events.EXIT
             sys.exit()    
 
-        self.game_engine.app.game_save_frames_data_to_json()
+        #self.game_engine.app.game_save_frames_data_to_json()
         self.menu.clear()
         self.menu.add.selector(title="Save Replay",
                                items=[("Yes",True),
