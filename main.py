@@ -176,18 +176,15 @@ class GraphicsEngine(Engine):
 
     def game_save_frames_data_to_json(self):
         # Save frame data to json for metrics
-
-        if self.save_data:
-            columns = ["PlayerName", "TurnStatus", "TurnCount", "Pos1", "Pos2", "Pos3"]
-            self.game_data = self.game_data[1:]
-            df = pd.DataFrame(self.game_data, columns=columns)
-            create_graphs(df) # Create  metrics graphs
+        columns = ["PlayerName", "TurnStatus", "TurnCount", "Pos1", "Pos2", "Pos3"]
+        self.game_data = self.game_data[1:]
+        df = pd.DataFrame(self.game_data, columns=columns)
+        create_graphs(df) # Create  metrics graphs
 
 
     def check_events(self):
         if self.quit:    
             
-            self.game_save_frames_data_to_json()
             self.mesh.destroy()
             self.sound.destroy()
             pg.quit()
@@ -289,7 +286,13 @@ class GraphicsEngine(Engine):
         player2 = Player(name = names[1], ball = self.scene.ball_objects[1], type = mode)
 
         self.game = Game(player1, player2, self.scene.ball_objects, difficulty=difficulty)
-        self.game.mode = FreeCarambole(max_turn=25, max_score=10)
+        if self.game_engine.menu.typeGame == "FreeCarambole":
+            self.game.mode = FreeCarambole(max_score=self.game_engine.menu.max_score,
+                                            max_turn=self.game_engine.menu.max_turn)
+        elif self.game_engine.menu.typeGame == "ThreeWayCarambole":
+            self.game.mode = ThreeWayCarambole(max_score=self.game_engine.menu.max_score,
+                                                max_turn=self.game_engine.menu.max_turn)
+       
 
         self.sound = SoundManager(self)
         self.sound.playSong(rolloff=1)
@@ -734,6 +737,9 @@ class Menu:
         self.start=False
         self.difficulty = "Normal"
         self.game_df = None
+        self.typeGame = "FreeCarambole"
+        self.max_score = 10
+        self.max_turn = 25
 
     def display_menu(self):
         self.surface = pg.display.set_mode(W_SIZE)
@@ -759,9 +765,12 @@ class Menu:
         self.name2 = name.upper()
     def select_mode(self,value,mode):
         self.mode = mode   
+    def select_typeGame(self,value,typeGame):
+        self.typeGame = typeGame      
     def play(self):
         self.mode = None
         self.menu.clear() 
+        self.menu.add.selector('Game Type ', [('Free', 'FreeCarambole'), ('ThreeWay', 'ThreeWayCarambole')], onchange=self.select_typeGame)
         self.menu.add.selector('Mode ', [('PvP', None), ('vs IA', "IA")], onchange=self.select_mode)
         self.menu.add.button('Next', self.set_params_game)
         self.menu.add.button('Back', self.on_init)
@@ -775,8 +784,24 @@ class Menu:
             self.name2 = "IA"
             self.menu.add.selector('Difficulty ', [('Normal', "Normal"),
             ("Hard", "Hard"),('Easy', "Easy")], onchange=self.select_difficulty)
+        self.menu.add.button('Additional Options', self.set_add_options)
         self.menu.add.button('Play', self.start_the_game)
         self.menu.add.button('Back', self.play)
+
+    def set_add_options(self):
+        self.menu.clear() 
+        self.menu.add.range_slider('Max turns', 25, (0, 100), 1,
+                      rangeslider_id='range_slider1',
+                      value_format=lambda x: str(int(x)), onchange=(self.apply_turns))
+        self.menu.add.range_slider('Max score', 10, (0, 50), 1,
+                      rangeslider_id='range_slider2',
+                      value_format=lambda x: str(int(x)), onchange=(self.apply_score))
+        self.menu.add.button('Back', self.set_params_game)  
+
+    def apply_turns(self,turn):
+        self.max_turn = turn
+    def apply_score(self,score):
+        self.max_score = score
     
     def select_difficulty(self,value,difficulty):
         self.difficulty = difficulty
@@ -938,6 +963,17 @@ class Menu:
     def save_rep(self,value,save_bool):
         if save_bool:
             self.game_engine.app.save_game_record()  
+        self.menu.clear()
+        self.menu.add.selector(title="Save Graphics",
+                               items=[("Yes",True),
+                               ("No",False)],
+                                font_size=50,
+                                selection_color = (139,0,0),
+                                onreturn=self.save_graphics)
+    
+    def save_graphics(self,value,save_bool):
+        if save_bool:
+            self.game_engine.app.game_save_frames_data_to_json()   
         if self.game_engine.app != None:
             self.game_engine.app.mesh.destroy()
         pg_menu.events.EXIT
