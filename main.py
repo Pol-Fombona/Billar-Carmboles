@@ -623,6 +623,23 @@ class ReplayEngine(Engine):
         self.replay_data = load_replay_data(self.replay_file)
         self.replay_data_iterator = self.replay_data.iterrows()
 
+    def reload_params(self):
+        # Set PyGame attributes
+        self.set_pg_attributes()
+
+        # Detect and use exixting opengl context
+        self.ctx = mgl.create_context()
+        self.ctx.enable(flags=mgl.DEPTH_TEST)
+
+        self.camera = Camera(self)
+        self.light = Light(position=LIGHT1_POSITION, Ia = 0.2, Id = 0, Is = 0)
+        self.light2 = Light(position=LIGHT2_POSITION, Ia = 0)
+        self.light3 = Light(position=LIGHT3_POSITION, Ia = 0)
+        self.mesh = Mesh(self)
+        self.scene = Scene(self)
+        self.init_game_params(names = [self.game_engine.menu.name,self.game_engine.menu.name2],mode = self.game_engine.menu.mode)
+        self.game.game_speed *= self.game_engine.menu.game_speed
+
 
     def render(self):
         # Default render
@@ -698,7 +715,7 @@ class ReplayEngine(Engine):
 
             if self.pause and self.game.current_player.type != "IA":
                     #self.quit = pause_manager(self.game)
-                    self.game_engine.menu.display_menu_pause()
+                    self.game_engine.menu.display_menu_replay()
                     last_timestamp = self.unpause()
 
             else:
@@ -831,9 +848,9 @@ class Menu:
         self.menu.add.button('Back', self.on_init)
         
     def start_replay(self,file=""):
-        app = ReplayEngine(win_size=W_SIZE,replay_name = file, game_engine = self.game_engine)
-        app.init_game_params(names = [self.name,self.name2],mode = self.mode)
-        app.run()
+        self.game_engine.app = ReplayEngine(win_size=W_SIZE,replay_name = file, game_engine = self.game_engine)
+        self.game_engine.app.init_game_params(names = [self.name,self.name2],mode = self.mode)
+        self.game_engine.app.run()
 
     def select_options(self):
         self.menu.clear()
@@ -1035,6 +1052,58 @@ class Menu:
         self.menu.clear()
         self.menu.add.button('Back', self.select_options_pause) 
 
+    def display_menu_replay(self,start=False):
+        self.start = start
+        #save_game(self.game_engine.app.game,2)
+        #self.save_temporal_data()
+        #self.game_engine.app.sound.stopSong()
+        self.my_theme = pg_menu.Theme(
+            title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
+            title_font_size=60,
+            title_offset=(350,100),
+            title_font = pg_menu.font.FONT_8BIT,
+            background_color=self.myimage,
+            title_background_color=(4, 47, 126),
+            widget_font=pg_menu.font.FONT_8BIT,
+            widget_font_color = (139,0,0),
+            widget_font_size = 60
+        )
+        self.surface = pg.display.set_mode(W_SIZE)
+        self.menu = pg_menu.Menu('Pause Menu', W_SIZE[0], W_SIZE[1],
+                       theme=self.my_theme)
+        self.replay_menu() 
+    
+    def replay_menu(self):
+        self.menu.clear()
+        self.menu.add.button('Resume', self.resume_the_replay)
+        self.menu.add.button('Options', self.select_options_replay)
+        self.menu.add.button('Quit', self.quit_replay)
+        self.menu.mainloop(self.surface)
+
+    def resume_the_replay(self):
+        self.game_engine.app.pause = False
+        self.game_engine.app.reload_params()  
+        self.game_engine.app.run()
+
+    def select_options_replay(self):
+        self.menu.clear()    
+        self.menu.add.dropselect(
+            title='Select Game Speed',
+            items=[('x0,5', 0.5),
+            ('x1', 1),
+            ('x2',2),
+            ('x4',4)],
+            font_size=30,
+            selection_option_font_size=34,
+            onchange=(self.apply_speed)
+        )
+        self.menu.add.button('Back', self.replay_menu) 
+
+    def quit_replay(self):
+        if self.game_engine.app != None:
+            self.game_engine.app.mesh.destroy()
+        pg_menu.events.EXIT
+        sys.exit() 
     def save_temporal_data(self):
         game = self.game_engine.app.game
         # Game data to save
