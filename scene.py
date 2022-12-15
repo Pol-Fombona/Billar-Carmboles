@@ -56,9 +56,18 @@ class Scene:
         first_sphere_position = (30, 1, 10)
         second_sphere_position = (10, 1, 10)
         third_sphere_position = (20, 1, 60)
-        add_ball(Sphere(app, pos=first_sphere_position, tex_id="sphere1",id = 1))
-        add_ball(Sphere(app, pos=second_sphere_position, tex_id="sphere2",id = 2))
-        add_ball(Sphere(app, pos=third_sphere_position, tex_id="sphere3",id = 3))
+
+        ombra1 = OmbresEsferes(app, pos=(first_sphere_position[0], first_sphere_position[1] - 0.9, first_sphere_position[2]))
+        ombra2 = OmbresEsferes(app, pos=(second_sphere_position[0], second_sphere_position[1] - 0.9, second_sphere_position[2]))
+        ombra3 = OmbresEsferes(app, pos=(third_sphere_position[0], third_sphere_position[1] - 0.9, third_sphere_position[2]))
+
+        add(ombra1)
+        add(ombra2)
+        add(ombra3)
+
+        add_ball(Sphere(app, pos=first_sphere_position, tex_id="sphere1",id = 1, ombra=ombra1))
+        add_ball(Sphere(app, pos=second_sphere_position, tex_id="sphere2",id = 2, ombra=ombra2))
+        add_ball(Sphere(app, pos=third_sphere_position, tex_id="sphere3",id = 3, ombra=ombra3))
         '''
         add_ball(Sphere(app, pos=(23, 1, 65), tex_id="sphere4",id = 5))
         add_ball(Sphere(app, pos=(20, 1, 65), tex_id="sphere5",id = 6))
@@ -103,10 +112,18 @@ class Scene:
         pos_sphere_2 = FIRST_BALLS_POSITION[1]
         pos_sphere_3 = FIRST_BALLS_POSITION[2]
 
-        add_ball(Sphere(app, pos=pos_sphere_1, tex_id="sphere1",id = 1))
-        add_ball(Sphere(app, pos=pos_sphere_2, tex_id="sphere2",id = 2))
+        ombra1 = OmbresEsferes(app, pos=(pos_sphere_1[0], pos_sphere_1[1] - 0.9, pos_sphere_1[2]))
+        ombra2 = OmbresEsferes(app, pos=(pos_sphere_2[0], pos_sphere_2[1] - 0.9, pos_sphere_2[2]))
+        ombra3 = OmbresEsferes(app, pos=(pos_sphere_3[0], pos_sphere_3[1] - 0.9, pos_sphere_3[2]))
 
-        add_ball(Sphere(app, pos=pos_sphere_3, tex_id="sphere3", id = 3))
+        add(ombra1)
+        add(ombra2)
+        add(ombra3)
+
+        add_ball(Sphere(app, pos=pos_sphere_1, tex_id="sphere1",id = 1, ombra=ombra1))
+        add_ball(Sphere(app, pos=pos_sphere_2, tex_id="sphere2",id = 2, ombra=ombra2))
+
+        add_ball(Sphere(app, pos=pos_sphere_3, tex_id="sphere3", id = 3, ombra=ombra3))
 
         self.cue = Cue(app, axis=glm.vec3(pos_sphere_1), tex_id=5)
 

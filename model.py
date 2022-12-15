@@ -19,12 +19,12 @@ class BaseModel:
         self.camera = self.app.camera
 
     def on_init(self):
-        # shadow
-        self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
-        self.shadow_program = self.shadow_vao.program
-        self.shadow_program['m_proj'].write(self.camera.m_proj)
-        self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
-        self.shadow_program['m_model'].write(self.m_model)
+        # # shadow
+        # self.shadow_vao = self.app.mesh.vao.vaos['shadow_' + self.vao_name]
+        # self.shadow_program = self.shadow_vao.program
+        # self.shadow_program['m_proj'].write(self.camera.m_proj)
+        # self.shadow_program['m_view_light'].write(self.app.light.m_view_light)
+        # self.shadow_program['m_model'].write(self.m_model)
         # light
         self.program["light.position"].write(self.app.light.position)
         self.program["light.Ia"].write(self.app.light.Ia)
@@ -98,7 +98,7 @@ class TableFloor(BaseModel):
 class Sphere(BaseModel):
     def __init__(self, app, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1),
                     radi=1, slices=10, stacks=10, vao_name="balls", 
-                    tex_id="sphere1",id = 0):
+                    tex_id="sphere1",id = 0, ombra=None):
 
         super().__init__(app, vao_name, tex_id, pos)
 
@@ -114,6 +114,8 @@ class Sphere(BaseModel):
 
         self.slices = slices
         self.stacks = stacks
+
+        self.ombra = ombra
 
         self.on_init()
 
@@ -135,6 +137,10 @@ class Sphere(BaseModel):
         m_model = self.translation * self.rotation
         self.m_model = m_model
         self.program["m_model"].write(m_model)
+        # Move ombra
+        if self.ombra != None:
+            self.ombra.pos = (self.pos[0], self.pos[1] - 0.9, self.pos[2])
+
 
     def replay_update(self):
         # self.shader_program['m_proj'].write(self.app.camera.m_proj)
@@ -409,3 +415,45 @@ class Parets(BaseModel):
 
         return m_model
     
+
+class OmbresEsferes(BaseModel):
+    def __init__(
+        self, 
+        app, 
+        vao_name = "ombres_esferes", 
+        tex_id = 9, 
+        pos=(0, 0, 0),
+        rot=(0, 0, 0),
+        scale=(1, 1, 1),
+    ):
+        self.rot = glm.vec3([glm.radians(a) for a in rot])
+        self.scale = scale
+
+        super().__init__(app, vao_name, tex_id, pos)
+        self.on_init()
+
+    def get_model_matrix(self):
+
+        m_model = glm.mat4()
+
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
+
+        # scale
+        m_model = glm.scale(m_model, self.scale)
+
+        # translate
+        m_model = glm.translate(m_model, self.pos)
+
+        return m_model
+
+    def update(self):
+        self.texture.use()
+        self.program["m_view"].write(self.camera.m_view)
+        self.program['camPos'].write(self.app.camera.position)
+        self.program["m_model"].write(self.get_model_matrix())

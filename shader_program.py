@@ -15,6 +15,7 @@ class ShaderProgram:
         self.programs["line"] = self.get_program("line")
         self.programs["parets"] = self.get_program("parets")
         self.programs["shadow_map"] = self.get_program("shadow_map")
+        self.programs['ombres_esferes'] = self.get_program('ombres_esferes')
 
 
     def get_program(self, shader_program_name):
