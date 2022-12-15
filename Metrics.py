@@ -1,10 +1,9 @@
-import pandas as pd
 import imageio
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 from positions import *
-import seaborn as sns
+from seaborn import color_palette
 
 def get_intermediate_positions(a, b, distance):
     # Return list with intermediate positions when ball goes too fast
@@ -78,7 +77,7 @@ def plot_heatmap(positions, title = None):
 
     fig, ax = plt.subplots(1,1, figsize=(15, 15))
 
-    ax.imshow(grid, interpolation="quadric", cmap='crest')
+    ax.imshow(grid, interpolation="quadric", cmap=color_palette("crest", as_cmap=True))
 
     ax.set(xticklabels=[], yticklabels=[])
     ax.set(xlabel="Table Width", ylabel="Table Height")
