@@ -107,7 +107,7 @@ def create_heamaps(data):
     turns = list(data["TurnCount"].unique())
     for turn in turns:
         positions_list = get_position_list(data[data["TurnCount"] == turn], cols=["Pos1", "Pos2", "Pos3"])
-        plot_heatmap(positions=positions_list, title="Turn " + str(turn))
+        plot_heatmap(positions=positions_list, title="Turn " + str(turn).zfill(4))
 
     # Create gif from heatmaps
     path_temp = "GameData/Metrics/"
@@ -233,6 +233,10 @@ def get_sphere_total_movement(data):
 
 def create_graphs(data):
     # Creates and saves graphs
+
+    # Remove old files
+    for file in os.listdir("Gamedata/Metrics"):
+        os.remove("Gamedata/Metrics/"+file)
 
     create_heamaps(data)
     create_total_movement_graph(data)   
