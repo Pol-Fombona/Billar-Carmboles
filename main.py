@@ -967,7 +967,8 @@ class Menu:
     def show_summary(self,type=1):
         self.menu.clear()
         time = datetime.timedelta(seconds=self.game_engine.app.game.played_time)
-        self.menu.add.label("Game Finished")
+        if type != 2:
+            self.menu.add.label("Game Finished")
         self.menu.add.label("Played Time:" + str(time))
         scores = self.game_engine.app.game.get_scores()
         self.menu.add.label("Score:"+ scores[1:-1])
@@ -1094,7 +1095,7 @@ class Menu:
         self.my_theme = pg_menu.Theme(
             title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
             title_font_size=100,
-            title_offset=(470,50),
+            title_offset=(420,50),
             title_font = pg_menu.font.FONT_FRANCHISE,
             background_color=self.myimage,
             title_background_color=(4, 47, 126),
@@ -1103,7 +1104,7 @@ class Menu:
             widget_font_size = 80
         )
         self.surface = pg.display.set_mode(W_SIZE)
-        self.menu = pg_menu.Menu('GAME ENDED', W_SIZE[0], W_SIZE[1],
+        self.menu = pg_menu.Menu('GAME FINISHED', W_SIZE[0], W_SIZE[1],
                        theme=self.my_theme)
         self.show_summary(type=2) 
         
