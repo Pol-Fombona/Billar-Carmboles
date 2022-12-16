@@ -512,7 +512,7 @@ class GraphicsEngine(Engine):
 
             self.check_events()
 
-            if self.pause and self.game.current_player.type != "IA":
+            if self.pause: #and self.game.current_player.type != "IA":
                 #self.quit = pause_manager(self.game)
                 self.game_engine.menu.display_menu_pause()
                 last_timestamp = self.unpause()
