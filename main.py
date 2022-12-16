@@ -554,7 +554,8 @@ class GraphicsEngine(Engine):
 
                         if self.game.get_match_status():
                             # Mostrar guanyador
-                            game_ended(self.game)
+                            #game_ended(self.game)
+                            self.game_engine.menu.display_menu_winner()
                             self.quit = True
 
                     elif turn_status == "undo":
@@ -821,18 +822,18 @@ class Menu:
 
     def set_add_options(self):
         self.menu.clear() 
-        self.menu.add.range_slider('Max turns', 25, (0, 100), 1,
+        self.menu.add.range_slider('Max turns', self.max_turn, (1, 100), 1,
                       rangeslider_id='range_slider1',
                       value_format=lambda x: str(int(x)), onchange=(self.apply_turns))
-        self.menu.add.range_slider('Max score', 10, (0, 50), 1,
+        self.menu.add.range_slider('Max score', self.max_score, (1, 50), 1,
                       rangeslider_id='range_slider2',
                       value_format=lambda x: str(int(x)), onchange=(self.apply_score))
         self.menu.add.button('Back', self.set_params_game)  
 
     def apply_turns(self,turn):
-        self.max_turn = turn
+        self.max_turn = int(turn)
     def apply_score(self,score):
-        self.max_score = score
+        self.max_score = int(score)
     
     def select_difficulty(self,value,difficulty):
         self.difficulty = difficulty
@@ -963,7 +964,7 @@ class Menu:
         else:   
             self.game_engine.app.run()
 
-    def show_summary(self):
+    def show_summary(self,type=1):
         self.menu.clear()
         time = datetime.timedelta(seconds=self.game_engine.app.game.played_time)
         self.menu.add.label("Game Finished")
@@ -982,6 +983,8 @@ class Menu:
 
         update_ranking(self.game_engine.app.game)
         self.menu.add.button('Next', self.quit_pause)
+        if type==2:
+            self.menu.mainloop(self.surface)
 
     def quit_pause(self):
         if self.start:
@@ -1085,6 +1088,25 @@ class Menu:
     def show_controls_pause(self):
         self.menu.clear()
         self.menu.add.button('Back', self.select_options_pause) 
+
+    def display_menu_winner(self):
+        self.game_engine.app.sound.stopSong()
+        self.my_theme = pg_menu.Theme(
+            title_bar_style = pg_menu.widgets.MENUBAR_STYLE_NONE,
+            title_font_size=100,
+            title_offset=(470,50),
+            title_font = pg_menu.font.FONT_FRANCHISE,
+            background_color=self.myimage,
+            title_background_color=(4, 47, 126),
+            widget_font=pg_menu.font.FONT_FRANCHISE,
+            widget_font_color = (139,0,0),
+            widget_font_size = 80
+        )
+        self.surface = pg.display.set_mode(W_SIZE)
+        self.menu = pg_menu.Menu('GAME ENDED', W_SIZE[0], W_SIZE[1],
+                       theme=self.my_theme)
+        self.show_summary(type=2) 
+        
 
     def display_menu_replay(self,start=False):
         self.start = start
