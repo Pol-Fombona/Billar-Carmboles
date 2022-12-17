@@ -10,11 +10,12 @@ class Texture:
         self.textures = {}
 
         self.textures[5] = self.get_texture(path="textures/cue.png")
-        self.textures[6] = self.get_texture(path="textures/pool_table2.jpg")
+        self.textures[6] = self.get_texture(path="textures/TexturesCom_Grass_1K_albedo.jpg")
         self.textures[7] = self.get_texture(path="textures/brixton_finish.jpg")
-        self.textures[8] = self.get_texture(path="textures/floor-texture-refactor.jfif")
-        self.textures[9] = self.get_texture(path="textures/ceiling.jpg")
-        self.textures[10] = self.get_texture(path="textures/wall-new-compress.jpg")
+        self.textures[8] = self.get_texture(path="textures/floor-texture-refactor.jpg")
+        self.textures[9] = self.get_texture(path="textures/ceiling-min.jpg")
+        self.textures[10] = self.get_texture(path="textures/wall-new-compress-min.jpg")
+        self.textures[11] = self.get_texture(path="textures/black.jpg")
 
         # Spheres  [https://sharecg.com/v/12975/view/6/Texture/Billiard-Ball-N%B0-10]
         self.textures["sphere1"] = self.get_texture(path="textures/spheres/sphere (1).jpg")

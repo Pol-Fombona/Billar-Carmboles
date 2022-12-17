@@ -33,8 +33,8 @@ vec3 getLight(vec3 color){
     float diff2 = max(0, dot(lightDir2, Normal));
     float diff3 = max(0, dot(lightDir3, Normal));
     vec3 diffuse = diff * light.Id * 0.5;
-    vec3 diffuse2 = diff2 * light2.Id * 0.5;
-    vec3 diffuse3 = diff3 * light3.Id * 0.5;
+    vec3 diffuse2 = diff2 * light2.Id * 0.25;
+    vec3 diffuse3 = diff3 * light3.Id * 0.25;
 
     // specular
     vec3 viewDir = normalize(camPos - fragPos);

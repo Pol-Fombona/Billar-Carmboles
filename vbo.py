@@ -299,7 +299,7 @@ class TableVBO(BaseVBO):
             (1, 0, 0) * 6,
             (-1, 0, 0) * 6,
             (0, -1, 0) * 6,
-            (0, 0, 1) * 6,
+            (0, 1, 0) * 6,
             #Third
             (0, 0, -1) * 6,
             (0, 0, 1) * 6,
@@ -686,20 +686,24 @@ class TerraVBO(BaseVBO):
 
     def get_vertex_data(self): #sobre eix y
         
-        vertices = [(INICI_TERRA,T_Y,INICI_TERRA),(T_X,T_Y,T_Z),(INICI_TERRA,T_Y,T_Z),(T_X,T_Y,INICI_TERRA)]
-        indices = [(0,1,3),(0,2,1)]
+        # vertices = [(INICI_TERRA,T_Y,INICI_TERRA),(T_X,T_Y,T_Z),(INICI_TERRA,T_Y,T_Z),(T_X,T_Y,INICI_TERRA)]
+        # indices = [(0,1,3),(0,2,1)]
+        vertices = [(INICI_TERRA, T_Y, INICI_TERRA), (T_X, T_Y, INICI_TERRA), (T_X, T_Y, T_Z), (INICI_TERRA, T_Y, T_Z)]
+        indices = [(0, 1, 2), (0, 2, 3)]
         
 
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(0,0), (1,0), (1,1), (0,1)]
-        
-        tex_coord_indices = [(0,1,3),(0,2,1)]
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
+        tex_coord_indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+        ]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
         normals = [
-            (0, 0, 1) * 6
+            (0, 1, 0) * 6
         ]
 
         normals = np.array(normals, dtype="f4").reshape(6, 3)
@@ -722,21 +726,20 @@ class SostreVBO(BaseVBO):
         return np.array(data, dtype='f4')
 
     def get_vertex_data(self): #sobre eix y
-        
-        vertices = [(-150,S_HEIGHT,-150),(S_X,S_HEIGHT,S_Z),(-150,S_HEIGHT,S_Z),(S_X,S_HEIGHT,-150)]
-        indices = [(0,1,3),(0,2,1)]
-        
-
+        vertices = [(INICI_TERRA, S_HEIGHT, INICI_TERRA), (T_X, S_HEIGHT, INICI_TERRA), (T_X, S_HEIGHT, T_Z), (INICI_TERRA, S_HEIGHT, T_Z)]
+        indices = [(0, 1, 2), (0, 2, 3)]
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(0,0), (1,0), (1,1), (0,1)]
-        
-        tex_coord_indices = [(0,1,3),(0,2,1)]
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
+        tex_coord_indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+        ]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
         normals = [
-            (0, 0, -1) * 6,
+            (0, -1, 0) * 6
         ]
         
         normals = np.array(normals, dtype="f4").reshape(6, 3)
@@ -928,29 +931,26 @@ class OmbresEsferes(BaseVBO):
         data = [vertices[ind] for triangle in indices for ind in triangle]
         return np.array(data, dtype="f4")
     def get_vertex_data(self):
-        vertices = [
-            (0, 0, 0),
-            (2, 0, 0),
-            (2, 0, 2),
-            (0, 0, 2)
-        ]
-        indices = [
-            (0, 1, 2),
-            (0, 2, 3),
-        ]
+        r = 1
+        vertices = [(0, 0, 0)]
+        indices = []
+        vertex_count = 1
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        tex_coord_indices = []
+        normals = []
+        for i in range(360):
+            x = r*np.cos(i)
+            z = r*np.sin(i)
+            vertices.append((x, 0, z))
+            if vertex_count > 1 and vertex_count < 360:
+                indices.append((0, vertex_count, vertex_count + 1))
+                tex_coord_indices.append((0, 1, 2))
+                normals.append((0, 0, 1) * 3)
+            vertex_count += 1
 
         vertex_data = self.get_data(vertices, indices)
 
-        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
-        tex_coord_indices = [
-            (0, 1, 2),
-            (0, 2, 3)
-        ]
-        normals = [
-            (0, 0, 1) * 6,
-        ]
-        
-        normals = np.array(normals, dtype="f4").reshape(6, 3)
+        normals = np.array(normals, dtype="f4").reshape(1074, 3)
 
         vertex_data = np.hstack([normals, vertex_data])
 
