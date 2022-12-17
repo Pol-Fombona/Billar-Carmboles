@@ -392,7 +392,6 @@ class GraphicsEngine(Engine):
             if not self.game_started:
                 last_timestamp = time.time()
                 self.shots_taken = 0
-                shots = {'p1':True, 'p2': True}
 
                 while True and self.shots_taken < 2:
 
@@ -426,7 +425,7 @@ class GraphicsEngine(Engine):
                             case "played":
                                 # Shot made but spheres are in movement
                                 # TODO: Aqui no detecta correctament la variable game_started, no entenc del tot perque
-                                valid = self.render_status_played_game_starting()
+                                self.render_status_played_game_starting()
                             
                             case "ended":
                                 # Shot made and all spheres have stopped
@@ -449,8 +448,14 @@ class GraphicsEngine(Engine):
                         player1 = index
 
                 # Aqui tenim el player 1 sera el que mes a prop tingui la pilota del 0 en el eix z, falta com decidir posarlo com a P1
+                self.game.player1.name = names[player1]
+                if player1 == 0:
+                    self.game.player2.name = names[1]
+                else:
+                    self.game.player2.name = names[0]
 
-                print(f'El jugador {names[index]} serà el jugador 1.')
+
+                print(f'El jugador {names[player1]} serà el jugador 1.')
         self.sound.stopSong(0)
         self.game_started = True
         # self.mesh.vao.destroy()
