@@ -1,0 +1,12 @@
+# Blender 3.3.1 MTL File: 'jukebox.blend'
+# www.blender.org
+
+newmtl _20344_Jukebox_bubbler_style_V220344_Jukebox_bubbler_style
+Ns 19.000008
+Ka 1.000000 1.000000 1.000000
+Ks 0.432000 0.432000 0.432000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/Angel Funes/Downloads/objects_models/Jukebox_bubbler_style_V2_L1.123c952c06a6-781f-4777-a807-c67cdf0b0a2a/20344_Jukebox_bubbler_style_Diffuse.jpg
