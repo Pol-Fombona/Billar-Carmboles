@@ -686,16 +686,20 @@ class TerraVBO(BaseVBO):
 
     def get_vertex_data(self): #sobre eix y
         
-        vertices = [(INICI_TERRA,T_Y,INICI_TERRA),(T_X,T_Y,T_Z),(INICI_TERRA,T_Y,T_Z),(T_X,T_Y,INICI_TERRA)]
-        indices = [(0,1,3),(0,2,1)]
+        # vertices = [(INICI_TERRA,T_Y,INICI_TERRA),(T_X,T_Y,T_Z),(INICI_TERRA,T_Y,T_Z),(T_X,T_Y,INICI_TERRA)]
+        # indices = [(0,1,3),(0,2,1)]
+        vertices = [(INICI_TERRA, T_Y, INICI_TERRA), (T_X, T_Y, INICI_TERRA), (T_X, T_Y, T_Z), (INICI_TERRA, T_Y, T_Z)]
+        indices = [(0, 1, 2), (0, 2, 3)]
         
 
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(0,0), (1,0), (1,1), (0,1)]
-        
-        tex_coord_indices = [(0,1,3),(0,2,1)]
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
+        tex_coord_indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+        ]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
         normals = [
