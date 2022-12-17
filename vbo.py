@@ -703,7 +703,7 @@ class TerraVBO(BaseVBO):
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
         normals = [
-            (0, 0, 1) * 6
+            (0, 1, 0) * 6
         ]
 
         normals = np.array(normals, dtype="f4").reshape(6, 3)
@@ -726,21 +726,20 @@ class SostreVBO(BaseVBO):
         return np.array(data, dtype='f4')
 
     def get_vertex_data(self): #sobre eix y
-        
-        vertices = [(-150,S_HEIGHT,-150),(S_X,S_HEIGHT,S_Z),(-150,S_HEIGHT,S_Z),(S_X,S_HEIGHT,-150)]
-        indices = [(0,1,3),(0,2,1)]
-        
-
+        vertices = [(INICI_TERRA, S_HEIGHT, INICI_TERRA), (T_X, S_HEIGHT, INICI_TERRA), (T_X, S_HEIGHT, T_Z), (INICI_TERRA, S_HEIGHT, T_Z)]
+        indices = [(0, 1, 2), (0, 2, 3)]
         
         vertex_data = self.get_data(vertices, indices)
         
-        tex_coord = [(0,0), (1,0), (1,1), (0,1)]
-        
-        tex_coord_indices = [(0,1,3),(0,2,1)]
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
+        tex_coord_indices = [
+            (0, 1, 2),
+            (0, 2, 3),
+        ]
         tex_coord_data = self.get_data(tex_coord, tex_coord_indices)
 
         normals = [
-            (0, 0, -1) * 6,
+            (0, -1, 0) * 6
         ]
         
         normals = np.array(normals, dtype="f4").reshape(6, 3)
