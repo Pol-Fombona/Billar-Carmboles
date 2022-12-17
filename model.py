@@ -139,7 +139,7 @@ class Sphere(BaseModel):
         self.program["m_model"].write(m_model)
         # Move ombra
         if self.ombra != None:
-            self.ombra.pos = (self.pos[0], self.pos[1] - 0.9, self.pos[2])
+            self.ombra.pos = (self.pos[0] + 0.6, self.pos[1] - 0.9, self.pos[2] + 0.6)
 
 
     def replay_update(self):
@@ -421,7 +421,7 @@ class OmbresEsferes(BaseModel):
         self, 
         app, 
         vao_name = "ombres_esferes", 
-        tex_id = 9, 
+        tex_id = 11, 
         pos=(0, 0, 0),
         rot=(0, 0, 0),
         scale=(1, 1, 1),

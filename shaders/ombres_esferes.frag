@@ -22,7 +22,7 @@ uniform vec3 camPos;
 vec3 getLight(vec3 color){
     vec3 Normal = normalize(normal);
     // ambient
-    vec3 ambient = light.Ia * 1.2;
+    vec3 ambient = light.Ia * 0.3;
     vec3 ambient2 = light2.Ia;
     vec3 ambient3 = light3.Ia;
     //diffuse
@@ -33,8 +33,8 @@ vec3 getLight(vec3 color){
     float diff2 = max(0, dot(lightDir2, Normal));
     float diff3 = max(0, dot(lightDir3, Normal));
     vec3 diffuse = diff * light.Id;
-    vec3 diffuse2 = diff2 * light2.Id * 0.4;
-    vec3 diffuse3 = diff3 * light3.Id * 0.4;
+    vec3 diffuse2 = diff2 * light2.Id * 0.001;
+    vec3 diffuse3 = diff3 * light3.Id * 0.001;
 
     // specular
     vec3 viewDir = normalize(camPos - fragPos);
@@ -44,9 +44,9 @@ vec3 getLight(vec3 color){
     float spec = pow(max(dot(viewDir, reflectDir), 0), 12);
     float spec2 = pow(max(dot(viewDir, reflectDir2), 0), 12);
     float spec3 = pow(max(dot(viewDir, reflectDir3), 0), 12);
-    vec3 specular = spec * light.Is * 0.001;
-    vec3 specular2 = spec2 * light2.Is * 0.001;
-    vec3 specular3 = spec3 * light3.Is * 0.001;
+    vec3 specular = spec * light.Is * 0.0001;
+    vec3 specular2 = spec2 * light2.Is * 0.0001;
+    vec3 specular3 = spec3 * light3.Is * 0.0001;
 
     return color * (ambient + diffuse + specular + ambient2 + diffuse2 + specular2 + ambient3 + diffuse3 + specular3);
 }
@@ -55,5 +55,5 @@ vec3 getLight(vec3 color){
 void main() { 
     vec3 color = texture(u_texture_0, uv_0).rgb;
     color = getLight(color);
-    fragColor = vec4(color,1.0);
+    fragColor = vec4(color,1);
 }

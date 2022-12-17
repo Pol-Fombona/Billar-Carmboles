@@ -928,29 +928,26 @@ class OmbresEsferes(BaseVBO):
         data = [vertices[ind] for triangle in indices for ind in triangle]
         return np.array(data, dtype="f4")
     def get_vertex_data(self):
-        vertices = [
-            (0, 0, 0),
-            (2, 0, 0),
-            (2, 0, 2),
-            (0, 0, 2)
-        ]
-        indices = [
-            (0, 1, 2),
-            (0, 2, 3),
-        ]
+        r = 1
+        vertices = [(0, 0, 0)]
+        indices = []
+        vertex_count = 1
+        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        tex_coord_indices = []
+        normals = []
+        for i in range(360):
+            x = r*np.cos(i)
+            z = r*np.sin(i)
+            vertices.append((x, 0, z))
+            if vertex_count > 1 and vertex_count < 360:
+                indices.append((0, vertex_count, vertex_count + 1))
+                tex_coord_indices.append((0, 1, 2))
+                normals.append((0, 0, 1) * 3)
+            vertex_count += 1
 
         vertex_data = self.get_data(vertices, indices)
 
-        tex_coord = [(0, 0), (1, 0), (1, 1), (0, 1), (0.8, 0), (0.8, 0.8), (0, 0.8)]
-        tex_coord_indices = [
-            (0, 1, 2),
-            (0, 2, 3)
-        ]
-        normals = [
-            (0, 0, 1) * 6,
-        ]
-        
-        normals = np.array(normals, dtype="f4").reshape(6, 3)
+        normals = np.array(normals, dtype="f4").reshape(1074, 3)
 
         vertex_data = np.hstack([normals, vertex_data])
 
