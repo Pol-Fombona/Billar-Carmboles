@@ -94,6 +94,8 @@ class Scene:
 
         add(Parets(app, pos=(0,0,0),tex_id = 10))
 
+        add(Jukebox(app, pos=(-20,-5,-35.5),scale = (4,4,4), tex_id = 12))
+
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
     def load_decision_starting(self):
@@ -133,6 +135,8 @@ class Scene:
         self.line = Line(app, axis = glm.vec3(pos_sphere_1))
 
         add(Parets(app, pos=(0,0,0),tex_id = 10))
+
+        add(Jukebox(app, pos=(-20,-5,-35.5),scale = (4,4,4), tex_id = 12))
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 

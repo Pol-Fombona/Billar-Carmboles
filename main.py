@@ -252,7 +252,7 @@ class GraphicsEngine(Engine):
                         self.sound.stopSong(0)
                     else:
                         self.sound.song_playing = True
-                        self.sound.playSong()       
+                        self.sound.playSong(pos = (-20*4,-5*4,-35.5*4))       
 
 
     def render_status_played(self):
@@ -301,8 +301,8 @@ class GraphicsEngine(Engine):
                                                 max_turn=self.game_engine.menu.max_turn)
        
 
-        self.sound = SoundManager(self)
-        self.sound.playSong(rolloff=1)
+        self.sound = SoundManager(self, pos = (-20,-5,-35.5))
+        self.sound.playSong(pos = (-20*4,(-5*4)+6,-35.5*4))
 
         # Game history 
         # (contains: sphere1.pos, sphere2.pos, sphere3.pos, 

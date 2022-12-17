@@ -457,3 +457,40 @@ class OmbresEsferes(BaseModel):
         self.program["m_view"].write(self.camera.m_view)
         self.program['camPos'].write(self.app.camera.position)
         self.program["m_model"].write(self.get_model_matrix())
+
+
+class Jukebox(BaseModel):
+    def __init__(self, app, vao_name="jukebox", tex_id=12, pos=(0, 0, 0),rot=(0, 0, 0),scale=(1, 1, 1)):
+        self.app = app
+        self.pos = pos
+        self.rot = glm.vec3(rot)
+        self.scale = glm.vec3(scale)
+        self.m_model = self.get_model_matrix()
+        self.tex_id = tex_id
+        self.vao_name = vao_name
+        self.vao = app.mesh.vao.vaos[vao_name]
+        self.program = self.vao.program
+        self.camera = self.app.camera
+        
+        self.on_init()
+
+    def get_model_matrix(self):
+
+        m_model = glm.mat4()
+
+        # translate (origen)
+        m_model = glm.translate(m_model, (0, 0, 0))
+
+        # rotation
+        m_model = glm.rotate(m_model, self.rot.x, glm.vec3(1, 0, 0))
+        m_model = glm.rotate(m_model, self.rot.y, glm.vec3(0, 1, 0))
+        m_model = glm.rotate(m_model, self.rot.z, glm.vec3(0, 0, 1))
+
+        # scale
+        m_model = glm.scale(m_model, self.scale)
+
+        # translate
+        m_model = glm.translate(m_model, self.pos)
+
+        return m_model
+

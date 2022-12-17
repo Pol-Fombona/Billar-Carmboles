@@ -67,7 +67,11 @@ class VAO:
             vbo=self.vbo.vbos["parets"]
         )
         self.vaos['ombres_esferes'] = self.get_vao(program=self.program.programs['ombres_esferes'],
-            vbo=self.vbo.vbos['ombres_esferes'])
+            vbo=self.vbo.vbos['ombres_esferes']
+        )
+        self.vaos['jukebox'] = self.get_vao(program=self.program.programs['jukebox'],
+            vbo=self.vbo.vbos['jukebox']
+        )
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)], skip_errors=True)
