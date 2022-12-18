@@ -17,6 +17,8 @@ class ShaderProgram:
         self.programs["shadow_map"] = self.get_program("shadow_map")
         self.programs['ombres_esferes'] = self.get_program('ombres_esferes')
         self.programs['jukebox'] = self.get_program('jukebox')
+        self.programs['counter'] = self.get_program('counter')
+        self.programs['barchair'] = self.get_program('barchair')
 
 
     def get_program(self, shader_program_name):

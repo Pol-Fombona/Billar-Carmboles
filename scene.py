@@ -95,6 +95,10 @@ class Scene:
         add(Parets(app, pos=(0,0,0),tex_id = 10))
 
         add(Jukebox(app, pos=(-20,-5,-35.5),scale = (4,4,4), tex_id = 12))
+        add(Counter(app, pos=(-10,-2,12.16),scale = (10,10,10), tex_id = 13))
+        add(Barchair(app, pos=(-14,-4,12),scale = (5,5,5), tex_id = 14))
+        add(Barchair(app, pos=(-14,-4,24),scale = (5,5,5), tex_id = 14))
+        add(Barchair(app, pos=(-14,-4,36),scale = (5,5,5), tex_id = 14))
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
@@ -137,6 +141,10 @@ class Scene:
         add(Parets(app, pos=(0,0,0),tex_id = 10))
 
         add(Jukebox(app, pos=(-20,-5,-35.5),scale = (4,4,4), tex_id = 12))
+        add(Counter(app, pos=(-10,-2,12.16),scale = (10,10,10), tex_id = 13))
+        add(Barchair(app, pos=(-14,-4,12),scale = (5,5,5), tex_id = 14))
+        add(Barchair(app, pos=(-14,-4,24),scale = (5,5,5), tex_id = 14))
+        add(Barchair(app, pos=(-14,-4,36),scale = (5,5,5), tex_id = 14))
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 

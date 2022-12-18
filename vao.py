@@ -72,6 +72,12 @@ class VAO:
         self.vaos['jukebox'] = self.get_vao(program=self.program.programs['jukebox'],
             vbo=self.vbo.vbos['jukebox']
         )
+        self.vaos['counter'] = self.get_vao(program=self.program.programs['counter'],
+            vbo=self.vbo.vbos['counter']
+        )
+        self.vaos['barchair'] = self.get_vao(program=self.program.programs['barchair'],
+            vbo=self.vbo.vbos['barchair']
+        )
 
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)], skip_errors=True)

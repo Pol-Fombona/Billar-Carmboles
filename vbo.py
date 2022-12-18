@@ -20,6 +20,9 @@ class VBO:
         self.vbos["parets"] = ParetsVBO(app)
         self.vbos['ombres_esferes'] = OmbresEsferes(app)
         self.vbos['jukebox'] = JukeboxVBO(app)
+        self.vbos['counter'] = CounterVBO(app)
+        self.vbos['barchair'] = BarchairVBO(app)
+
 
     def destroy(self):
         [vbo.destroy() for vbo in self.vbos.values()]
@@ -975,6 +978,44 @@ class JukeboxVBO(BaseVBO):
     
     def get_vertex_data(self):
         Objs = pywavefront.Wavefront("textures/jukebox.obj", cache=True, parse=True)
+        Obj = Objs.materials.popitem()[1]
+        vertex_data = Obj.vertices
+        vertex_data = np.array(vertex_data,dtype="f4")
+        
+        return vertex_data
+
+class CounterVBO(BaseVBO):
+    def __init__(self,app):
+        super().__init__(app.ctx)
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal","in_position"]
+
+    @staticmethod
+    def get_data(vertices, indices):
+        data = [vertices[ind] for triangle in indices for ind in triangle]
+        return np.array(data, dtype="f4")
+    
+    def get_vertex_data(self):
+        Objs = pywavefront.Wavefront("textures/counter.obj", cache=True, parse=True)
+        Obj = Objs.materials.popitem()[1]
+        vertex_data = Obj.vertices
+        vertex_data = np.array(vertex_data,dtype="f4")
+        
+        return vertex_data
+
+class BarchairVBO(BaseVBO):
+    def __init__(self,app):
+        super().__init__(app.ctx)
+        self.format = "2f 3f 3f"
+        self.attrib = ["in_texcoord_0", "in_normal","in_position"]
+
+    @staticmethod
+    def get_data(vertices, indices):
+        data = [vertices[ind] for triangle in indices for ind in triangle]
+        return np.array(data, dtype="f4")
+    
+    def get_vertex_data(self):
+        Objs = pywavefront.Wavefront("textures/barchair.obj", cache=True, parse=True)
         Obj = Objs.materials.popitem()[1]
         vertex_data = Obj.vertices
         vertex_data = np.array(vertex_data,dtype="f4")
