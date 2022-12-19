@@ -61,10 +61,6 @@ class Scene:
         ombra2 = OmbresEsferes(app, pos=(second_sphere_position[0], second_sphere_position[1] - 0.9, second_sphere_position[2]))
         ombra3 = OmbresEsferes(app, pos=(third_sphere_position[0], third_sphere_position[1] - 0.9, third_sphere_position[2]))
 
-        add(ombra1)
-        add(ombra2)
-        add(ombra3)
-
         add_ball(Sphere(app, pos=first_sphere_position, tex_id="sphere1",id = 1, ombra=ombra1))
         add_ball(Sphere(app, pos=second_sphere_position, tex_id="sphere2",id = 2, ombra=ombra2))
         add_ball(Sphere(app, pos=third_sphere_position, tex_id="sphere3",id = 3, ombra=ombra3))
@@ -100,6 +96,11 @@ class Scene:
         add(Barchair(app, pos=(-14,-4,24),scale = (5,5,5), tex_id = 14))
         add(Barchair(app, pos=(-14,-4,36),scale = (5,5,5), tex_id = 14))
 
+        # Han de ser els ultims objectes
+        add(ombra1)
+        add(ombra2)
+        add(ombra3)
+
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
     def load_decision_starting(self):
@@ -122,10 +123,6 @@ class Scene:
         ombra2 = OmbresEsferes(app, pos=(pos_sphere_2[0], pos_sphere_2[1] - 0.9, pos_sphere_2[2]))
         ombra3 = OmbresEsferes(app, pos=(pos_sphere_3[0], pos_sphere_3[1] - 0.9, pos_sphere_3[2]))
 
-        add(ombra1)
-        add(ombra2)
-        add(ombra3)
-
         add_ball(Sphere(app, pos=pos_sphere_1, tex_id="sphere1",id = 1, ombra=ombra1))
         add_ball(Sphere(app, pos=pos_sphere_2, tex_id="sphere2",id = 2, ombra=ombra2))
 
@@ -145,6 +142,11 @@ class Scene:
         add(Barchair(app, pos=(-14,-4,12),scale = (5,5,5), tex_id = 14))
         add(Barchair(app, pos=(-14,-4,24),scale = (5,5,5), tex_id = 14))
         add(Barchair(app, pos=(-14,-4,36),scale = (5,5,5), tex_id = 14))
+
+        # Han de ser els ultims objectes
+        add(ombra1)
+        add(ombra2)
+        add(ombra3)
 
         self.all_objects = self.table_objects + self.ball_objects + [self.cue,self.line]
 
@@ -173,7 +175,7 @@ class Scene:
     def replay_render(self):
         # Render table + special render spheres
 
-        for obj in self.table_objects:
+        for obj in self.table_objects[:-3]:
             obj.render()
 
         for sphere in self.ball_objects:
