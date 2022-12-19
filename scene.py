@@ -13,6 +13,8 @@ class Scene:
         self.ball_objects = []
         self.cue = None
         self.line = None
+        self.skybox = SkyBox(app)
+
         # depth buffer
         self.depth_texture = self.mesh.texture.textures['depth_texture']
         self.depth_fbo = self.ctx.framebuffer(depth_attachment=self.depth_texture)
@@ -30,6 +32,8 @@ class Scene:
         for sphere in self.ball_objects:
             sphere.render_shadow()
         
+        self.skybox.render()
+
 
     def add_object(self, obj):
         self.table_objects.append(obj)
@@ -164,12 +168,16 @@ class Scene:
         for sphere in self.ball_objects:
             sphere.render()
 
+        self.skybox.render()
+
 
     def render_with_cue(self):
         # Render table + spheres + cue
 
         for obj in self.all_objects:
             obj.render()
+
+        self.skybox.render()
 
 
     def replay_render(self):
@@ -181,3 +189,4 @@ class Scene:
         for sphere in self.ball_objects:
             sphere.replay_render()
         
+        self.skybox.render()

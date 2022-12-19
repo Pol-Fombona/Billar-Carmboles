@@ -79,6 +79,10 @@ class VAO:
             vbo=self.vbo.vbos['barchair']
         )
 
+        self.vaos["skybox"] = self.get_vao(program=self.program.programs["skybox"],
+            vbo=self.vbo.vbos["skybox"]   
+        )
+
     def get_vao(self, program, vbo):
         vao = self.ctx.vertex_array(program, [(vbo.vbo, vbo.format, *vbo.attrib)], skip_errors=True)
 

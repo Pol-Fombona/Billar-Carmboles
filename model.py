@@ -247,6 +247,22 @@ class Cue(BaseModel):
         self.program["m_view"].write(self.app.camera.m_view)
         self.program["m_model"].write(self.m_model)
 
+class SkyBox(BaseModel):
+    def __init__(self,app, vao_name='skybox',tex_id='skybox', pos=(0,0,0), rot=(0,0,0),scale=(1,1,1)):
+        super().__init__(app, vao_name,tex_id, pos, rot,scale)
+        self.on_init()
+    
+    def update(self):
+        m_view = glm.mat4(glm.mat3(self.camera.m_view))
+        self.program['m_invProjView'].write(glm.inverse(self.camera.m_proj * m_view))
+        
+        
+    def on_init(self):
+        self.texture= self.app.mesh.texture.textures[self.tex_id]
+        self.program["u_texture_skybox"] = 0
+        self.texture.use(location=0)
+
+        
 class Terra(BaseModel):
     def __init__(
         self, 

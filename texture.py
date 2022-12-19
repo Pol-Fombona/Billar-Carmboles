@@ -19,6 +19,7 @@ class Texture:
         self.textures[12] = self.get_texture(path="textures/jukebox.jpg")
         self.textures[13] = self.get_texture(path="textures/counter.png")
         self.textures[14] = self.get_texture(path="textures/barchair.png")
+        self.textures['skybox'] = self.get_texture_cube(dir_path = 'textures/', ext='png')
 
         # Spheres  [https://sharecg.com/v/12975/view/6/Texture/Billiard-Ball-N%B0-10]
         self.textures["sphere1"] = self.get_texture(path="textures/spheres/sphere (1).jpg")

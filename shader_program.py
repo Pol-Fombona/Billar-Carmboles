@@ -19,6 +19,7 @@ class ShaderProgram:
         self.programs['jukebox'] = self.get_program('jukebox')
         self.programs['counter'] = self.get_program('counter')
         self.programs['barchair'] = self.get_program('barchair')
+        self.programs['skybox'] = self.get_program('skybox')
 
 
     def get_program(self, shader_program_name):

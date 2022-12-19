@@ -22,6 +22,7 @@ class VBO:
         self.vbos['jukebox'] = JukeboxVBO(app)
         self.vbos['counter'] = CounterVBO(app)
         self.vbos['barchair'] = BarchairVBO(app)
+        self.vbos['skybox'] = SkyBoxVBO(app)
 
 
     def destroy(self):
@@ -753,6 +754,22 @@ class SostreVBO(BaseVBO):
         vertex_data = np.hstack([tex_coord_data, vertex_data])
         
         return vertex_data
+
+class SkyBoxVBO(BaseVBO):
+    def __init__(self, app):
+        super().__init__(app.ctx)
+        self.format = '3f'
+        self.attrib=['in_position']
+        
+    
+    def get_vertex_data(self):
+        z= 0.9999
+
+        vertices = [(-1,-1,z),(1,1,z),(-1,1,z),(-1,-1,z),(1,-1,z),(1,1,z)]
+                
+        vertex_data = np.array(vertices,dtype="f4" )
+        return vertex_data
+
 
 class LineVBO(BaseVBO):
     def __init__(self, app):
