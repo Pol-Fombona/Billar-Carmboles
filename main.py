@@ -770,6 +770,7 @@ class Menu:
         self.typeGame = "FreeCarambole"
         self.max_score = 10
         self.max_turn = 25
+        self.friction = 20
         self.bool_replay = False
         self.bool_graphics = False
 
@@ -878,12 +879,13 @@ class Menu:
         self.menu.add.button('Back', self.on_init)
     def change_friction(self):
         self.menu.clear()
-        self.menu.add.range_slider('Choose a value', 1, (0, 100), 1,
+        self.menu.add.range_slider('Choose a value', self.friction, (0, 100), 1,
                       rangeslider_id='range_slider',
                       value_format=lambda x: str(int(x)), onchange=(self.apply_friction))
         self.menu.add.button('Back', self.select_options)
     
-    def apply_friction(self,friction = 1):
+    def apply_friction(self,friction = 20):
+        self.friction = friction
         MovementManagement.friction = round(friction / 2000 , 2)
 
     def change_speed(self):
@@ -1068,7 +1070,7 @@ class Menu:
     
     def change_friction_pause(self):
         self.menu.clear()
-        self.menu.add.range_slider('Choose a value', 1, (0, 100), 1,
+        self.menu.add.range_slider('Choose a value', self.friction, (0, 100), 1,
                       rangeslider_id='range_slider',
                       value_format=lambda x: str(int(x)), onchange=(self.apply_friction))
         self.menu.add.button('Back', self.select_options_pause)
