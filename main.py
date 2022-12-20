@@ -884,7 +884,7 @@ class Menu:
         self.menu.add.button('Back', self.select_options)
     
     def apply_friction(self,friction = 1):
-        MovementManagement.friction = round(friction / 100 , 2)
+        MovementManagement.friction = round(friction / 2000 , 2)
 
     def change_speed(self):
         self.menu.clear()
@@ -1061,7 +1061,7 @@ class Menu:
         self.menu.add.button('Friction', self.change_friction_pause)
         self.menu.add.button('Game Speed', self.change_speed_pause)
         if self.game_engine.app.game.getTurnStatus() != "initial":
-            print(self.game_engine.app.game.getTurnStatus())
+            #print(self.game_engine.app.game.getTurnStatus())
             self.menu.add.button('Undo Turn', self.undo_move)
         self.menu.add.button('Show Controls', self.show_controls_pause)
         self.menu.add.button('Back', self.pause_menu)
