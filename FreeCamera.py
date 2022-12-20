@@ -15,7 +15,7 @@ class Camera:
 
         self.FOV = 50
         self.near = 0.1
-        self.far = 500
+        self.far = 1000
         self.speed = 0.05
         self.sensivity = 0.15
 
