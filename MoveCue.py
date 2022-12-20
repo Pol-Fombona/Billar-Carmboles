@@ -77,3 +77,4 @@ def manage_move(cue):
                 cue.state = "stop"
                 cue_hit_ball(cue, cue.app.game.current_player.ball)
                 cue.moving = True
+                cue.app.sound.playSound([cue.app.game.current_player.ball,cue.axis],3)

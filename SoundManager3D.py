@@ -82,9 +82,16 @@ class SoundManager:
             pos = list(ti/2 for ti in balls[0].pos+balls[1].pos)
             ref_dist = float(np.sqrt((balls[1].velocity[0]-balls[0].velocity[0])**2 +
             (balls[1].velocity[2]-balls[0].velocity[2])**2))+0.4
+            rolloff = 0.1
+        elif effect == 3:
+            pos = balls[0].pos
+            ref_dist = float(np.sqrt((balls[1][0]-balls[0].pos[0])**2 +
+            (balls[1][2]-balls[0].pos[2])**2))+0.8   
+            rolloff = 0.05
         elif effect == 2:
             pos = balls[1]
             ref_dist  = float(np.sqrt(balls[0].velocity[0]**2+balls[0].velocity[2]**2))+0.5
+            rolloff = 0.1
         looping = False
-        rolloff = 0.25
+        #rolloff = 0.25
         self.dict_sounds[balls[0].id][effect].play(looping,pos,rolloff, ref_dist)
