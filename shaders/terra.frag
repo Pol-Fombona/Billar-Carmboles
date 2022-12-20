@@ -44,9 +44,9 @@ vec3 getLight(vec3 color){
     float spec = pow(max(dot(viewDir, reflectDir), 0), 12);
     float spec2 = pow(max(dot(viewDir, reflectDir2), 0), 12);
     float spec3 = pow(max(dot(viewDir, reflectDir3), 0), 12);
-    vec3 specular = spec * light.Is * 0.8;
-    vec3 specular2 = spec2 * light2.Is * 0.8;
-    vec3 specular3 = spec3 * light3.Is * 0.8;
+    vec3 specular = spec * light.Is * 0.2;
+    vec3 specular2 = spec2 * light2.Is * 0.2;
+    vec3 specular3 = spec3 * light3.Is * 0.2;
 
     return color * (ambient + diffuse + specular + ambient2 + diffuse2 + specular2 + ambient3 + diffuse3 + specular3);
 }
