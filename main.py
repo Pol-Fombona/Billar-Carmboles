@@ -920,6 +920,7 @@ class Menu:
 
     def show_controls(self):
         self.menu.clear()
+        self.menu.add.label("Hit ball: SPACE\nRotate cue: J/K\nChange camera: B\nEnable/disable music: M\nReset position: P\nPause: ESC")
         self.menu.add.button('Back', self.select_options) 
 
     def start_the_game(self):
@@ -1095,6 +1096,7 @@ class Menu:
 
     def show_controls_pause(self):
         self.menu.clear()
+        self.menu.add.label("Hit ball: SPACE\nRotate cue: J/K\nChange camera: B\nEnable/disable music: M\nReset position: P\nPause: ESC")
         self.menu.add.button('Back', self.select_options_pause) 
 
     def display_menu_winner(self):
